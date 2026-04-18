@@ -1,58 +1,313 @@
 <!DOCTYPE html>
 <html lang="de"><head><meta charset="UTF-8"><title>Vermietung · Real Estate 2.0</title>
-<script src="https://cdn.tailwindcss.com"></script></head>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .listing-card { cursor:pointer; transition: transform .15s, box-shadow .15s; }
+  .listing-card:hover { transform:translateY(-3px); box-shadow:0 12px 32px -8px rgba(0,0,0,.18); }
+  .thumb { object-fit:cover; width:100%; height:100%; }
+  .gallery-img { cursor:pointer; object-fit:cover; transition: opacity .15s; }
+  .gallery-img:hover { opacity:.85; }
+  .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center; }
+  .modal-img { max-width:90vw; max-height:88vh; border-radius:8px; object-fit:contain; }
+  [data-listing]:not(.active-listing) { display:none; }
+  .score-a { background:#d1fae5; color:#065f46; }
+  .score-b { background:#fef3c7; color:#92400e; }
+  .score-c { background:#fee2e2; color:#991b1b; }
+</style>
+</head>
 <body class="bg-slate-50 min-h-screen" data-page="listings">
 <main class="p-8">
-  <div class="mb-6">
-    <div class="text-sm text-slate-500">Automatisierte Vermietung</div>
-    <h1 class="text-3xl font-bold text-slate-900">Inserate &amp; Bewerbungen</h1>
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <div class="text-sm text-slate-500">Automatisierte Vermietung</div>
+      <h1 class="text-3xl font-bold text-slate-900">Inserate &amp; Bewerbungen</h1>
+    </div>
+    <div class="flex gap-2">
+      <select class="border border-slate-300 rounded-lg px-3 py-2 text-sm" id="obj-filter" onchange="filterObj(this.value)">
+        <option value="all">Alle Objekte</option>
+        <option value="rosengasse14">Rosengasse 14, Zürich</option>
+        <option value="seestrasse88">Seestrasse 88, Horgen</option>
+        <option value="bahnhofstr5">Bahnhofstr. 5, St. Gallen</option>
+        <option value="laenggasse22">Länggasse 22, Bern</option>
+      </select>
+      <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm">+ Neues Inserat</button>
+    </div>
   </div>
 
-  <div class="grid grid-cols-3 gap-6 mb-6">
-    <div class="bg-white rounded-xl p-5 border border-slate-200"><div class="text-xs text-slate-500">Aktive Inserate</div><div class="text-3xl font-bold">12</div><div class="text-xs text-slate-500 mt-1">auf 7 Portalen publiziert</div></div>
-    <div class="bg-white rounded-xl p-5 border border-slate-200"><div class="text-xs text-slate-500">Eingehende Bewerbungen (7 Tage)</div><div class="text-3xl font-bold">147</div><div class="text-xs text-emerald-600 mt-1">→ 23 Shortlist nach KI-Screening</div></div>
-    <div class="bg-white rounded-xl p-5 border border-slate-200"><div class="text-xs text-slate-500">Ø Time-to-Rent</div><div class="text-3xl font-bold">11 Tage</div><div class="text-xs text-slate-500 mt-1">Branchenschnitt: 38 Tage</div></div>
+  <!-- KPIs -->
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="bg-white rounded-xl p-5 border border-slate-200">
+      <div class="text-xs text-slate-500">Aktive Inserate</div>
+      <div class="text-3xl font-bold">4</div>
+      <div class="text-xs text-slate-500 mt-1">auf 7 Portalen publiziert</div>
+    </div>
+    <div class="bg-white rounded-xl p-5 border border-slate-200">
+      <div class="text-xs text-slate-500">Bewerbungen (7 Tage)</div>
+      <div class="text-3xl font-bold">147</div>
+      <div class="text-xs text-emerald-600 mt-1">→ 23 Shortlist nach KI-Screening</div>
+    </div>
+    <div class="bg-white rounded-xl p-5 border border-slate-200">
+      <div class="text-xs text-slate-500">Ø Time-to-Rent</div>
+      <div class="text-3xl font-bold">11 Tage</div>
+      <div class="text-xs text-slate-500 mt-1">Branchenschnitt: 38 Tage</div>
+    </div>
   </div>
 
+  <!-- Listing cards overview -->
+  <div class="grid grid-cols-4 gap-4 mb-8" id="cards-grid"></div>
+
+  <!-- Detail panel -->
   <div class="grid grid-cols-3 gap-6">
-    <div class="col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden">
-      <div class="p-5 border-b border-slate-200 flex items-center justify-between"><h3 class="font-semibold">Inserat · 3.5 Zi Rosengasse 14</h3><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">Live</span></div>
-      <div class="grid grid-cols-2">
-        <div class="bg-gradient-to-br from-slate-200 to-slate-300 h-72 flex items-center justify-center text-slate-500">🏙️  Objektbild · KI-optimiert</div>
-        <div class="p-6">
-          <div class="text-xs text-slate-500 mb-1">Bruttomiete</div>
-          <div class="text-2xl font-bold text-slate-900 mb-4">CHF 2'650<span class="text-sm font-normal text-slate-500">/Mt.</span></div>
-          <div class="text-xs text-slate-500 mb-1">KI-generiertes Exposé</div>
-          <p class="text-sm text-slate-700 mb-4">Helle 3.5-Zimmer-Wohnung im 3. OG mit Blick über die Limmat. Kernsaniert 2019, moderne Küche, Parkett, Balkon Süd…</p>
-          <div class="space-y-2 text-xs">
-            <div class="flex justify-between"><span class="text-slate-500">Homegate</span><span class="text-emerald-600">✓ publiziert</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">ImmoScout24</span><span class="text-emerald-600">✓ publiziert</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Flatfox</span><span class="text-emerald-600">✓ publiziert</span></div>
-            <div class="flex justify-between"><span class="text-slate-500">Newhome</span><span class="text-emerald-600">✓ publiziert</span></div>
+    <!-- Left: photos + info -->
+    <div class="col-span-2 space-y-5">
+
+      <!-- Photo gallery -->
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden" id="listing-detail">
+        <div class="flex items-center justify-between px-5 pt-4 pb-3 border-b border-slate-100">
+          <div>
+            <h3 class="font-semibold text-slate-900" id="detail-title">3.5-Zi Rosengasse 14</h3>
+            <div class="text-xs text-slate-500" id="detail-sub">Zürich · 82 m² · 3. OG</div>
           </div>
+          <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">Live</span>
+        </div>
+
+        <!-- Main photo -->
+        <div class="relative overflow-hidden" style="height:300px">
+          <img id="main-photo" src="" alt="Hauptfoto" class="w-full h-full object-cover" onclick="openLightbox(this.src)">
+          <div class="absolute bottom-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded">
+            <span id="photo-idx">1</span> / <span id="photo-total">5</span>
+          </div>
+          <button onclick="prevPhoto()" class="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-9 h-9 rounded-full text-lg hover:bg-black/60">‹</button>
+          <button onclick="nextPhoto()" class="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 text-white w-9 h-9 rounded-full text-lg hover:bg-black/60">›</button>
+        </div>
+
+        <!-- Thumbnails -->
+        <div class="flex gap-2 p-3 overflow-x-auto" id="thumb-row"></div>
+
+        <!-- Key facts -->
+        <div class="grid grid-cols-4 gap-4 p-5 border-t border-slate-100 text-center text-sm" id="detail-facts">
+          <div><div class="text-2xl font-bold text-slate-900" id="fact-miete">CHF 2'650</div><div class="text-xs text-slate-500">Bruttomiete</div></div>
+          <div><div class="text-2xl font-bold text-slate-900" id="fact-zi">3.5</div><div class="text-xs text-slate-500">Zimmer</div></div>
+          <div><div class="text-2xl font-bold text-slate-900" id="fact-m2">82</div><div class="text-xs text-slate-500">m²</div></div>
+          <div><div class="text-2xl font-bold text-slate-900" id="fact-verfueg">01.07.26</div><div class="text-xs text-slate-500">Verfügbar ab</div></div>
+        </div>
+
+        <!-- Description -->
+        <div class="px-5 pb-4 text-sm text-slate-700" id="detail-desc"></div>
+
+        <!-- Portals -->
+        <div class="px-5 pb-5">
+          <div class="text-xs text-slate-500 mb-2">Publiziert auf</div>
+          <div class="flex gap-2 flex-wrap" id="portal-badges"></div>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl p-6 border border-slate-200">
-      <h3 class="font-semibold text-slate-900 mb-4">Bewerber-Shortlist (KI-Screening)</h3>
-      <div class="space-y-3">
-        <div class="border border-emerald-200 bg-emerald-50 rounded-lg p-3">
-          <div class="flex items-center justify-between mb-1"><div class="font-medium text-sm">Anna Keller, 34</div><span class="text-xs font-bold text-emerald-700">Score 94</span></div>
-          <div class="text-xs text-slate-600">Angestellt · CHF 9'200/Mt · Betreibungsregister clean · Referenzen ✓</div>
-          <div class="mt-2 flex gap-1"><button class="text-xs bg-emerald-600 text-white px-2 py-1 rounded">Einladen</button><button class="text-xs border border-slate-300 px-2 py-1 rounded">Details</button></div>
+    <!-- Right: applicants -->
+    <div class="space-y-5">
+      <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-slate-900">KI-Shortlist</h3>
+          <span class="text-xs text-slate-500" id="shortlist-count">23 / 147</span>
         </div>
-        <div class="border border-slate-200 rounded-lg p-3">
-          <div class="flex items-center justify-between mb-1"><div class="font-medium text-sm">Marco Rossi, 42</div><span class="text-xs font-bold text-slate-600">Score 81</span></div>
-          <div class="text-xs text-slate-600">Selbständig · 3-J. Durchschnitt OK · 1 Betreibung (erledigt)</div>
-        </div>
-        <div class="border border-slate-200 rounded-lg p-3">
-          <div class="flex items-center justify-between mb-1"><div class="font-medium text-sm">Familie Schmid</div><span class="text-xs font-bold text-slate-600">Score 76</span></div>
-          <div class="text-xs text-slate-600">2 Einkommen · noch Referenzcheck ausstehend</div>
-        </div>
+        <div class="space-y-3" id="shortlist"></div>
       </div>
-      <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500">Screening: Einkommen, Betreibung, Referenzen, Social-Proof, Nachhaltigkeitsmatch. Diskriminierungsfrei (Audit-Log aktiv).</div>
     </div>
   </div>
 </main>
-<script src="_layout.js"></script></body></html>
+
+<!-- Lightbox -->
+<div id="lightbox" class="modal-overlay hidden" onclick="closeLightbox()">
+  <img id="lightbox-img" class="modal-img" src="" alt="">
+  <button onclick="closeLightbox()" style="position:fixed;top:20px;right:24px;background:rgba(255,255,255,.15);color:white;border:none;font-size:28px;cursor:pointer;border-radius:50%;width:40px;height:40px">×</button>
+</div>
+
+<script src="_layout.js"></script>
+<script>
+/* ── Listing data ── */
+const LISTINGS = [
+  {
+    id: 'rg14-302',
+    obj: 'rosengasse14',
+    title: '3.5-Zi Rosengasse 14, Zürich',
+    sub: 'Zürich Altstadt · 82 m² · 3. OG Süd',
+    miete: "CHF 2'650", zi: '3.5', m2: '82', verfueg: '01.07.26',
+    status: 'live',
+    desc: 'Helle 3.5-Zimmer-Wohnung im 3. Obergeschoss mit Blick über die Dächer der Altstadt. Kernsaniert 2019 – offene Küche mit Inselkocherfeld, Eiche-Parkett, Badezimmer mit ebenerdiger Dusche. Grosszügiger Balkon nach Süden, Lift im Haus. Sehr ruhige Lage, 3 Min. zum HB Zürich.',
+    photos: [
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=900&q=80',
+    ],
+    portals: ['Homegate ✓', 'ImmoScout24 ✓', 'Flatfox ✓', 'Newhome ✓'],
+    applicants: [
+      { name:'Anna Keller',   score:94, cls:'score-a', info:'Angestellt · CHF 9\'200/Mt · Betreibung clean' },
+      { name:'Marco Rossi',   score:81, cls:'score-b', info:'Selbständig · 3-J. Ø OK · 1 Betreibung erledigt' },
+      { name:'Fam. Brunner',  score:76, cls:'score-b', info:'2 Einkommen · Referenzcheck ausstehend' },
+    ],
+  },
+  {
+    id: 'ss88-207',
+    obj: 'seestrasse88',
+    title: '4.5-Zi Seestrasse 88, Horgen',
+    sub: 'Horgen Seequartier · 104 m² · 2. OG',
+    miete: "CHF 3'840", zi: '4.5', m2: '104', verfueg: '01.08.26',
+    status: 'live',
+    desc: 'Grosszügige 4.5-Zimmer-Wohnung mit Seeblick im 2. OG. Moderne Küche, helles Wohnzimmer mit Parkettboden, zwei Nasszellen, Schlafzimmer mit Einbauschränken. Grosser Balkon Richtung See. Tiefgaragen-PP inklusive.',
+    photos: [
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=900&q=80',
+    ],
+    portals: ['Homegate ✓', 'ImmoScout24 ✓', 'Comparis ✓'],
+    applicants: [
+      { name:'Sarah Meier',   score:91, cls:'score-a', info:'Ärztin · CHF 14\'000/Mt · Top-Referenzen' },
+      { name:'Fam. Steiner',  score:84, cls:'score-a', info:'2 Einkommen · CHF 18\'400/Mt · clean' },
+      { name:'Lars Huber',    score:68, cls:'score-b', info:'Freelancer · Einkommen unregelmässig' },
+    ],
+  },
+  {
+    id: 'bh5-312',
+    obj: 'bahnhofstr5',
+    title: '2.5-Zi Bahnhofstr. 5, St. Gallen',
+    sub: 'St. Gallen Zentrum · 58 m² · 3. OG',
+    miete: "CHF 1'890", zi: '2.5', m2: '58', verfueg: '15.06.26',
+    status: 'live',
+    desc: 'Kompakte 2.5-Zimmer-Wohnung, ideal für Einzelpersonen oder Paare. Frisch renoviert, neue Küche und Bad, Parkettboden. Ruhige Innenhof-Lage, sehr gute ÖV-Anbindung direkt beim Hauptbahnhof.',
+    photos: [
+      'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=900&q=80',
+    ],
+    portals: ['Homegate ✓', 'ImmoScout24 ✓', 'Flatfox ✓'],
+    applicants: [
+      { name:'Jonas Wirth',   score:88, cls:'score-a', info:'Student / Werkstudent · Eltern als Bürgen' },
+      { name:'Nina Bosch',    score:83, cls:'score-a', info:'Angestellt · CHF 6\'200/Mt · clean' },
+    ],
+  },
+  {
+    id: 'lg22-405',
+    obj: 'laenggasse22',
+    title: '3.5-Zi Länggasse 22, Bern',
+    sub: 'Bern Länggasse · 78 m² · 4. OG',
+    miete: "CHF 2'280", zi: '3.5', m2: '78', verfueg: 'sofort',
+    status: 'live',
+    desc: 'Sonnige 3.5-Zimmer-Wohnung im Studentenquartier Länggasse, 10 Min. zur Uni Bern. Renoviertes Bad, offene Küche, Dachterrassen-Aussicht. Keller und Veloraum inklusive. Seit 67 Tagen leer — Preis verhandelbar.',
+    photos: [
+      'https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80',
+      'https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=900&q=80',
+    ],
+    portals: ['Homegate ✓', 'ImmoScout24 ✓', 'Newhome ✓', 'WGZimmer ✓'],
+    applicants: [
+      { name:'Tobias Graf',   score:79, cls:'score-b', info:'Angestellt · CHF 5\'800/Mt · 1 älte Betreibung' },
+    ],
+  },
+];
+
+/* ── State ── */
+let activeListing = LISTINGS[0];
+let photoIdx = 0;
+
+/* ── Render cards ── */
+function renderCards(filter) {
+  const grid = document.getElementById('cards-grid');
+  const list = filter === 'all' ? LISTINGS : LISTINGS.filter(l => l.obj === filter);
+  grid.innerHTML = list.map((l,i) => `
+    <div class="listing-card bg-white rounded-xl overflow-hidden border border-slate-200 ${l.id===activeListing.id?'ring-2 ring-indigo-500':''}"
+         onclick="selectListing('${l.id}')">
+      <div style="height:140px;overflow:hidden">
+        <img src="${l.photos[0]}" alt="${l.title}" class="thumb">
+      </div>
+      <div class="p-3">
+        <div class="font-semibold text-sm text-slate-900 leading-tight mb-0.5">${l.zi}-Zi · ${l.m2} m²</div>
+        <div class="text-xs text-slate-500 truncate">${l.sub.split('·')[0].trim()}</div>
+        <div class="font-bold text-indigo-600 mt-2">${l.miete}</div>
+        <div class="mt-2 flex justify-between items-center">
+          <span class="text-xs text-slate-500">ab ${l.verfueg}</span>
+          <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">Live</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── Render detail ── */
+function renderDetail(l) {
+  photoIdx = 0;
+  document.getElementById('detail-title').textContent = l.title;
+  document.getElementById('detail-sub').textContent   = l.sub;
+  document.getElementById('fact-miete').textContent   = l.miete;
+  document.getElementById('fact-zi').textContent      = l.zi;
+  document.getElementById('fact-m2').textContent      = l.m2 + ' m²';
+  document.getElementById('fact-verfueg').textContent = l.verfueg;
+  document.getElementById('detail-desc').textContent  = l.desc;
+  document.getElementById('photo-total').textContent  = l.photos.length;
+  updateMainPhoto(l);
+
+  // Thumbnails
+  document.getElementById('thumb-row').innerHTML = l.photos.map((p,i) => `
+    <img src="${p}" onclick="jumpPhoto(${i})" class="gallery-img flex-shrink-0 rounded-md border-2 ${i===0?'border-indigo-500':'border-transparent'}"
+         style="width:72px;height:54px;object-fit:cover">`).join('');
+
+  // Portals
+  document.getElementById('portal-badges').innerHTML = l.portals.map(p =>
+    `<span class="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded">${p}</span>`).join('');
+
+  // Shortlist
+  document.getElementById('shortlist-count').textContent = `${l.applicants.length} / ${l.applicants.length + 8} Bewerbungen`;
+  document.getElementById('shortlist').innerHTML = l.applicants.map((a,i) => `
+    <div class="border border-slate-200 rounded-lg p-3 hover:bg-slate-50 cursor-pointer">
+      <div class="flex items-center justify-between mb-1">
+        <div class="font-medium text-sm">${a.name}</div>
+        <span class="text-xs font-bold px-2 py-0.5 rounded ${a.cls}">Score ${a.score}</span>
+      </div>
+      <div class="text-xs text-slate-600">${a.info}</div>
+      ${i===0 ? `<div class="mt-2 flex gap-1">
+        <button class="text-xs bg-emerald-600 text-white px-2 py-1 rounded">Einladen</button>
+        <button class="text-xs border border-slate-300 px-2 py-1 rounded">Details</button>
+      </div>` : ''}
+    </div>`).join('');
+}
+
+function updateMainPhoto(l) {
+  const img = document.getElementById('main-photo');
+  img.src = l.photos[photoIdx];
+  document.getElementById('photo-idx').textContent = photoIdx + 1;
+  document.querySelectorAll('#thumb-row img').forEach((t,i) => {
+    t.classList.toggle('border-indigo-500', i===photoIdx);
+    t.classList.toggle('border-transparent', i!==photoIdx);
+  });
+}
+
+function nextPhoto() { photoIdx = (photoIdx+1) % activeListing.photos.length; updateMainPhoto(activeListing); }
+function prevPhoto() { photoIdx = (photoIdx-1+activeListing.photos.length) % activeListing.photos.length; updateMainPhoto(activeListing); }
+function jumpPhoto(i) { photoIdx = i; updateMainPhoto(activeListing); }
+
+function selectListing(id) {
+  activeListing = LISTINGS.find(l=>l.id===id) || LISTINGS[0];
+  renderDetail(activeListing);
+  renderCards(document.getElementById('obj-filter').value); // re-render to update ring
+}
+
+function filterObj(val) {
+  renderCards(val);
+}
+
+/* ── Lightbox ── */
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.remove('hidden');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.add('hidden');
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeLightbox(); });
+
+/* ── Init ── */
+renderCards('all');
+renderDetail(activeListing);
+</script>
+</body></html>

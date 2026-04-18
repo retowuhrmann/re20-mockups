@@ -93,7 +93,7 @@
       </div>
       <table class="w-full text-sm" id="obj-table">
         <thead class="text-xs text-slate-500 uppercase tracking-wide border-b border-slate-200">
-          <tr><th class="text-left pb-2">Objekt</th><th class="text-right pb-2">Einh.</th><th class="text-right pb-2">Leerstand</th><th class="text-right pb-2">Rendite</th><th class="text-right pb-2">Status</th></tr>
+          <tr><th class="text-left pb-2" colspan="2">Objekt</th><th class="text-right pb-2">Einh.</th><th class="text-right pb-2">Leerstand</th><th class="text-right pb-2">Rendite</th><th class="text-right pb-2">Status</th></tr>
         </thead>
         <tbody id="obj-tbody"></tbody>
       </table>
@@ -109,10 +109,14 @@
 <script src="_layout.js"></script>
 <script>
 const OBJECTS = [
-  { id:'rosengasse14', label:'Rosengasse 14, Zürich',     einh:48,  leer:'0%',   leerCls:'text-emerald-600', rendite:'4.2%', mandant:'mueller', alerts:1 },
-  { id:'seestrasse88', label:'Seestrasse 88, Horgen',     einh:32,  leer:'3.1%', leerCls:'text-amber-600',   rendite:'3.9%', mandant:'mueller', alerts:2 },
-  { id:'bahnhofstr5',  label:'Bahnhofstr. 5, St. Gallen', einh:64,  leer:'1.5%', leerCls:'text-emerald-600', rendite:'4.6%', mandant:'pk',       alerts:0 },
-  { id:'laenggasse22', label:'Länggasse 22, Bern',        einh:28,  leer:'7.1%', leerCls:'text-rose-600',    rendite:'3.1%', mandant:'stiftung', alerts:1 },
+  { id:'rosengasse14', label:'Rosengasse 14, Zürich',     einh:48,  leer:'0%',   leerCls:'text-emerald-600', rendite:'4.2%', mandant:'mueller', alerts:1,
+    img:'https://images.unsplash.com/photo-1486325212027-8081e485255e?auto=format&fit=crop&w=120&q=80' },
+  { id:'seestrasse88', label:'Seestrasse 88, Horgen',     einh:32,  leer:'3.1%', leerCls:'text-amber-600',   rendite:'3.9%', mandant:'mueller', alerts:2,
+    img:'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=120&q=80' },
+  { id:'bahnhofstr5',  label:'Bahnhofstr. 5, St. Gallen', einh:64,  leer:'1.5%', leerCls:'text-emerald-600', rendite:'4.6%', mandant:'pk',       alerts:0,
+    img:'https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=120&q=80' },
+  { id:'laenggasse22', label:'Länggasse 22, Bern',        einh:28,  leer:'7.1%', leerCls:'text-rose-600',    rendite:'3.1%', mandant:'stiftung', alerts:1,
+    img:'https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?auto=format&fit=crop&w=120&q=80' },
 ];
 
 const ALERTS = [
@@ -129,6 +133,7 @@ function renderTable(mandant) {
   const tbody = document.getElementById('obj-tbody');
   tbody.innerHTML = rows.map(o => `
     <tr class="obj-row border-b border-slate-100 last:border-0" onclick="goObject('${o.id}')">
+      <td class="py-2 pr-2 w-12"><img src="${o.img}" alt="" class="w-10 h-10 rounded-lg object-cover"></td>
       <td class="py-2.5 font-medium text-indigo-600 hover:underline">${o.label}</td>
       <td class="text-right">${o.einh}</td>
       <td class="text-right ${o.leerCls}">${o.leer}</td>
