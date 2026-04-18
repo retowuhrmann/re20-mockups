@@ -102,4 +102,19 @@
     </div>
   </div>
 </main>
-<script src="_layout.js"></script></body></html>
+<script src="_layout.js"></script>
+<script>
+// Interactive priority filter
+document.addEventListener('DOMContentLoaded', function() {
+  const cards = document.querySelectorAll('.p-3.rounded-lg.border');
+  document.querySelectorAll('[data-prio-filter]')?.forEach(btn => {
+    btn.onclick = () => {
+      const p = btn.dataset.prioFilter;
+      cards.forEach(c => {
+        const badge = c.querySelector('span[class*="bg-rose"], span[class*="bg-amber"], span[class*="bg-slate"]');
+        c.style.display = (!p || !badge || badge.textContent.trim() === p) ? '' : 'none';
+      });
+    };
+  });
+});
+</script></body></html>

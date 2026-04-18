@@ -31,17 +31,17 @@
     <div class="bg-white rounded-xl border border-slate-200 p-5">
       <div class="text-xs text-slate-500 mb-1 mono">rec:hasTenant</div>
       <div class="flex items-center gap-3 mb-3">
-        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-600">AK</div>
+        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-600" data-lease-initials>AK</div>
         <div>
-          <div class="font-bold">Anna Keller</div>
+          <div class="font-bold" data-lease-name>Anna Keller</div>
           <div class="text-xs text-slate-500">*1989 · anna.keller@…</div>
         </div>
       </div>
       <dl class="text-sm space-y-2">
-        <div class="flex justify-between"><dt class="text-slate-500">Beruf</dt><dd>Consultant</dd></div>
-        <div class="flex justify-between"><dt class="text-slate-500">Einkommen (ind.)</dt><dd>CHF 9'200/Mt.</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-500">Beruf</dt><dd data-lease-beruf>Consultant</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-500">Einkommen (ind.)</dt><dd data-lease-einkomm>CHF 9'200/Mt.</dd></div>
         <div class="flex justify-between"><dt class="text-slate-500">Betreibung</dt><dd class="text-emerald-600">clean ✓</dd></div>
-        <div class="flex justify-between"><dt class="text-slate-500">Mieter-Score</dt><dd class="font-semibold">A</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-500">Mieter-Score</dt><dd class="font-semibold" data-lease-score>A</dd></div>
       </dl>
     </div>
 
@@ -61,10 +61,10 @@
     <!-- Financials -->
     <div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-xl p-5 text-white">
       <div class="text-xs text-indigo-200 mb-1">Aktuelle Miete (brutto)</div>
-      <div class="text-4xl font-bold">CHF 2'650</div>
-      <div class="text-xs text-indigo-200 mt-1">netto CHF 2'330 + NK CHF 320</div>
+      <div class="text-4xl font-bold" data-lease-brutto>CHF 2'650</div>
+      <div class="text-xs text-indigo-200 mt-1"><span data-lease-netto>CHF 2'330</span> netto + NK <span data-lease-nk>CHF 320</span></div>
       <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/20 text-xs">
-        <div><div class="text-indigo-200">Kaution</div><div class="font-semibold">CHF 6'990</div></div>
+        <div><div class="text-indigo-200">Kaution</div><div class="font-semibold" data-lease-kaut>CHF 6'990</div></div>
         <div><div class="text-indigo-200">Inkasso-Quote</div><div class="font-semibold">100%</div></div>
         <div><div class="text-indigo-200">Letzte Indexanp.</div><div class="font-semibold">Jan 2024</div></div>
         <div><div class="text-indigo-200">Nächste mögl.</div><div class="font-semibold">Okt 2026</div></div>
@@ -150,4 +150,46 @@
     </div>
   </div>
 </main>
-<script src="_layout.js"></script></body></html>
+<script src="_layout.js"></script>
+<script>
+const LEASES = {
+  'L-1423': { name:'Anna Keller',   initials:'AK', whg:'3.02', zi:'3.5', m2:82, brutto:2650, netto:2330, nk:320, seit:'2022-04-01', score:'A', beruf:'Consultant',     einkomm:'9\'200', kaut:'6\'990', index:'104.7', refzins:'1.75%', letzteAnp:'Jan 2024' },
+  'L-1398': { name:'Marco Rossi',   initials:'MR', whg:'3.03', zi:'4.5', m2:104,brutto:3120, netto:2800, nk:320, seit:'2019-10-01', score:'B', beruf:'Ingenieur',       einkomm:'11\'400',kaut:'8\'400',index:'98.1',  refzins:'1.75%', letzteAnp:'Jan 2023' },
+  'L-1512': { name:'Fam. Schmid',   initials:'FS', whg:'2.08', zi:'4.5', m2:96, brutto:2340, netto:2020, nk:320, seit:'2024-01-15', score:'B', beruf:'2× angestellt',   einkomm:'13\'200',kaut:'6\'060',index:'101.2', refzins:'1.75%', letzteAnp:'—' },
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  const id  = new URLSearchParams(location.search).get('lease') || 'L-1423';
+  const l   = LEASES[id] || LEASES['L-1423'];
+
+  document.querySelector('h1').textContent = `Mietverhältnis ${id}`;
+  document.querySelector('.sb-topbar-lease')?.remove();
+
+  // switcher
+  const bar = document.createElement('div');
+  bar.className = 'flex gap-2 mb-5 flex-wrap text-sm';
+  Object.keys(LEASES).forEach(k => {
+    const d = LEASES[k];
+    const btn = document.createElement('button');
+    btn.textContent = `${k} · ${d.name} · Whg. ${d.whg}`;
+    btn.className = 'px-3 py-1.5 rounded-full text-xs border ' +
+      (k===id ? 'bg-rose-600 text-white border-rose-600' : 'border-slate-300 text-slate-600 hover:border-rose-400');
+    btn.onclick = () => location.href = 'lease-detail.html?lease='+k;
+    bar.appendChild(btn);
+  });
+  document.querySelector('main').insertBefore(bar, document.querySelector('main').firstChild);
+
+  // patch name/details
+  document.querySelectorAll('[data-lease-name]').forEach(el => el.textContent = l.name);
+  document.querySelectorAll('[data-lease-initials]').forEach(el => el.textContent = l.initials);
+  document.querySelectorAll('[data-lease-whg]').forEach(el => el.textContent = l.whg);
+  document.querySelectorAll('[data-lease-brutto]').forEach(el => el.textContent = `CHF ${l.brutto.toLocaleString('de-CH')}`);
+  document.querySelectorAll('[data-lease-netto]').forEach(el => el.textContent = `CHF ${l.netto.toLocaleString('de-CH')}`);
+  document.querySelectorAll('[data-lease-nk]').forEach(el => el.textContent = `CHF ${l.nk}`);
+  document.querySelectorAll('[data-lease-seit]').forEach(el => el.textContent = l.seit);
+  document.querySelectorAll('[data-lease-score]').forEach(el => el.textContent = l.score);
+  document.querySelectorAll('[data-lease-beruf]').forEach(el => el.textContent = l.beruf);
+  document.querySelectorAll('[data-lease-einkomm]').forEach(el => el.textContent = `CHF ${l.einkomm}/Mt.`);
+  document.querySelectorAll('[data-lease-kaut]').forEach(el => el.textContent = `CHF ${l.kaut}`);
+});
+</script></body></html>
