@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><title>Supply Chain · Real Estate 2.0</title>
+<script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-slate-50 min-h-screen" data-page="supply-chain">
+<main class="p-8">
+  <div class="mb-6">
+    <div class="text-sm text-slate-500">Integrierte Supply Chain</div>
+    <h1 class="text-3xl font-bold text-slate-900">Lieferanten &amp; Offerten</h1>
+  </div>
+
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Offerten offen</div><div class="text-2xl font-bold">17</div></div>
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Volumen YTD</div><div class="text-2xl font-bold">CHF 2.4M</div></div>
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Aktive Lieferanten</div><div class="text-2xl font-bold">184</div></div>
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Ø SLA-Erfüllung</div><div class="text-2xl font-bold text-emerald-600">96.3%</div></div>
+  </div>
+
+  <div class="bg-white rounded-xl p-6 border border-slate-200 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold text-slate-900">Aktive Ausschreibung · #RFP-2104 Dachsanierung Länggasse 22</h3>
+      <span class="px-3 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">KI empfiehlt: Lieferant B</span>
+    </div>
+    <table class="w-full text-sm">
+      <thead class="text-xs text-slate-500 uppercase tracking-wide border-b border-slate-200">
+        <tr><th class="text-left py-2">Lieferant</th><th class="text-right py-2">Preis</th><th class="text-right py-2">Termin</th><th class="text-right py-2">Ø SLA</th><th class="text-right py-2">Qualitäts-Score</th><th class="text-right py-2">KI-Score</th><th></th></tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <tr><td class="py-3 font-medium">Dachdecker Alpin AG</td><td class="text-right">CHF 14'200</td><td class="text-right">3 Wo.</td><td class="text-right">92%</td><td class="text-right">4.3 / 5</td><td class="text-right"><span class="px-2 py-0.5 bg-slate-100 rounded">78</span></td><td></td></tr>
+        <tr class="bg-emerald-50"><td class="py-3 font-medium">Meier Dach GmbH ⭐</td><td class="text-right">CHF 13'850</td><td class="text-right">2 Wo.</td><td class="text-right">98%</td><td class="text-right">4.7 / 5</td><td class="text-right"><span class="px-2 py-0.5 bg-emerald-200 text-emerald-800 rounded font-semibold">94</span></td><td><button class="text-xs bg-emerald-600 text-white px-3 py-1 rounded">Vergeben</button></td></tr>
+        <tr><td class="py-3 font-medium">Ziegler &amp; Partner</td><td class="text-right">CHF 12'900</td><td class="text-right">5 Wo.</td><td class="text-right">84%</td><td class="text-right">3.9 / 5</td><td class="text-right"><span class="px-2 py-0.5 bg-slate-100 rounded">71</span></td><td></td></tr>
+      </tbody>
+    </table>
+    <div class="mt-4 text-xs text-slate-500">KI-Score gewichtet Preis (30%), Termin (20%), SLA-Historie (30%), Qualität (20%) – Gewichtung pro Eigentümer konfigurierbar.</div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl p-6 border border-slate-200">
+      <h3 class="font-semibold text-slate-900 mb-4">Top-Lieferanten (Gewerke)</h3>
+      <div class="space-y-3">
+        <div class="flex items-center justify-between p-3 border border-slate-100 rounded-lg"><div><div class="font-medium text-sm">Müller Sanitär AG</div><div class="text-xs text-slate-500">Sanitär · 142 Aufträge</div></div><div class="text-right"><div class="text-sm font-semibold text-emerald-600">98.2% SLA</div><div class="text-xs text-slate-500">CHF 340k YTD</div></div></div>
+        <div class="flex items-center justify-between p-3 border border-slate-100 rounded-lg"><div><div class="font-medium text-sm">Peier Heizung</div><div class="text-xs text-slate-500">Heizung · 89 Aufträge</div></div><div class="text-right"><div class="text-sm font-semibold text-emerald-600">96.8% SLA</div><div class="text-xs text-slate-500">CHF 218k YTD</div></div></div>
+        <div class="flex items-center justify-between p-3 border border-slate-100 rounded-lg"><div><div class="font-medium text-sm">CleanPro Reinigung</div><div class="text-xs text-slate-500">Reinigung · 312 Aufträge</div></div><div class="text-right"><div class="text-sm font-semibold text-amber-600">91.4% SLA</div><div class="text-xs text-slate-500">CHF 156k YTD</div></div></div>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl p-6 border border-slate-200">
+      <h3 class="font-semibold text-slate-900 mb-4">Supply-Chain-Erlöse (transparent)</h3>
+      <svg viewBox="0 0 400 180" class="w-full">
+        <g>
+          <rect x="20" y="130" width="40" height="40" fill="#6366f1"/><rect x="80" y="110" width="40" height="60" fill="#6366f1"/><rect x="140" y="90" width="40" height="80" fill="#6366f1"/><rect x="200" y="70" width="40" height="100" fill="#6366f1"/><rect x="260" y="50" width="40" height="120" fill="#6366f1"/><rect x="320" y="30" width="40" height="140" fill="#818cf8"/>
+          <text x="40" y="175" text-anchor="middle" font-size="9" fill="#64748b">Nov</text><text x="100" y="175" text-anchor="middle" font-size="9" fill="#64748b">Dez</text><text x="160" y="175" text-anchor="middle" font-size="9" fill="#64748b">Jan</text><text x="220" y="175" text-anchor="middle" font-size="9" fill="#64748b">Feb</text><text x="280" y="175" text-anchor="middle" font-size="9" fill="#64748b">Mär</text><text x="340" y="175" text-anchor="middle" font-size="9" fill="#64748b">Apr</text>
+        </g>
+      </svg>
+      <div class="mt-3 text-xs text-slate-500">Transaktionsgebühren 1.5% auf Supply-Chain-Volumen · keine Kickbacks.</div>
+    </div>
+  </div>
+</main>
+<script src="_layout.js"></script></body></html>

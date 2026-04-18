@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><title>KI-Agenten · Real Estate 2.0</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>.mono{font-family:ui-monospace,monospace}</style>
+</head>
+<body class="bg-slate-50 min-h-screen" data-page="agents">
+<main class="p-8">
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <div class="text-sm text-slate-500">Governance · Human-in-the-loop · <strong>FinOps</strong></div>
+      <h1 class="text-3xl font-bold text-slate-900">KI-Agenten Cockpit</h1>
+    </div>
+    <div class="flex gap-2">
+      <select class="border border-slate-300 rounded-lg px-3 py-2 text-sm"><option>April 2026</option><option>März 2026</option><option>YTD</option></select>
+      <button class="border border-slate-300 px-3 py-2 rounded-lg text-sm">Export FinOps-Report</button>
+    </div>
+  </div>
+
+  <!-- KPI strip -->
+  <div class="grid grid-cols-6 gap-4 mb-6">
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Aktive Agenten</div><div class="text-2xl font-bold">11</div></div>
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Entsch. heute</div><div class="text-2xl font-bold">1'487</div></div>
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Eskalationen</div><div class="text-2xl font-bold text-amber-600">14</div></div>
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Tokens (Monat)</div><div class="text-2xl font-bold">184.2M</div></div>
+    <div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-xl p-4 text-white"><div class="text-xs text-indigo-200">Kosten April</div><div class="text-2xl font-bold">CHF 2'847</div><div class="text-xs text-indigo-200">CHF 2.28 / Einheit</div></div>
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Ersparnis vs. FTE</div><div class="text-2xl font-bold text-emerald-600">CHF 48k</div></div>
+  </div>
+
+  <!-- Cost trend + model mix -->
+  <div class="grid grid-cols-3 gap-6 mb-6">
+    <div class="col-span-2 bg-white rounded-xl border border-slate-200 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold">Token-Verbrauch & Kosten (CHF) · letzte 30 Tage</h3>
+        <div class="flex gap-3 text-xs">
+          <span class="flex items-center gap-1"><div class="w-3 h-3 bg-indigo-500 rounded"></div>Input Tokens</span>
+          <span class="flex items-center gap-1"><div class="w-3 h-3 bg-violet-400 rounded"></div>Output Tokens</span>
+          <span class="flex items-center gap-1"><div class="w-3 h-3 bg-amber-500 rounded"></div>Kosten CHF</span>
+        </div>
+      </div>
+      <svg viewBox="0 0 700 240" class="w-full">
+        <defs><pattern id="g" width="70" height="40" patternUnits="userSpaceOnUse"><path d="M 70 0 L 0 0 0 40" fill="none" stroke="#f1f5f9"/></pattern></defs>
+        <rect width="700" height="240" fill="url(#g)"/>
+        <!-- stacked bars: each day -->
+        <g>
+          <!-- generate a series of bars -->
+          <g fill="#6366f1">
+            <rect x="10"  y="140" width="16" height="60"/><rect x="33" y="130" width="16" height="70"/><rect x="56" y="135" width="16" height="65"/>
+            <rect x="79"  y="120" width="16" height="80"/><rect x="102" y="125" width="16" height="75"/><rect x="125" y="115" width="16" height="85"/>
+            <rect x="148" y="130" width="16" height="70"/><rect x="171" y="110" width="16" height="90"/><rect x="194" y="105" width="16" height="95"/>
+            <rect x="217" y="115" width="16" height="85"/><rect x="240" y="100" width="16" height="100"/><rect x="263" y="95" width="16" height="105"/>
+            <rect x="286" y="110" width="16" height="90"/><rect x="309" y="90" width="16" height="110"/><rect x="332" y="85" width="16" height="115"/>
+            <rect x="355" y="95" width="16" height="105"/><rect x="378" y="80" width="16" height="120"/><rect x="401" y="75" width="16" height="125"/>
+            <rect x="424" y="85" width="16" height="115"/><rect x="447" y="70" width="16" height="130"/><rect x="470" y="65" width="16" height="135"/>
+            <rect x="493" y="75" width="16" height="125"/><rect x="516" y="60" width="16" height="140"/><rect x="539" y="55" width="16" height="145"/>
+            <rect x="562" y="65" width="16" height="135"/><rect x="585" y="50" width="16" height="150"/><rect x="608" y="45" width="16" height="155"/>
+            <rect x="631" y="55" width="16" height="145"/><rect x="654" y="40" width="16" height="160"/><rect x="677" y="35" width="16" height="165"/>
+          </g>
+          <g fill="#a78bfa">
+            <rect x="10" y="115" width="16" height="25"/><rect x="33" y="105" width="16" height="25"/><rect x="56" y="110" width="16" height="25"/>
+            <rect x="79" y="95" width="16" height="25"/><rect x="102" y="100" width="16" height="25"/><rect x="125" y="85" width="16" height="30"/>
+            <rect x="148" y="105" width="16" height="25"/><rect x="171" y="80" width="16" height="30"/><rect x="194" y="75" width="16" height="30"/>
+            <rect x="217" y="85" width="16" height="30"/><rect x="240" y="65" width="16" height="35"/><rect x="263" y="60" width="16" height="35"/>
+            <rect x="286" y="75" width="16" height="35"/><rect x="309" y="55" width="16" height="35"/><rect x="332" y="50" width="16" height="35"/>
+            <rect x="355" y="60" width="16" height="35"/><rect x="378" y="45" width="16" height="35"/><rect x="401" y="40" width="16" height="35"/>
+            <rect x="424" y="50" width="16" height="35"/><rect x="447" y="30" width="16" height="40"/><rect x="470" y="25" width="16" height="40"/>
+            <rect x="493" y="40" width="16" height="35"/><rect x="516" y="20" width="16" height="40"/><rect x="539" y="15" width="16" height="40"/>
+            <rect x="562" y="25" width="16" height="40"/><rect x="585" y="10" width="16" height="40"/><rect x="608" y="5" width="16" height="40"/>
+            <rect x="631" y="15" width="16" height="40"/><rect x="654" y="0" width="16" height="40"/><rect x="677" y="0" width="16" height="35"/>
+          </g>
+        </g>
+        <!-- cost line -->
+        <polyline fill="none" stroke="#f59e0b" stroke-width="2.5" points="18,180 41,175 64,172 87,168 110,165 133,160 156,162 179,155 202,150 225,152 248,142 271,138 294,140 317,130 340,125 363,128 386,118 409,115 432,118 455,108 478,102 501,105 524,95 547,92 570,95 593,85 616,80 639,82 662,72 685,68"/>
+        <!-- axis labels -->
+        <g font-size="10" fill="#64748b"><text x="10" y="230">1. Apr</text><text x="340" y="230">15. Apr</text><text x="650" y="230">30. Apr</text></g>
+        <!-- cost axis right -->
+        <text x="695" y="75" font-size="9" fill="#f59e0b" text-anchor="end">CHF 130/d</text>
+        <text x="695" y="180" font-size="9" fill="#f59e0b" text-anchor="end">CHF 60/d</text>
+      </svg>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <h3 class="font-semibold mb-4">Model-Mix &amp; Preise</h3>
+      <div class="space-y-3 text-sm">
+        <div class="flex items-center justify-between p-3 rounded-lg bg-indigo-50 border border-indigo-200">
+          <div><div class="font-medium">Claude Sonnet 4.6</div><div class="text-xs mono text-slate-500">$3 in · $15 out / 1M</div></div>
+          <div class="text-right"><div class="font-bold">64%</div><div class="text-xs text-slate-500">der Calls</div></div>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+          <div><div class="font-medium">Claude Haiku 4.5</div><div class="text-xs mono text-slate-500">$1 in · $5 out / 1M</div></div>
+          <div class="text-right"><div class="font-bold">28%</div><div class="text-xs text-slate-500">Triage/Routing</div></div>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-violet-50 border border-violet-200">
+          <div><div class="font-medium">Claude Opus 4.7</div><div class="text-xs mono text-slate-500">$15 in · $75 out / 1M</div></div>
+          <div class="text-right"><div class="font-bold">6%</div><div class="text-xs text-slate-500">Legal/Complex</div></div>
+        </div>
+        <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200">
+          <div><div class="font-medium">Local (Llama 3)</div><div class="text-xs mono text-slate-500">CHF 0 · On-Prem</div></div>
+          <div class="text-right"><div class="font-bold">2%</div><div class="text-xs text-slate-500">OCR Post-Proc.</div></div>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500">
+        Prompt-Caching: <strong class="text-emerald-600">74%</strong> Hit-Rate · Einsparung CHF 1'124/Mt.
+      </div>
+    </div>
+  </div>
+
+  <!-- Agent table with tokens & CHF -->
+  <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold">Agenten · Verbrauch &amp; Kosten (April 2026)</h3>
+      <div class="text-xs text-slate-500">Sortiert nach Kosten ▾</div>
+    </div>
+    <table class="w-full text-sm">
+      <thead class="text-xs text-slate-500 uppercase border-b border-slate-200">
+        <tr>
+          <th class="text-left py-2">Agent</th>
+          <th class="text-left">Modell</th>
+          <th class="text-right">Calls</th>
+          <th class="text-right">Input Tk.</th>
+          <th class="text-right">Output Tk.</th>
+          <th class="text-right">Cache-Hit</th>
+          <th class="text-right">Ø Latenz</th>
+          <th class="text-right">Kosten CHF</th>
+          <th class="text-right">CHF/Call</th>
+          <th class="text-right">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <tr class="hover:bg-slate-50">
+          <td class="py-3"><div class="font-medium">🔧 Ticket-Triage</div><div class="text-xs text-slate-500 mono">agent/triage</div></td>
+          <td class="mono text-xs">Haiku 4.5</td>
+          <td class="text-right mono">14'823</td>
+          <td class="text-right mono">18.4M</td>
+          <td class="text-right mono">2.1M</td>
+          <td class="text-right text-emerald-600">82%</td>
+          <td class="text-right mono">0.8s</td>
+          <td class="text-right font-semibold">CHF 28.40</td>
+          <td class="text-right mono text-slate-500">0.0019</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">aktiv</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3"><div class="font-medium">🤝 Offerten-Evaluator</div><div class="text-xs text-slate-500 mono">agent/rfp-eval</div></td>
+          <td class="mono text-xs">Sonnet 4.6</td>
+          <td class="text-right mono">892</td>
+          <td class="text-right mono">42.3M</td>
+          <td class="text-right mono">8.7M</td>
+          <td class="text-right text-emerald-600">68%</td>
+          <td class="text-right mono">2.4s</td>
+          <td class="text-right font-semibold">CHF 214.60</td>
+          <td class="text-right mono text-slate-500">0.2406</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">aktiv</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3"><div class="font-medium">💳 Rechnungs-Clearing</div><div class="text-xs text-slate-500 mono">agent/clearing</div></td>
+          <td class="mono text-xs">Haiku 4.5</td>
+          <td class="text-right mono">8'412</td>
+          <td class="text-right mono">14.2M</td>
+          <td class="text-right mono">1.3M</td>
+          <td class="text-right text-emerald-600">88%</td>
+          <td class="text-right mono">0.6s</td>
+          <td class="text-right font-semibold">CHF 18.90</td>
+          <td class="text-right mono text-slate-500">0.0022</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">aktiv</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3"><div class="font-medium">📋 NK-Abrechnung</div><div class="text-xs text-slate-500 mono">agent/nk-billing</div></td>
+          <td class="mono text-xs">Sonnet 4.6</td>
+          <td class="text-right mono">1'247</td>
+          <td class="text-right mono">89.4M</td>
+          <td class="text-right mono">12.8M</td>
+          <td class="text-right text-emerald-600">91%</td>
+          <td class="text-right mono">3.1s</td>
+          <td class="text-right font-semibold">CHF 287.30</td>
+          <td class="text-right mono text-slate-500">0.2304</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">aktiv</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3"><div class="font-medium">🔑 Mieter-Screening</div><div class="text-xs text-slate-500 mono">agent/screening</div></td>
+          <td class="mono text-xs">Sonnet 4.6</td>
+          <td class="text-right mono">147</td>
+          <td class="text-right mono">8.4M</td>
+          <td class="text-right mono">1.9M</td>
+          <td class="text-right text-amber-600">42%</td>
+          <td class="text-right mono">4.8s</td>
+          <td class="text-right font-semibold">CHF 47.20</td>
+          <td class="text-right mono text-slate-500">0.3211</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">aktiv</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3"><div class="font-medium">🌱 ESG-Aggregator</div><div class="text-xs text-slate-500 mono">agent/esg</div></td>
+          <td class="mono text-xs">Haiku 4.5</td>
+          <td class="text-right mono">3'218</td>
+          <td class="text-right mono">12.1M</td>
+          <td class="text-right mono">1.8M</td>
+          <td class="text-right text-emerald-600">76%</td>
+          <td class="text-right mono">1.2s</td>
+          <td class="text-right font-semibold">CHF 16.80</td>
+          <td class="text-right mono text-slate-500">0.0052</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">aktiv</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3"><div class="font-medium">🔮 Predictive Maintenance</div><div class="text-xs text-slate-500 mono">agent/predict-maint</div></td>
+          <td class="mono text-xs">Sonnet 4.6</td>
+          <td class="text-right mono">2'104</td>
+          <td class="text-right mono">38.2M</td>
+          <td class="text-right mono">4.1M</td>
+          <td class="text-right text-emerald-600">79%</td>
+          <td class="text-right mono">1.8s</td>
+          <td class="text-right font-semibold">CHF 112.40</td>
+          <td class="text-right mono text-slate-500">0.0534</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded">beta</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3"><div class="font-medium">📄 Onboarding-OCR/NLP</div><div class="text-xs text-slate-500 mono">agent/onboarding</div></td>
+          <td class="mono text-xs">Sonnet 4.6 + OCR</td>
+          <td class="text-right mono">4'189</td>
+          <td class="text-right mono">142.8M</td>
+          <td class="text-right mono">18.4M</td>
+          <td class="text-right text-slate-500">31%</td>
+          <td class="text-right mono">5.4s</td>
+          <td class="text-right font-semibold">CHF 684.20</td>
+          <td class="text-right mono text-slate-500">0.1633</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">aktiv</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3"><div class="font-medium">💬 Mieter-Chat-Assistent</div><div class="text-xs text-slate-500 mono">agent/tenant-chat</div></td>
+          <td class="mono text-xs">Sonnet 4.6</td>
+          <td class="text-right mono">6'847</td>
+          <td class="text-right mono">28.4M</td>
+          <td class="text-right mono">4.2M</td>
+          <td class="text-right text-emerald-600">85%</td>
+          <td class="text-right mono">1.4s</td>
+          <td class="text-right font-semibold">CHF 94.80</td>
+          <td class="text-right mono text-slate-500">0.0138</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">aktiv</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50 bg-violet-50">
+          <td class="py-3"><div class="font-medium">⚖️ Rechts-Check</div><div class="text-xs text-slate-500 mono">agent/legal-check</div></td>
+          <td class="mono text-xs">Opus 4.7</td>
+          <td class="text-right mono">182</td>
+          <td class="text-right mono">14.8M</td>
+          <td class="text-right mono">3.2M</td>
+          <td class="text-right text-emerald-600">64%</td>
+          <td class="text-right mono">8.2s</td>
+          <td class="text-right font-semibold">CHF 412.80</td>
+          <td class="text-right mono text-slate-500">2.2681</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-slate-200 text-slate-700 text-xs rounded">Human-only</span></td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-3"><div class="font-medium">📊 Report-Generator</div><div class="text-xs text-slate-500 mono">agent/reporter</div></td>
+          <td class="mono text-xs">Sonnet 4.6</td>
+          <td class="text-right mono">412</td>
+          <td class="text-right mono">142.1M</td>
+          <td class="text-right mono">28.4M</td>
+          <td class="text-right text-emerald-600">94%</td>
+          <td class="text-right mono">12s</td>
+          <td class="text-right font-semibold">CHF 847.40</td>
+          <td class="text-right mono text-slate-500">2.0568</td>
+          <td class="text-right"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs rounded">aktiv</span></td>
+        </tr>
+        <tr class="bg-slate-900 text-white font-bold">
+          <td class="py-3 text-xs uppercase text-slate-400">Total</td>
+          <td></td>
+          <td class="text-right mono">42'473</td>
+          <td class="text-right mono">551.1M</td>
+          <td class="text-right mono">87.0M</td>
+          <td class="text-right text-emerald-400">74%</td>
+          <td></td>
+          <td class="text-right">CHF 2'764.80</td>
+          <td class="text-right mono text-slate-400">0.0651 Ø</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Budget & alerts -->
+  <div class="grid grid-cols-3 gap-6">
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <h3 class="font-semibold mb-4">Budget-Steuerung (Policies)</h3>
+      <div class="space-y-3 text-sm">
+        <div>
+          <div class="flex justify-between mb-1"><span>Monats-Budget KI</span><span class="font-semibold">CHF 2'847 / 4'000</span></div>
+          <div class="bg-slate-100 h-2 rounded-full"><div class="bg-emerald-500 h-2 rounded-full" style="width:71%"></div></div>
+          <div class="text-xs text-slate-500 mt-1">Prognose Monatsende: CHF 3'480 · innerhalb Limit</div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span>Opus 4.7 (Legal)</span><span class="font-semibold">CHF 413 / 500</span></div>
+          <div class="bg-slate-100 h-2 rounded-full"><div class="bg-amber-500 h-2 rounded-full" style="width:82%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span>CHF / Einheit</span><span class="font-semibold">2.28 / 3.50</span></div>
+          <div class="bg-slate-100 h-2 rounded-full"><div class="bg-emerald-500 h-2 rounded-full" style="width:65%"></div></div>
+        </div>
+      </div>
+      <button class="mt-4 w-full border border-slate-300 rounded-lg py-2 text-sm">Budget-Policies verwalten →</button>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <h3 class="font-semibold mb-4">Live Audit-Trail</h3>
+      <div class="space-y-3 text-xs">
+        <div class="flex gap-2"><span class="text-emerald-500">●</span><div class="flex-1">
+          <div class="font-medium">Rechnung freigegeben #4712</div>
+          <div class="text-slate-500">Clearing-Agent · Haiku 4.5 · 1.8k tok · <span class="text-emerald-600 font-semibold">CHF 0.002</span></div>
+          <div class="text-slate-400 mono">14:22:14 · 0.7s</div>
+        </div></div>
+        <div class="flex gap-2"><span class="text-indigo-500">●</span><div class="flex-1">
+          <div class="font-medium">Ticket geroutet #4822</div>
+          <div class="text-slate-500">Triage · Haiku · 1.2k tok · <span class="text-emerald-600 font-semibold">CHF 0.001</span> · Cache-Hit</div>
+          <div class="text-slate-400 mono">14:21:08 · 0.4s</div>
+        </div></div>
+        <div class="flex gap-2"><span class="text-violet-500">●</span><div class="flex-1">
+          <div class="font-medium">OR-Prüfung Kündigung</div>
+          <div class="text-slate-500">Legal · Opus 4.7 · 84k tok · <span class="text-amber-600 font-semibold">CHF 2.34</span></div>
+          <div class="text-slate-400 mono">14:18:44 · 9.1s · → R. Wuhrmann</div>
+        </div></div>
+        <div class="flex gap-2"><span class="text-emerald-500">●</span><div class="flex-1">
+          <div class="font-medium">Screening abgeschlossen</div>
+          <div class="text-slate-500">Screening · Sonnet · 58k tok · <span class="text-amber-600 font-semibold">CHF 0.32</span></div>
+          <div class="text-slate-400 mono">14:15:02 · 4.6s</div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="bg-slate-900 text-white rounded-xl p-6">
+      <h3 class="font-semibold mb-3">🛡️ Governance &amp; FinOps</h3>
+      <ul class="text-xs space-y-2 text-slate-300">
+        <li>✓ Pro Agent: Hard-Budget · Rate-Limit · Model-Pinning</li>
+        <li>✓ Auto-Downgrade bei Budget-Überschreitung (Sonnet → Haiku)</li>
+        <li>✓ Prompt-Caching aktiviert · 74% Hit-Rate</li>
+        <li>✓ Audit: jeder Call mit Token-Count + CHF + Trace-ID</li>
+        <li>✓ Human-in-the-Loop für rechtliche Schritte (Opus)</li>
+        <li>✓ CH/EU-Datenhaltung · verschlüsselt · revisionssicher</li>
+      </ul>
+      <div class="mt-4 pt-4 border-t border-slate-700 text-xs">
+        <div class="text-slate-400">Break-even-Rechnung</div>
+        <div class="mono mt-1">1 Senior-FTE ≈ CHF 12'500/Mt. = 5'490 Agenten-Monate</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="_layout.js"></script></body></html>

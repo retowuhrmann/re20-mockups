@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><title>NK-Abrechnung · Real Estate 2.0</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>.mono{font-family:ui-monospace,monospace;font-size:11px}</style>
+</head>
+<body class="bg-slate-50 min-h-screen" data-page="nk-abrechnung">
+<main class="p-8">
+  <div class="flex items-center gap-2 text-sm text-slate-500 mb-2">
+    <a href="property-detail.html" class="hover:text-indigo-600">Liegenschaft</a><span>›</span>
+    <span>NK-Abrechnung 2025</span>
+  </div>
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">Nebenkostenabrechnung 2025</h1>
+      <div class="flex items-center gap-3 mt-2 text-sm text-slate-600 flex-wrap">
+        <span>Rosengasse 14, Zürich · 48 Einheiten</span>
+        <span class="mono px-1.5 py-0.5 bg-indigo-50 text-indigo-700 rounded">re2:estate/rosengasse14</span>
+        <span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-xs">Freigabe ausstehend</span>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button class="border border-slate-300 px-3 py-2 rounded-lg text-sm">Vorschau PDF</button>
+      <button class="bg-emerald-600 text-white px-3 py-2 rounded-lg text-sm">Alle 48 freigeben</button>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <div class="flex items-center justify-between text-center relative">
+      <div class="absolute top-5 left-10 right-10 h-0.5 bg-slate-200 -z-10"></div>
+      <div class="flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">✓</div><div class="text-xs mt-2">Kosten erfasst</div></div>
+      <div class="flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">✓</div><div class="text-xs mt-2">Verteilschlüssel</div></div>
+      <div class="flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">✓</div><div class="text-xs mt-2">Abrechnung generiert</div></div>
+      <div class="flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold">4</div><div class="text-xs mt-2 font-semibold text-indigo-600">Freigabe</div></div>
+      <div class="flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-white border-2 border-slate-300 text-slate-400 flex items-center justify-center font-bold">5</div><div class="text-xs mt-2 text-slate-500">Versand</div></div>
+      <div class="flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-white border-2 border-slate-300 text-slate-400 flex items-center justify-center font-bold">6</div><div class="text-xs mt-2 text-slate-500">Verbuchung</div></div>
+    </div>
+  </div>
+
+  <!-- Cost buckets & allocation -->
+  <div class="grid grid-cols-3 gap-6 mb-6">
+    <div class="col-span-2 bg-white rounded-xl border border-slate-200 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold">Kostenarten &amp; Verteilschlüssel</h3>
+        <div class="text-xs text-slate-500">Datenquellen: 127 Belege · 4 IoT-Zähler · 2 Verträge</div>
+      </div>
+      <table class="w-full text-sm">
+        <thead class="text-xs text-slate-500 uppercase border-b border-slate-200">
+          <tr><th class="text-left py-2">Kostenart</th><th class="text-left">Quelle</th><th class="text-left">Verteiler</th><th class="text-right">Kosten 2025</th><th class="text-right">vs. Akonto</th></tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr>
+            <td class="py-3 font-medium">Heizung / Warmwasser</td>
+            <td class="text-xs text-slate-500 mono">sensor/heat-meter-01</td>
+            <td><span class="mono text-indigo-700">rec:Observation · m³ WW</span></td>
+            <td class="text-right">CHF 48'420</td>
+            <td class="text-right text-emerald-600">-2.1%</td>
+          </tr>
+          <tr>
+            <td class="py-3 font-medium">Wasser / Abwasser</td>
+            <td class="text-xs text-slate-500 mono">sensor/water-meter-k3</td>
+            <td><span class="mono text-indigo-700">nach Personen</span></td>
+            <td class="text-right">CHF 14'280</td>
+            <td class="text-right text-emerald-600">-0.8%</td>
+          </tr>
+          <tr>
+            <td class="py-3 font-medium">Allg. Strom</td>
+            <td class="text-xs text-slate-500 mono">sensor/elec-general</td>
+            <td><span class="mono text-indigo-700">nach m²</span></td>
+            <td class="text-right">CHF 8'912</td>
+            <td class="text-right text-amber-600">+3.4%</td>
+          </tr>
+          <tr>
+            <td class="py-3 font-medium">Hauswart</td>
+            <td class="text-xs text-slate-500 mono">vertrag/hauswart-2024</td>
+            <td><span class="mono text-indigo-700">nach m²</span></td>
+            <td class="text-right">CHF 18'600</td>
+            <td class="text-right">±0%</td>
+          </tr>
+          <tr>
+            <td class="py-3 font-medium">Treppenhausreinigung</td>
+            <td class="text-xs text-slate-500 mono">vertrag/cleanpro</td>
+            <td><span class="mono text-indigo-700">nach Einheit</span></td>
+            <td class="text-right">CHF 12'240</td>
+            <td class="text-right">±0%</td>
+          </tr>
+          <tr>
+            <td class="py-3 font-medium">Kehricht/Entsorgung</td>
+            <td class="text-xs text-slate-500 mono">belege/erz-2025</td>
+            <td><span class="mono text-indigo-700">nach Personen</span></td>
+            <td class="text-right">CHF 6'840</td>
+            <td class="text-right text-rose-600">+8.2%</td>
+          </tr>
+          <tr>
+            <td class="py-3 font-medium">Lift-Wartung</td>
+            <td class="text-xs text-slate-500 mono">asset/elevator-a</td>
+            <td><span class="mono text-indigo-700">nach Stockwerk</span></td>
+            <td class="text-right">CHF 4'200</td>
+            <td class="text-right">±0%</td>
+          </tr>
+          <tr>
+            <td class="py-3 font-medium">Gartenpflege</td>
+            <td class="text-xs text-slate-500 mono">belege/garten-2025</td>
+            <td><span class="mono text-indigo-700">nach m² · EG-faktor</span></td>
+            <td class="text-right">CHF 3'840</td>
+            <td class="text-right">±0%</td>
+          </tr>
+          <tr class="bg-slate-50 font-bold">
+            <td class="py-3">Total</td>
+            <td></td>
+            <td></td>
+            <td class="text-right">CHF 117'332</td>
+            <td class="text-right text-emerald-600">-0.7%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="space-y-6">
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-6 text-white">
+        <div class="text-xs uppercase tracking-wide text-emerald-100 mb-1">Automatisierungsgrad</div>
+        <div class="text-4xl font-bold">94%</div>
+        <div class="text-sm text-emerald-100 mt-1">45/48 ohne manuellen Eingriff</div>
+      </div>
+      <div class="bg-white rounded-xl border border-slate-200 p-5">
+        <h3 class="font-semibold mb-3">KI-Agent</h3>
+        <div class="text-xs text-slate-500 mb-1">NK-Billing-Agent (Sonnet 4.6)</div>
+        <dl class="space-y-2 text-sm">
+          <div class="flex justify-between"><dt class="text-slate-500">Laufzeit</dt><dd class="mono">2h 14m</dd></div>
+          <div class="flex justify-between"><dt class="text-slate-500">Tokens</dt><dd class="mono">12.4M</dd></div>
+          <div class="flex justify-between"><dt class="text-slate-500">Kosten</dt><dd class="mono font-semibold">CHF 38.20</dd></div>
+          <div class="flex justify-between"><dt class="text-slate-500">CHF/Einheit</dt><dd class="mono text-emerald-600">0.80</dd></div>
+        </dl>
+        <div class="mt-3 pt-3 border-t border-slate-100 text-xs text-slate-500">Branchenschnitt manuell: 40–80h / Mandat ≈ CHF 4'000</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Per-unit breakdown -->
+  <div class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="font-semibold">Abrechnung pro Einheit · 48 Mieter</h3>
+      <div class="flex gap-2">
+        <input type="text" placeholder="Einheit filtern…" class="border border-slate-300 rounded px-3 py-1 text-sm">
+        <button class="text-xs border border-slate-300 rounded px-2 py-1">Alle expandieren</button>
+      </div>
+    </div>
+    <table class="w-full text-sm">
+      <thead class="text-xs text-slate-500 uppercase border-b border-slate-200">
+        <tr><th class="text-left py-2">Einheit</th><th class="text-left">Mieter</th><th class="text-right">m²</th><th class="text-right">Pers.</th><th class="text-right">Akonto total</th><th class="text-right">Ist-Kosten</th><th class="text-right">Saldo</th><th class="text-right">Status</th><th></th></tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <tr class="hover:bg-slate-50">
+          <td class="py-2 mono text-indigo-700">apt/3.01</td><td>Weber M.</td><td class="text-right">58</td><td class="text-right">1</td><td class="text-right">3'840</td><td class="text-right">3'724</td>
+          <td class="text-right font-semibold text-emerald-600">+116</td><td class="text-right"><span class="mono text-xs text-emerald-700">AUTO ✓</span></td>
+          <td><button class="text-xs text-indigo-600">Detail</button></td>
+        </tr>
+        <tr class="hover:bg-slate-50 bg-indigo-50">
+          <td class="py-2 mono text-indigo-700">apt/3.02</td><td>Keller A.</td><td class="text-right">82</td><td class="text-right">2</td><td class="text-right">5'280</td><td class="text-right">5'138</td>
+          <td class="text-right font-semibold text-emerald-600">+142</td><td class="text-right"><span class="mono text-xs text-emerald-700">AUTO ✓</span></td>
+          <td><button class="text-xs text-indigo-600">Detail ▾</button></td>
+        </tr>
+        <tr class="bg-indigo-50/50">
+          <td colspan="9" class="p-4">
+            <div class="grid grid-cols-5 gap-3 text-xs">
+              <div class="p-2 bg-white rounded border border-slate-200"><div class="text-slate-500">Heizung</div><div class="font-semibold">CHF 2'180</div><div class="mono text-slate-400">8.4 m³ WW · Verbrauch</div></div>
+              <div class="p-2 bg-white rounded border border-slate-200"><div class="text-slate-500">Wasser</div><div class="font-semibold">CHF 594</div><div class="mono text-slate-400">2 Personen</div></div>
+              <div class="p-2 bg-white rounded border border-slate-200"><div class="text-slate-500">Strom allg.</div><div class="font-semibold">CHF 152</div><div class="mono text-slate-400">82m²/4820m²</div></div>
+              <div class="p-2 bg-white rounded border border-slate-200"><div class="text-slate-500">Hauswart/Reinigung</div><div class="font-semibold">CHF 782</div><div class="mono text-slate-400">kombiniert</div></div>
+              <div class="p-2 bg-white rounded border border-slate-200"><div class="text-slate-500">Übrige</div><div class="font-semibold">CHF 1'430</div><div class="mono text-slate-400">Lift, Garten, etc.</div></div>
+            </div>
+          </td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="py-2 mono text-indigo-700">apt/3.03</td><td>Rossi M.</td><td class="text-right">104</td><td class="text-right">4</td><td class="text-right">7'200</td><td class="text-right">7'432</td>
+          <td class="text-right font-semibold text-rose-600">-232</td><td class="text-right"><span class="mono text-xs text-emerald-700">AUTO ✓</span></td>
+          <td><button class="text-xs text-indigo-600">Detail</button></td>
+        </tr>
+        <tr class="hover:bg-slate-50 bg-amber-50">
+          <td class="py-2 mono text-indigo-700">apt/2.08</td><td>Fam. Schmid</td><td class="text-right">96</td><td class="text-right">5</td><td class="text-right">6'720</td><td class="text-right">7'182</td>
+          <td class="text-right font-semibold text-rose-600">-462</td>
+          <td class="text-right"><span class="mono text-xs text-amber-700">⚠ Review</span></td>
+          <td><button class="text-xs text-indigo-600">Detail</button></td>
+        </tr>
+        <tr class="bg-amber-50/50">
+          <td colspan="9" class="p-3 text-xs text-amber-900">
+            🤖 <strong>KI-Hinweis:</strong> Nachzahlung &gt; CHF 400 · Mieter hat im Vorjahr bereits reklamiert.
+            Empfehlung: persönliches Anschreiben, Verbrauchsanalyse (Warmwasser +28% vs. Vorjahr — mögl. Leck?).
+            Sensor-Check: <span class="mono">sensor/water-meter-k3</span> zeigt Nachtverbrauch konstant &gt; 0.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+<script src="_layout.js"></script></body></html>

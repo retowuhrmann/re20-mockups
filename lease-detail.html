@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><title>Mietverhältnis · Real Estate 2.0</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>.mono{font-family:ui-monospace,monospace;font-size:11px}</style>
+</head>
+<body class="bg-slate-50 min-h-screen" data-page="lease-detail">
+<main class="p-8">
+  <div class="flex items-center gap-2 text-sm text-slate-500 mb-2">
+    <a href="property-detail.html" class="hover:text-indigo-600">Liegenschaft</a><span>›</span>
+    <span class="mono px-1.5 py-0.5 bg-rose-50 text-rose-700 rounded">rec:Lease</span>
+    <span>L-1423 · Keller A.</span>
+  </div>
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-bold text-slate-900">Mietverhältnis L-1423</h1>
+      <div class="flex items-center gap-3 mt-2 text-sm flex-wrap">
+        <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded">Aktiv</span>
+        <span class="text-slate-600">Laufzeit: 4 Jahre 1 Monat</span>
+        <span class="text-slate-400">|</span>
+        <span class="mono text-slate-600">re2:lease/L-1423</span>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <button class="border border-slate-300 px-3 py-2 rounded-lg text-sm">OR-Dossier</button>
+      <button class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm">Aktion ▾</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-6 mb-6">
+    <!-- Parties -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5">
+      <div class="text-xs text-slate-500 mb-1 mono">rec:hasTenant</div>
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-indigo-600">AK</div>
+        <div>
+          <div class="font-bold">Anna Keller</div>
+          <div class="text-xs text-slate-500">*1989 · anna.keller@…</div>
+        </div>
+      </div>
+      <dl class="text-sm space-y-2">
+        <div class="flex justify-between"><dt class="text-slate-500">Beruf</dt><dd>Consultant</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-500">Einkommen (ind.)</dt><dd>CHF 9'200/Mt.</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-500">Betreibung</dt><dd class="text-emerald-600">clean ✓</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-500">Mieter-Score</dt><dd class="font-semibold">A</dd></div>
+      </dl>
+    </div>
+
+    <!-- Object -->
+    <div class="bg-white rounded-xl border border-slate-200 p-5">
+      <div class="text-xs text-slate-500 mb-1 mono">rec:forSpace</div>
+      <div class="font-bold mb-1">Rosengasse 14, Whg. 3.02</div>
+      <div class="text-xs text-slate-500 mono mb-3">re2:apt/rosengasse14-3.02</div>
+      <dl class="text-sm space-y-2">
+        <div class="flex justify-between"><dt class="text-slate-500">Zimmer / Fläche</dt><dd>3.5 / 82 m²</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-500">Lage</dt><dd>3. OG rechts</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-500">Ausrichtung</dt><dd>Süd · Balkon</dd></div>
+        <div class="flex justify-between"><dt class="text-slate-500">Zustand</dt><dd>Kernsaniert 2019</dd></div>
+      </dl>
+    </div>
+
+    <!-- Financials -->
+    <div class="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-xl p-5 text-white">
+      <div class="text-xs text-indigo-200 mb-1">Aktuelle Miete (brutto)</div>
+      <div class="text-4xl font-bold">CHF 2'650</div>
+      <div class="text-xs text-indigo-200 mt-1">netto CHF 2'330 + NK CHF 320</div>
+      <div class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-white/20 text-xs">
+        <div><div class="text-indigo-200">Kaution</div><div class="font-semibold">CHF 6'990</div></div>
+        <div><div class="text-indigo-200">Inkasso-Quote</div><div class="font-semibold">100%</div></div>
+        <div><div class="text-indigo-200">Letzte Indexanp.</div><div class="font-semibold">Jan 2024</div></div>
+        <div><div class="text-indigo-200">Nächste mögl.</div><div class="font-semibold">Okt 2026</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline + Legal -->
+  <div class="grid grid-cols-3 gap-6 mb-6">
+    <div class="col-span-2 bg-white rounded-xl border border-slate-200 p-6">
+      <h3 class="font-semibold mb-4">Vertrags-Timeline</h3>
+      <div class="relative pl-8 space-y-5 border-l-2 border-slate-100">
+        <div class="relative"><div class="absolute -left-[33px] w-5 h-5 bg-emerald-500 rounded-full border-4 border-white"></div>
+          <div class="font-medium">2022-04-01 · Vertragsbeginn</div>
+          <div class="text-xs text-slate-500">Miete CHF 2'240 netto · Index-Basis Mai 2020 = 100.3 · Referenzzins 1.25%</div>
+        </div>
+        <div class="relative"><div class="absolute -left-[33px] w-5 h-5 bg-indigo-500 rounded-full border-4 border-white"></div>
+          <div class="font-medium">2023-06-15 · NK-Nachzahlung 2022</div>
+          <div class="text-xs text-slate-500">CHF 84.– · beglichen 2023-07-02</div>
+        </div>
+        <div class="relative"><div class="absolute -left-[33px] w-5 h-5 bg-amber-500 rounded-full border-4 border-white"></div>
+          <div class="font-medium">2024-01-01 · Indexanpassung</div>
+          <div class="text-xs text-slate-500">Index 104.7 · Erhöhung auf CHF 2'330 netto · 40% weitergegeben (OR 269a)</div>
+        </div>
+        <div class="relative"><div class="absolute -left-[33px] w-5 h-5 bg-emerald-500 rounded-full border-4 border-white"></div>
+          <div class="font-medium">2025-05-10 · Schaden Bad</div>
+          <div class="text-xs text-slate-500">Ticket #3412 · Wasserhahn defekt · 2h behoben</div>
+        </div>
+        <div class="relative"><div class="absolute -left-[33px] w-5 h-5 bg-violet-500 rounded-full border-4 border-white animate-pulse"></div>
+          <div class="font-medium">Heute · NK 2025 offen</div>
+          <div class="text-xs text-slate-500">Guthaben CHF 142 → Verrechnung Mai-Miete</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold">⚖️ OR-Compliance</h3>
+        <span class="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">alles konform</span>
+      </div>
+      <div class="space-y-3 text-sm">
+        <div class="p-3 border border-slate-200 rounded-lg">
+          <div class="flex justify-between"><span class="font-medium">Kündigungsfrist</span><span class="mono text-xs">OR Art. 266a</span></div>
+          <div class="text-xs text-slate-500">3 Monate auf ortsübliche Termine (31.03/30.06/30.09)</div>
+        </div>
+        <div class="p-3 border border-slate-200 rounded-lg">
+          <div class="flex justify-between"><span class="font-medium">Kaution</span><span class="mono text-xs">OR Art. 257e</span></div>
+          <div class="text-xs text-slate-500">Max 3× Monatsmiete · hinterlegt bei ZKB ✓</div>
+        </div>
+        <div class="p-3 border border-slate-200 rounded-lg">
+          <div class="flex justify-between"><span class="font-medium">Indexklausel</span><span class="mono text-xs">OR Art. 269b</span></div>
+          <div class="text-xs text-slate-500">≥5 Jahre Vertrag · ✓ indexiert auf LIK</div>
+        </div>
+        <div class="p-3 border border-slate-200 rounded-lg">
+          <div class="flex justify-between"><span class="font-medium">NK-Abrechnung</span><span class="mono text-xs">OR Art. 257b</span></div>
+          <div class="text-xs text-slate-500">Pflicht zur Detailaufstellung · ✓ erfüllt</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Predictive actions -->
+  <div class="bg-white rounded-xl border border-slate-200 p-6">
+    <h3 class="font-semibold mb-4">🤖 KI-Handlungsempfehlungen</h3>
+    <div class="grid grid-cols-3 gap-3">
+      <div class="p-4 rounded-lg border border-indigo-200 bg-indigo-50">
+        <div class="text-xs text-indigo-600 font-semibold mb-1">MIETZINSOPTIMIERUNG</div>
+        <div class="font-medium text-sm">Anpassung möglich per 01.10.2026</div>
+        <div class="text-xs text-slate-600 mt-1">Vergleichsmieten in der Zone: CHF 2'780 · Potenzial +CHF 130/Mt.</div>
+        <div class="mt-2 text-xs text-slate-500">Grundlage: 12 rec:Lease-Vergleiche im Graph · LIK +2.1%</div>
+      </div>
+      <div class="p-4 rounded-lg border border-emerald-200 bg-emerald-50">
+        <div class="text-xs text-emerald-700 font-semibold mb-1">RETENTION</div>
+        <div class="font-medium text-sm">Top-Mieterin · lange halten</div>
+        <div class="text-xs text-slate-600 mt-1">Score A · 4 J. ohne Störung · Zahlungsverhalten perfekt</div>
+        <div class="mt-2 text-xs text-slate-500">Empfehlung: Balkonsanierung vor Rückfrage anbieten</div>
+      </div>
+      <div class="p-4 rounded-lg border border-slate-200">
+        <div class="text-xs text-slate-600 font-semibold mb-1">DOKUMENTE</div>
+        <div class="font-medium text-sm">Vertrag digital unterzeichnet</div>
+        <div class="text-xs text-slate-600 mt-1">QES (SignatureSuite) · Audit-Trail vollständig</div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="_layout.js"></script></body></html>

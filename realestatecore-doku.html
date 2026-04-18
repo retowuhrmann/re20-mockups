@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><title>RealEstateCore · Datenmodell</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  .mono{font-family:ui-monospace,monospace}
+  pre{font-size:12px;line-height:1.5}
+  h2{scroll-margin-top:1rem}
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen" data-page="realestatecore-doku">
+<main class="p-8 max-w-5xl">
+  <div class="mb-8">
+    <div class="text-sm text-slate-500">Datenmodell-Dokumentation · intern · v0.1</div>
+    <h1 class="text-3xl font-bold text-slate-900">RealEstateCore (REC) in Real Estate 2.0</h1>
+    <p class="text-sm text-slate-600 mt-2">Semantische Grundlage des Building Operating System · OWL/RDF-Ontologie · CC-BY-4.0</p>
+  </div>
+
+  <nav class="bg-white rounded-xl border border-slate-200 p-4 mb-6 text-sm">
+    <div class="font-semibold mb-2">Inhalt</div>
+    <ol class="list-decimal pl-5 space-y-1 text-slate-700">
+      <li><a href="#was" class="hover:text-indigo-600">Was ist RealEstateCore?</a></li>
+      <li><a href="#warum" class="hover:text-indigo-600">Warum REC für Real Estate 2.0</a></li>
+      <li><a href="#klassen" class="hover:text-indigo-600">Kernklassen &amp; Hierarchie</a></li>
+      <li><a href="#relationen" class="hover:text-indigo-600">Relationen (Object Properties)</a></li>
+      <li><a href="#beispiel" class="hover:text-indigo-600">Konkretes Beispiel (Turtle)</a></li>
+      <li><a href="#shacl" class="hover:text-indigo-600">Validierung mit SHACL</a></li>
+      <li><a href="#erweiterungen" class="hover:text-indigo-600">CH-spezifische Erweiterungen</a></li>
+      <li><a href="#links" class="hover:text-indigo-600">Git &amp; offizielle Referenzen</a></li>
+    </ol>
+  </nav>
+
+  <section class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <h2 id="was" class="text-xl font-bold mb-3">1. Was ist RealEstateCore?</h2>
+    <p class="text-sm text-slate-700 leading-relaxed mb-3">
+      RealEstateCore (REC) ist eine <strong>offene Ontologie für Gebäude und Immobilien</strong>,
+      ursprünglich von Vasakronan, Akademiska Hus, ProNova Research, KTH und RISE entwickelt und heute von der
+      <strong>RealEstateCore Consortium / Linux Foundation</strong> betreut. Sie beschreibt in OWL/RDF die
+      Struktur von Liegenschaften, Räumen, technischen Anlagen, Sensoren, Verträgen und Akteuren sowie deren
+      Verhältnis untereinander — maschinenlesbar und interoperabel.
+    </p>
+    <p class="text-sm text-slate-700 leading-relaxed">
+      Microsoft hat REC als Grundlage der <em>Azure Digital Twins · Smart Buildings</em>-Referenz gewählt,
+      Siemens, Willow und grosse Immobiliengesellschaften (u.a. Vasakronan) setzen es produktiv ein.
+      Damit steht mit REC <strong>ein in der Industrie getestetes, nicht-proprietäres Datenmodell</strong> zur Verfügung.
+    </p>
+  </section>
+
+  <section class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <h2 id="warum" class="text-xl font-bold mb-3">2. Warum REC für Real Estate 2.0</h2>
+    <ul class="text-sm space-y-2 text-slate-700">
+      <li>✅ <strong>Kein Lock-in:</strong> offener Standard statt proprietäres Schema einer REM-Software.</li>
+      <li>✅ <strong>End-to-End-Verknüpfung:</strong> Technik, Verträge, Finanzen, Nutzer im selben Graph abbildbar.</li>
+      <li>✅ <strong>Algorithmen-ready:</strong> KI-Agenten können via SPARQL / GraphQL traversieren statt über SQL-Joins.</li>
+      <li>✅ <strong>IoT-nativ:</strong> Sensoren / Observations sind First-Class-Citizens (nicht aufgepfropft).</li>
+      <li>✅ <strong>Interoperabilität:</strong> Azure Digital Twins, Brick Schema, ifcOWL (BIM) lassen sich mappen.</li>
+      <li>✅ <strong>Zukunftssicher:</strong> ESG- und Regulatory-Reporting profitieren von semantischer Konsistenz.</li>
+    </ul>
+  </section>
+
+  <section class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <h2 id="klassen" class="text-xl font-bold mb-3">3. Kernklassen &amp; Hierarchie</h2>
+    <p class="text-sm text-slate-700 mb-4">REC gliedert sich in fünf grosse Konzeptgruppen. Die für unser BOS relevanten Klassen:</p>
+
+    <div class="grid grid-cols-2 gap-4 text-sm">
+      <div class="p-4 rounded-lg bg-indigo-50 border border-indigo-200">
+        <div class="font-semibold text-indigo-700 mb-2">Spaces (Räume &amp; Container)</div>
+        <ul class="space-y-1 mono text-xs text-indigo-900">
+          <li>rec:Space <span class="text-slate-500">// abstrakte Oberklasse</span></li>
+          <li>└─ rec:Site</li>
+          <li>└─ rec:Building</li>
+          <li>   └─ rec:Storey</li>
+          <li>      └─ rec:Apartment · rec:Room · rec:CommercialSpace</li>
+          <li>└─ rec:Zone <span class="text-slate-500">// funktionale Zonen</span></li>
+        </ul>
+      </div>
+      <div class="p-4 rounded-lg bg-amber-50 border border-amber-200">
+        <div class="font-semibold text-amber-700 mb-2">Things (Anlagen, Komponenten)</div>
+        <ul class="space-y-1 mono text-xs text-amber-900">
+          <li>rec:Asset · rec:BuildingComponent</li>
+          <li>├─ rec:HVAC (Boiler, HeatPump, AHU…)</li>
+          <li>├─ rec:Elevator · rec:Facade · rec:Roof</li>
+          <li>rec:Device</li>
+          <li>├─ rec:Sensor (Temperature, Pressure, Meter…)</li>
+          <li>├─ rec:Actuator</li>
+        </ul>
+      </div>
+      <div class="p-4 rounded-lg bg-violet-50 border border-violet-200">
+        <div class="font-semibold text-violet-700 mb-2">Agents (Personen &amp; Organisationen)</div>
+        <ul class="space-y-1 mono text-xs text-violet-900">
+          <li>rec:Agent</li>
+          <li>├─ rec:Person · rec:Organization</li>
+          <li>├─ Rollen: rec:Tenant, rec:Owner, rec:Contractor, rec:FacilityManager</li>
+        </ul>
+      </div>
+      <div class="p-4 rounded-lg bg-rose-50 border border-rose-200">
+        <div class="font-semibold text-rose-700 mb-2">Contracts &amp; Documents</div>
+        <ul class="space-y-1 mono text-xs text-rose-900">
+          <li>rec:Lease · rec:ServiceContract · rec:SalesContract</li>
+          <li>rec:Document (Plan, Invoice, Certificate…)</li>
+        </ul>
+      </div>
+      <div class="p-4 rounded-lg bg-emerald-50 border border-emerald-200 col-span-2">
+        <div class="font-semibold text-emerald-700 mb-2">Observations (Zeitreihen)</div>
+        <ul class="space-y-1 mono text-xs text-emerald-900">
+          <li>rec:Observation <span class="text-slate-500">// angelehnt an SOSA/SSN</span></li>
+          <li>├─ Eigenschaften: rec:ofSensor · rec:hasValue · rec:atTime · rec:unit</li>
+          <li>└─ Messreihen werden in Time-Series-DB gespeichert, Metadaten im Graph</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <h2 id="relationen" class="text-xl font-bold mb-3">4. Wichtigste Relationen</h2>
+    <table class="w-full text-sm">
+      <thead class="text-xs text-slate-500 uppercase border-b border-slate-200">
+        <tr><th class="text-left py-2">Property</th><th class="text-left">Domain</th><th class="text-left">Range</th><th class="text-left">Verwendung bei uns</th></tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <tr><td class="py-2 mono text-xs text-indigo-700">rec:hasPart / isPartOf</td><td class="mono text-xs">Space</td><td class="mono text-xs">Space</td><td>Building→Storey→Apartment→Room</td></tr>
+        <tr><td class="py-2 mono text-xs text-indigo-700">rec:locatedIn</td><td class="mono text-xs">Asset, Device</td><td class="mono text-xs">Space</td><td>Boiler locatedIn Storey/UG</td></tr>
+        <tr><td class="py-2 mono text-xs text-indigo-700">rec:hasSensor</td><td class="mono text-xs">Asset</td><td class="mono text-xs">Sensor</td><td>Boiler hasSensor Brennerdruck</td></tr>
+        <tr><td class="py-2 mono text-xs text-indigo-700">rec:servesSpace</td><td class="mono text-xs">Asset</td><td class="mono text-xs">Space</td><td>Lift servesSpace Aufgang A</td></tr>
+        <tr><td class="py-2 mono text-xs text-indigo-700">rec:forSpace</td><td class="mono text-xs">Lease</td><td class="mono text-xs">Space</td><td>Lease forSpace Apartment/3.02</td></tr>
+        <tr><td class="py-2 mono text-xs text-indigo-700">rec:hasTenant</td><td class="mono text-xs">Lease</td><td class="mono text-xs">Agent</td><td>Lease hasTenant agent/keller-a</td></tr>
+        <tr><td class="py-2 mono text-xs text-indigo-700">rec:owner</td><td class="mono text-xs">RealEstate</td><td class="mono text-xs">Agent</td><td>Estate owner familyOfficeMueller</td></tr>
+        <tr><td class="py-2 mono text-xs text-indigo-700">rec:ofSensor</td><td class="mono text-xs">Observation</td><td class="mono text-xs">Sensor</td><td>Obs ofSensor Brennerdruck</td></tr>
+        <tr><td class="py-2 mono text-xs text-indigo-700">rec:relatesTo</td><td class="mono text-xs">Document</td><td class="mono text-xs">Entity</td><td>Rechnung relatesTo Ticket/Asset</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <h2 id="beispiel" class="text-xl font-bold mb-3">5. Konkretes Beispiel (Turtle)</h2>
+    <p class="text-sm text-slate-700 mb-3">Auszug aus dem Produktivgraph für Rosengasse 14, Whg. 3.02:</p>
+<pre class="bg-slate-900 text-slate-100 rounded-lg p-4 overflow-x-auto"><code>@prefix rec:  &lt;https://w3id.org/rec#&gt; .
+@prefix re2:  &lt;https://re20.ch/id/&gt; .
+@prefix xsd:  &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+# Liegenschaft
+re2:estate/rosengasse14 a rec:RealEstate ;
+    rec:hasPart re2:bldg/rosengasse14 ;
+    rec:owner   re2:agent/familyOfficeMueller .
+
+# Gebäude mit Stockwerken
+re2:bldg/rosengasse14 a rec:Building ;
+    rec:grossArea "4820"^^xsd:decimal ;
+    rec:hasPart re2:storey/rosengasse14-3 .
+
+re2:storey/rosengasse14-3 a rec:Storey ;
+    rec:level 3 ;
+    rec:hasPart re2:apt/rosengasse14-3.02 .
+
+# Wohnung
+re2:apt/rosengasse14-3.02 a rec:Apartment ;
+    rec:grossArea "82"^^xsd:decimal ;
+    rec:roomCount "3.5" ;
+    rec:orientation "south" .
+
+# Mietverhältnis
+re2:lease/L-1423 a rec:Lease ;
+    rec:forSpace    re2:apt/rosengasse14-3.02 ;
+    rec:hasTenant   re2:agent/keller-a ;
+    rec:monthlyRent "2650"^^xsd:decimal ;
+    rec:startDate   "2022-04-01"^^xsd:date ;
+    rec:status      "active" .
+
+# Technische Anlage + Sensor
+re2:asset/boiler-01 a rec:HVAC , rec:Asset ;
+    rec:locatedIn re2:storey/rosengasse14-ug ;
+    rec:servesSpace re2:bldg/rosengasse14 ;
+    rec:hasSensor re2:sensor/boiler-pressure .
+
+re2:sensor/boiler-pressure a rec:Sensor ;
+    rec:measures rec:Pressure ;
+    rec:unit "bar" .
+
+# Observation (Zeitreihe-Punkt)
+re2:obs/2026-04-18T14:22:00 a rec:Observation ;
+    rec:ofSensor re2:sensor/boiler-pressure ;
+    rec:hasValue "2.8"^^xsd:decimal ;
+    rec:atTime "2026-04-18T14:22:00Z"^^xsd:dateTime .</code></pre>
+  </section>
+
+  <section class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <h2 id="shacl" class="text-xl font-bold mb-3">6. Validierung mit SHACL</h2>
+    <p class="text-sm text-slate-700 mb-3">
+      Jede REC-Entität wird beim Schreiben gegen SHACL-Shapes validiert. Beispiel <code class="mono text-xs bg-slate-100 px-1 rounded">rec:LeaseShape</code>:
+    </p>
+<pre class="bg-slate-900 text-slate-100 rounded-lg p-4 overflow-x-auto"><code>rec:LeaseShape a sh:NodeShape ;
+    sh:targetClass rec:Lease ;
+    sh:property [ sh:path rec:forSpace   ; sh:minCount 1 ; sh:class rec:Space ] ;
+    sh:property [ sh:path rec:hasTenant  ; sh:minCount 1 ; sh:class rec:Agent ] ;
+    sh:property [ sh:path rec:monthlyRent; sh:datatype xsd:decimal ; sh:minInclusive 0 ] ;
+    sh:property [ sh:path rec:startDate  ; sh:datatype xsd:date ] .</code></pre>
+    <p class="text-sm text-slate-700 mt-3">
+      Verletzungen erzeugen automatisch einen Klärungsfall in der Onboarding-Factory oder blockieren den
+      Import (harte vs. weiche Constraints konfigurierbar).
+    </p>
+  </section>
+
+  <section class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <h2 id="erweiterungen" class="text-xl font-bold mb-3">7. CH-spezifische Erweiterungen</h2>
+    <p class="text-sm text-slate-700 mb-3">
+      Wir ergänzen REC um ein schmales <code class="mono text-xs bg-slate-100 px-1 rounded">re2:</code>-Namespace mit
+      Schweiz-spezifischen Attributen, ohne das Kern-Schema zu brechen:
+    </p>
+    <ul class="text-sm space-y-1 text-slate-700">
+      <li>• <span class="mono text-xs text-indigo-700">re2:indexBaseMonth</span> / <span class="mono text-xs text-indigo-700">re2:referenceRate</span> — Schweizer Mietrecht (OR 269a/b).</li>
+      <li>• <span class="mono text-xs text-indigo-700">re2:geakClass</span> (A–G) — GEAK/CECB-Gebäudeenergieausweis.</li>
+      <li>• <span class="mono text-xs text-indigo-700">re2:egid</span> / <span class="mono text-xs text-indigo-700">re2:ewid</span> — amtliche Gebäude-/Wohnungs-Identifikatoren (BFS).</li>
+      <li>• <span class="mono text-xs text-indigo-700">re2:qrIban</span> — Schweizer QR-Rechnungs-IBAN an Lease/Invoice.</li>
+      <li>• <span class="mono text-xs text-indigo-700">re2:compliesWith rec:ArticleOR266a</span> — Referenzen auf OR-Artikel.</li>
+    </ul>
+  </section>
+
+  <section class="bg-white rounded-xl border border-slate-200 p-6 mb-6">
+    <h2 id="links" class="text-xl font-bold mb-3">8. Git &amp; offizielle Referenzen</h2>
+    <div class="space-y-3 text-sm">
+      <div class="p-3 rounded-lg border border-slate-200">
+        <div class="font-semibold">Offizielles REC-Repository (GitHub)</div>
+        <a href="https://github.com/RealEstateCore/rec" class="mono text-xs text-indigo-600 hover:underline">https://github.com/RealEstateCore/rec</a>
+        <div class="text-xs text-slate-500 mt-1">Kern-Ontologie (OWL), SHACL-Shapes, Beispielinstanzen. Lizenz: MIT.</div>
+      </div>
+      <div class="p-3 rounded-lg border border-slate-200">
+        <div class="font-semibold">REC-Website &amp; Spec</div>
+        <a href="https://dev.realestatecore.io/" class="mono text-xs text-indigo-600 hover:underline">https://dev.realestatecore.io/</a>
+        <div class="text-xs text-slate-500 mt-1">Spezifikation, Modul-Übersicht, Kontakt zum Consortium.</div>
+      </div>
+      <div class="p-3 rounded-lg border border-slate-200">
+        <div class="font-semibold">Azure Digital Twins · REC-Ontologie</div>
+        <a href="https://github.com/Azure/opendigitaltwins-building" class="mono text-xs text-indigo-600 hover:underline">https://github.com/Azure/opendigitaltwins-building</a>
+        <div class="text-xs text-slate-500 mt-1">DTDL-Variante für Azure Digital Twins (≈ 1:1 zu REC OWL).</div>
+      </div>
+      <div class="p-3 rounded-lg border border-slate-200">
+        <div class="font-semibold">Internes Real-Estate-2.0-Fork (geplant)</div>
+        <span class="mono text-xs text-slate-600">git@dev.vision-and.ch:re20/rec-ch.git</span>
+        <div class="text-xs text-slate-500 mt-1">Enthält CH-Erweiterungen (re2:-Namespace), SHACL-Shapes, CI-Pipeline für Onboarding-Validierung. Placeholder — anzulegen.</div>
+      </div>
+    </div>
+    <div class="mt-6 p-4 rounded-lg bg-indigo-50 border border-indigo-200 text-sm text-indigo-900">
+      <strong>Empfehlung:</strong> Upstream-REC als Submodule einbinden, CH-Erweiterungen in separatem
+      Modul halten (<span class="mono text-xs">rec-ch.ttl</span>), Pull-Requests an das Consortium für
+      generisch wiederverwendbare Konzepte (z.B. Index-Klauseln) einreichen — schafft Glaubwürdigkeit und verhindert Drift.
+    </div>
+  </section>
+
+  <footer class="text-xs text-slate-500 text-center py-6">
+    Real Estate 2.0 · vision& · Stand 18.04.2026 · v0.1
+  </footer>
+</main>
+<script src="_layout.js"></script></body></html>

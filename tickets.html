@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><title>Tickets · Real Estate 2.0</title>
+<script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-slate-50 min-h-screen" data-page="tickets">
+<main class="p-8">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <div class="text-sm text-slate-500">Orchestration Layer · Tickets verweisen via <code style="font-family:ui-monospace,monospace;font-size:10px" class="px-1 bg-slate-100 rounded">rec:affectsSpace</code> / <code style="font-family:ui-monospace,monospace;font-size:10px" class="px-1 bg-slate-100 rounded">rec:affectsAsset</code></div>
+      <h1 class="text-3xl font-bold text-slate-900">Tickets</h1>
+    </div>
+    <div class="flex gap-2">
+      <input type="text" placeholder="Suchen…" class="border border-slate-300 rounded-lg px-3 py-2 text-sm w-64">
+      <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm">+ Neues Ticket</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Offen</div><div class="text-2xl font-bold text-slate-900">14</div></div>
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">In Bearbeitung</div><div class="text-2xl font-bold text-indigo-600">23</div></div>
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Eskaliert (Human)</div><div class="text-2xl font-bold text-amber-600">4</div></div>
+    <div class="bg-white rounded-xl p-4 border border-slate-200"><div class="text-xs text-slate-500">Ø Durchlaufzeit</div><div class="text-2xl font-bold text-emerald-600">2.3 d</div></div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-6">
+    <!-- Kanban -->
+    <div class="bg-white rounded-xl p-4 border border-slate-200">
+      <div class="flex items-center justify-between mb-3"><div class="font-semibold text-sm">🆕 Neu · KI-Triage</div><span class="text-xs text-slate-500">5</span></div>
+      <div class="space-y-2">
+        <div class="p-3 rounded-lg border border-slate-200 bg-slate-50">
+          <div class="flex items-center gap-2 mb-1"><span class="text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded">P1</span><span class="text-xs text-slate-500">#4821</span></div>
+          <div class="font-medium text-sm">Wasserleck Badezimmer</div>
+          <div class="text-xs text-slate-500 mt-1">Rosengasse 14 · Whg. 4.12</div>
+          <div class="mt-1 text-xs" style="font-family:ui-monospace,monospace"><span class="text-indigo-600">rec:affectsSpace</span> apt/4.12 · <span class="text-indigo-600">rec:affectsAsset</span> shower-valve</div>
+          <div class="mt-2 p-2 bg-indigo-50 rounded text-xs text-indigo-700">🤖 KI: Sanitär · Müller AG vorgeschlagen · SLA 4h</div>
+        </div>
+        <div class="p-3 rounded-lg border border-slate-200 bg-slate-50">
+          <div class="flex items-center gap-2 mb-1"><span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">P2</span><span class="text-xs text-slate-500">#4822</span></div>
+          <div class="font-medium text-sm">Lift stehengeblieben</div>
+          <div class="text-xs text-slate-500 mt-1">Seestrasse 88 · Aufgang B</div>
+          <div class="mt-2 p-2 bg-indigo-50 rounded text-xs text-indigo-700">🤖 KI: Schindler · Wartungsvertrag aktiv</div>
+        </div>
+        <div class="p-3 rounded-lg border border-slate-200 bg-slate-50">
+          <div class="flex items-center gap-2 mb-1"><span class="text-xs bg-slate-200 text-slate-700 px-2 py-0.5 rounded">P3</span><span class="text-xs text-slate-500">#4823</span></div>
+          <div class="font-medium text-sm">Briefkastenschloss defekt</div>
+          <div class="text-xs text-slate-500 mt-1">Bahnhofstr. 5 · Eingang 3</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl p-4 border border-slate-200">
+      <div class="flex items-center justify-between mb-3"><div class="font-semibold text-sm">⚙️ In Bearbeitung</div><span class="text-xs text-slate-500">23</span></div>
+      <div class="space-y-2">
+        <div class="p-3 rounded-lg border border-indigo-200 bg-indigo-50">
+          <div class="flex items-center gap-2 mb-1"><span class="text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded">P1</span><span class="text-xs text-slate-500">#4815</span></div>
+          <div class="font-medium text-sm">Heizung ausgefallen 3. Stock</div>
+          <div class="text-xs text-slate-500 mt-1">Länggasse 22</div>
+          <div class="mt-1 text-xs" style="font-family:ui-monospace,monospace"><span class="text-indigo-600">rec:affectsAsset</span> boiler-01 · <span class="text-indigo-600">triggeredBy</span> sensor/flow-temp &lt;35°C</div>
+          <div class="mt-2 text-xs"><span class="font-medium">Peier Heizung</span> · Termin heute 14:00 bestätigt ✓</div>
+        </div>
+        <div class="p-3 rounded-lg border border-indigo-200 bg-indigo-50">
+          <div class="flex items-center gap-2 mb-1"><span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">P2</span><span class="text-xs text-slate-500">#4808</span></div>
+          <div class="font-medium text-sm">Schimmel Schlafzimmer-Decke</div>
+          <div class="text-xs text-slate-500 mt-1">Rosengasse 14 · Whg. 2.08</div>
+          <div class="mt-2 text-xs">Offerte eingeholt · 2 von 3 Anbietern</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl p-4 border border-slate-200">
+      <div class="flex items-center justify-between mb-3"><div class="font-semibold text-sm">⚠️ Human-in-the-loop</div><span class="text-xs text-slate-500">4</span></div>
+      <div class="space-y-2">
+        <div class="p-3 rounded-lg border border-amber-300 bg-amber-50">
+          <div class="flex items-center gap-2 mb-1"><span class="text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded">P1</span><span class="text-xs text-slate-500">#4799</span></div>
+          <div class="font-medium text-sm">Offerte &gt; CHF 15'000</div>
+          <div class="text-xs text-slate-600 mt-1">Dachsanierung – übersteigt Auto-Limit</div>
+          <div class="mt-2 flex gap-1"><button class="text-xs px-2 py-1 bg-emerald-600 text-white rounded">Freigeben</button><button class="text-xs px-2 py-1 bg-white border border-slate-300 rounded">Ablehnen</button></div>
+        </div>
+        <div class="p-3 rounded-lg border border-amber-300 bg-amber-50">
+          <div class="flex items-center gap-2 mb-1"><span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">P2</span><span class="text-xs text-slate-500">#4801</span></div>
+          <div class="font-medium text-sm">Nachbarstreit – Lärmbelästigung</div>
+          <div class="text-xs text-slate-600 mt-1">Sensitiver Fall → Senior-Bewirtschafter</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Process flow -->
+  <div class="mt-8 bg-white rounded-xl p-6 border border-slate-200">
+    <h3 class="font-semibold text-slate-900 mb-4">Automatisierter Prozess (event-driven)</h3>
+    <div class="flex items-center justify-between text-center text-xs">
+      <div class="flex-1"><div class="mx-auto w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center text-xl mb-2">📱</div><div class="font-medium">Meldung</div><div class="text-slate-500">Mieter-App</div></div>
+      <div class="text-slate-400">→</div>
+      <div class="flex-1"><div class="mx-auto w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-xl mb-2">🤖</div><div class="font-medium">KI-Triage</div><div class="text-slate-500">Kategorie · SLA</div></div>
+      <div class="text-slate-400">→</div>
+      <div class="flex-1"><div class="mx-auto w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-xl mb-2">🔍</div><div class="font-medium">Offerte</div><div class="text-slate-500">Auto-RfP</div></div>
+      <div class="text-slate-400">→</div>
+      <div class="flex-1"><div class="mx-auto w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-xl mb-2">📅</div><div class="font-medium">Terminierung</div><div class="text-slate-500">Lieferant</div></div>
+      <div class="text-slate-400">→</div>
+      <div class="flex-1"><div class="mx-auto w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-xl mb-2">✅</div><div class="font-medium">Abnahme</div><div class="text-slate-500">Foto-KI</div></div>
+      <div class="text-slate-400">→</div>
+      <div class="flex-1"><div class="mx-auto w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center text-xl mb-2">💳</div><div class="font-medium">Clearing</div><div class="text-slate-500">API-Banking</div></div>
+    </div>
+  </div>
+</main>
+<script src="_layout.js"></script></body></html>

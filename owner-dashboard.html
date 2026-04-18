@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8"><title>Portfolio · Real Estate 2.0</title>
+<script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-slate-50 min-h-screen" data-page="owner-dashboard">
+<main class="p-8">
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <div class="text-sm text-slate-500">Eigentümer-Portal</div>
+      <h1 class="text-3xl font-bold text-slate-900">Portfolio-Übersicht</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <select class="bg-white border border-slate-300 rounded-lg px-4 py-2 text-sm"><option>Alle Mandate</option><option>Family Office Müller</option><option>Pensionskasse XY</option></select>
+      <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Bericht exportieren</button>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="bg-white rounded-xl p-5 border border-slate-200">
+      <div class="text-xs text-slate-500 uppercase tracking-wide mb-1">Einheiten</div>
+      <div class="text-3xl font-bold text-slate-900">1'247</div>
+      <div class="text-sm text-emerald-600 mt-1">+43 MoM</div>
+    </div>
+    <div class="bg-white rounded-xl p-5 border border-slate-200">
+      <div class="text-xs text-slate-500 uppercase tracking-wide mb-1">Ist-Sollmieten YTD</div>
+      <div class="text-3xl font-bold text-slate-900">CHF 28.4M</div>
+      <div class="text-sm text-emerald-600 mt-1">98.6% Inkasso</div>
+    </div>
+    <div class="bg-white rounded-xl p-5 border border-slate-200">
+      <div class="text-xs text-slate-500 uppercase tracking-wide mb-1">Leerstand</div>
+      <div class="text-3xl font-bold text-slate-900">2.1%</div>
+      <div class="text-sm text-rose-600 mt-1">▲ 0.3% MoM</div>
+    </div>
+    <div class="bg-white rounded-xl p-5 border border-slate-200">
+      <div class="text-xs text-slate-500 uppercase tracking-wide mb-1">ESG-Score</div>
+      <div class="text-3xl font-bold text-slate-900">B+</div>
+      <div class="text-sm text-emerald-600 mt-1">Scope 1+2 erfasst</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-6 mb-6">
+    <div class="col-span-2 bg-white rounded-xl p-6 border border-slate-200">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-slate-900">Cashflow-Entwicklung (12 Monate)</h3>
+        <div class="text-xs text-slate-500">Aktualisiert: heute, 08:42</div>
+      </div>
+      <svg viewBox="0 0 600 200" class="w-full h-48">
+        <defs><linearGradient id="g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#6366f1" stop-opacity=".3"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0"/></linearGradient></defs>
+        <path d="M0,150 L50,140 L100,130 L150,135 L200,120 L250,110 L300,115 L350,100 L400,95 L450,80 L500,85 L550,70 L600,60 L600,200 L0,200 Z" fill="url(#g1)"/>
+        <path d="M0,150 L50,140 L100,130 L150,135 L200,120 L250,110 L300,115 L350,100 L400,95 L450,80 L500,85 L550,70 L600,60" stroke="#6366f1" stroke-width="2" fill="none"/>
+        <g class="text-xs" fill="#64748b" font-size="10"><text x="10" y="195">Mai</text><text x="150" y="195">Aug</text><text x="300" y="195">Nov</text><text x="450" y="195">Feb</text><text x="570" y="195">Apr</text></g>
+      </svg>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-slate-200">
+      <h3 class="font-semibold text-slate-900 mb-4">Automatisierungsgrad</h3>
+      <div class="space-y-3">
+        <div><div class="flex justify-between text-sm mb-1"><span>NK-Abrechnung</span><span class="font-semibold">94%</span></div><div class="bg-slate-100 rounded-full h-2"><div class="bg-emerald-500 h-2 rounded-full" style="width:94%"></div></div></div>
+        <div><div class="flex justify-between text-sm mb-1"><span>Ticket-Routing</span><span class="font-semibold">87%</span></div><div class="bg-slate-100 rounded-full h-2"><div class="bg-emerald-500 h-2 rounded-full" style="width:87%"></div></div></div>
+        <div><div class="flex justify-between text-sm mb-1"><span>Rechnungs-Clearing</span><span class="font-semibold">91%</span></div><div class="bg-slate-100 rounded-full h-2"><div class="bg-emerald-500 h-2 rounded-full" style="width:91%"></div></div></div>
+        <div><div class="flex justify-between text-sm mb-1"><span>Vermietung (Screening)</span><span class="font-semibold">62%</span></div><div class="bg-slate-100 rounded-full h-2"><div class="bg-amber-500 h-2 rounded-full" style="width:62%"></div></div></div>
+        <div><div class="flex justify-between text-sm mb-1"><span>Rechtliche Eskalation</span><span class="font-semibold">18%</span></div><div class="bg-slate-100 rounded-full h-2"><div class="bg-rose-500 h-2 rounded-full" style="width:18%"></div></div></div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-slate-100 text-xs text-slate-500">Rest: Management by Exception</div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl p-6 border border-slate-200">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-semibold text-slate-900">Top-Liegenschaften</h3>
+        <a href="property-detail.html" class="text-sm text-indigo-600">Alle anzeigen →</a>
+      </div>
+      <table class="w-full text-sm">
+        <thead class="text-xs text-slate-500 uppercase tracking-wide"><tr><th class="text-left pb-2">Objekt</th><th class="text-left pb-2">Einheiten</th><th class="text-left pb-2">Leerstand</th><th class="text-left pb-2">Rendite</th></tr></thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr><td class="py-2"><a href="property-detail.html" class="font-medium text-slate-900 hover:text-indigo-600">Rosengasse 14, Zürich</a></td><td>48</td><td class="text-emerald-600">0%</td><td>4.2%</td></tr>
+          <tr><td class="py-2"><a href="property-detail.html" class="font-medium text-slate-900 hover:text-indigo-600">Seestrasse 88, Horgen</a></td><td>32</td><td class="text-amber-600">3.1%</td><td>3.9%</td></tr>
+          <tr><td class="py-2"><a href="property-detail.html" class="font-medium text-slate-900 hover:text-indigo-600">Bahnhofstr. 5, St. Gallen</a></td><td>64</td><td class="text-emerald-600">1.5%</td><td>4.6%</td></tr>
+          <tr><td class="py-2"><a href="property-detail.html" class="font-medium text-slate-900 hover:text-indigo-600">Länggasse 22, Bern</a></td><td>28</td><td class="text-rose-600">7.1%</td><td>3.1%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bg-white rounded-xl p-6 border border-slate-200">
+      <h3 class="font-semibold text-slate-900 mb-4">Proaktive Hinweise (KI)</h3>
+      <div class="space-y-3">
+        <div class="flex gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
+          <div class="text-xl">⚠️</div>
+          <div class="flex-1"><div class="font-medium text-sm text-slate-900">Heizungsausfall-Risiko</div><div class="text-xs text-slate-600">Seestrasse 88: IoT-Daten zeigen Brennerdruck-Abweichung. Wartung empfohlen.</div></div>
+        </div>
+        <div class="flex gap-3 p-3 rounded-lg bg-indigo-50 border border-indigo-200">
+          <div class="text-xl">💡</div>
+          <div class="flex-1"><div class="font-medium text-sm text-slate-900">Mietanpassung möglich</div><div class="text-xs text-slate-600">Referenzzinssatz: 12 Wohnungen unterhalb Marktwert (~CHF 28k/Jahr).</div></div>
+        </div>
+        <div class="flex gap-3 p-3 rounded-lg bg-emerald-50 border border-emerald-200">
+          <div class="text-xl">✅</div>
+          <div class="flex-1"><div class="font-medium text-sm text-slate-900">NK-Abrechnung fertig</div><div class="text-xs text-slate-600">Rosengasse 14: 48/48 Abrechnungen automatisch erstellt, Freigabe ausstehend.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script src="_layout.js"></script></body></html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Real Estate 2.0 – Mockup Übersicht</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .card { transition: all .2s; }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -15px rgba(0,0,0,.2); }
+</style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+  <div class="max-w-7xl mx-auto p-8">
+    <div class="mb-10">
+      <div class="flex items-center gap-3 mb-2">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center text-white font-bold">RE</div>
+        <h1 class="text-3xl font-bold text-slate-900">Real Estate 2.0</h1>
+        <span class="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full">Building Operating System</span>
+      </div>
+      <p class="text-slate-600">Mockup-Übersicht · vision& · <strong>Semantic Core auf RealEstateCore v3.3</strong> · KI-Orchestrierung · End-to-End Bewirtschaftung</p>
+      <p class="text-xs text-slate-500 mt-2" style="font-family:ui-monospace,monospace">Alle Screens binden REC-Entitäten: rec:RealEstate · rec:Building · rec:Storey · rec:Apartment · rec:Room · rec:Asset · rec:Sensor · rec:Observation · rec:Lease · rec:Agent</p>
+    </div>
+
+    <div class="mb-8 bg-gradient-to-r from-indigo-600 to-violet-700 text-white rounded-2xl p-8 shadow-xl">
+      <div class="grid grid-cols-4 gap-6">
+        <div><div class="text-3xl font-bold">~70%</div><div class="text-indigo-200 text-sm">OPEX-Reduktion/Einheit</div></div>
+        <div><div class="text-3xl font-bold">1'500–2'500</div><div class="text-indigo-200 text-sm">Einheiten / Fachkraft</div></div>
+        <div><div class="text-3xl font-bold">CHF 40 Mrd.</div><div class="text-indigo-200 text-sm">Adressierbarer Markt CH</div></div>
+        <div><div class="text-3xl font-bold">&lt; 30 Tage</div><div class="text-indigo-200 text-sm">Onboarding-Ziel</div></div>
+      </div>
+    </div>
+
+    <h2 class="text-xl font-bold text-slate-900 mb-4">Rollenbasierte Oberflächen (Experience Layer)</h2>
+    <div class="grid grid-cols-3 gap-6 mb-10">
+
+      <a href="owner-dashboard.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center mb-4 text-2xl">🏢</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Eigentümer-Portal</h3>
+        <p class="text-sm text-slate-600">Portfolio-KPIs, Cashflow, ESG-Score, Leerstand, Risiken</p>
+      </a>
+
+      <a href="property-detail.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-4 text-2xl">📊</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Liegenschaft (REC-Entitäten)</h3>
+        <p class="text-sm text-slate-600">rec:Building → Storey → Apartment → Asset/Sensor</p>
+      </a>
+
+      <a href="graph-explorer.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center mb-4 text-2xl">🕸️</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Graph Explorer (SPARQL)</h3>
+        <p class="text-sm text-slate-600">REC-Ontologie durchsuchen, SHACL-Validierung</p>
+      </a>
+
+      <a href="tickets.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center mb-4 text-2xl">🔧</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Schaden & Mängel</h3>
+        <p class="text-sm text-slate-600">KI-Triage, Lieferantenrouting, automatisches Clearing</p>
+      </a>
+
+      <a href="lease-detail.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center mb-4 text-2xl">📝</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Mietverhältnis</h3>
+        <p class="text-sm text-slate-600">rec:Lease · Timeline · OR-Compliance · Retention</p>
+      </a>
+
+      <a href="nk-abrechnung.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-teal-100 flex items-center justify-center mb-4 text-2xl">📋</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">NK-Abrechnung</h3>
+        <p class="text-sm text-slate-600">Automatisch aus rec:Observation + Verteilschlüssel</p>
+      </a>
+
+      <a href="finance.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center mb-4 text-2xl">💳</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Finanzen & Clearing</h3>
+        <p class="text-sm text-slate-600">3-Wege-Match, API-Banking, Auto-Freigabe</p>
+      </a>
+
+      <a href="predictive-maintenance.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center mb-4 text-2xl">🔮</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Predictive Maintenance</h3>
+        <p class="text-sm text-slate-600">IoT-Anomalien, CAPEX-Planung, Lifecycle</p>
+      </a>
+
+      <a href="realestatecore-doku.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-slate-200 flex items-center justify-center mb-4 text-2xl">📖</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">REC Datenmodell-Doku</h3>
+        <p class="text-sm text-slate-600">Ontologie-Übersicht, Turtle-Beispiele, Git-Referenzen</p>
+      </a>
+
+      <a href="supply-chain.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center mb-4 text-2xl">🤝</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Supply Chain & Offerten</h3>
+        <p class="text-sm text-slate-600">Ausschreibung, Angebotsvergleich, SLA-Tracking</p>
+      </a>
+
+      <a href="listings.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-sky-100 flex items-center justify-center mb-4 text-2xl">🔑</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Vermietung & Inserate</h3>
+        <p class="text-sm text-slate-600">Auto-Publikation, KI-Screening, digitale Bewerbung</p>
+      </a>
+
+      <a href="esg.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center mb-4 text-2xl">🌱</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">ESG-Reporting</h3>
+        <p class="text-sm text-slate-600">CSRD/SFDR-konform, Verbräuche, Emissionen</p>
+      </a>
+
+      <a href="onboarding.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-violet-100 flex items-center justify-center mb-4 text-2xl">⚡</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Onboarding Factory</h3>
+        <p class="text-sm text-slate-600">AI-OCR, NLP-Extraktion, Datenmigration in Tagen</p>
+      </a>
+
+      <a href="tenant.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center mb-4 text-2xl">👤</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">Mieter-App</h3>
+        <p class="text-sm text-slate-600">Schadenmeldung, Dokumente, NK-Abrechnung, Chat</p>
+      </a>
+
+      <a href="agents.html" class="card bg-white rounded-2xl p-6 shadow border border-slate-200 block">
+        <div class="w-12 h-12 rounded-xl bg-slate-200 flex items-center justify-center mb-4 text-2xl">🤖</div>
+        <h3 class="font-bold text-lg text-slate-900 mb-1">KI-Agenten Cockpit</h3>
+        <p class="text-sm text-slate-600">Governance, Human-in-the-Loop, Audit-Trails</p>
+      </a>
+
+    </div>
+
+    <div class="bg-white rounded-2xl p-6 shadow border border-slate-200">
+      <h2 class="text-xl font-bold text-slate-900 mb-4">Plattform-Architektur (4 Ebenen)</h2>
+      <div class="space-y-2">
+        <div class="flex items-center gap-4 p-3 bg-slate-50 rounded-lg"><div class="w-16 text-center font-bold text-slate-400">04</div><div class="flex-1"><div class="font-semibold">Experience</div><div class="text-sm text-slate-600">Dashboards für Eigentümer, Mieter & Lieferanten</div></div></div>
+        <div class="flex items-center gap-4 p-3 bg-indigo-50 rounded-lg"><div class="w-16 text-center font-bold text-indigo-400">03</div><div class="flex-1"><div class="font-semibold">Orchestration</div><div class="text-sm text-slate-600">Event-Driven Microservices · KI-Agenten</div></div></div>
+        <div class="flex items-center gap-4 p-3 bg-violet-50 rounded-lg"><div class="w-16 text-center font-bold text-violet-400">02</div><div class="flex-1"><div class="font-semibold">Semantic Core</div><div class="text-sm text-slate-600">Knowledge Graph (RealEstateCore)</div></div></div>
+        <div class="flex items-center gap-4 p-3 bg-emerald-50 rounded-lg"><div class="w-16 text-center font-bold text-emerald-400">01</div><div class="flex-1"><div class="font-semibold">Ingestion</div><div class="text-sm text-slate-600">AI-OCR · NLP · IoT-Gateways</div></div></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
