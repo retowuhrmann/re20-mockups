@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>REC Space – Investor Pitch</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #060b1a;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  overflow: hidden; width: 100vw; height: 100vh; user-select: none;
+}
+#main-svg { position: absolute; top: 0; left: 0; overflow: visible; }
+
+#ui { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+#brand   { position: absolute; top: 26px; left: 38px; font-size: 10px; letter-spacing: 4px; color: rgba(80,140,255,0.5); text-transform: uppercase; }
+#step-title { position: absolute; top: 48px; left: 38px; font-size: 23px; font-weight: 200; color: #fff; max-width: 500px; }
+#step-sub   { position: absolute; top: 82px; left: 40px; font-size: 13px; color: rgba(255,255,255,0.38); }
+#counter    { position: absolute; bottom: 26px; right: 38px; font-size: 11px; color: rgba(255,255,255,0.25); letter-spacing: 1px; }
+#nav-hint   { position: absolute; bottom: 26px; width: 100%; text-align: center; font-size: 11px; letter-spacing: 2px; color: rgba(255,255,255,0.18); text-transform: uppercase; pointer-events: none; }
+#progress   { position: absolute; bottom: 0; left: 0; height: 2px; background: linear-gradient(90deg, #4a8fff, #a855f7); transition: width 0.55s cubic-bezier(.4,0,.2,1); }
+
+.icard {
+  position: absolute;
+  background: rgba(6,11,28,0.94); border: 1px solid rgba(74,143,255,0.22);
+  border-radius: 10px; padding: 12px 16px; min-width: 188px;
+  backdrop-filter: blur(10px); pointer-events: none;
+  opacity: 0; transform: translateY(6px) scale(0.93);
+  transition: opacity 0.32s ease, transform 0.32s cubic-bezier(.34,1.56,.64,1); z-index: 10;
+}
+.icard.on { opacity: 1; transform: translateY(0) scale(1); }
+.icard h4 { font-size: 11px; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.5px; }
+.icard .row { display: flex; justify-content: space-between; gap: 14px; padding: 2px 0; }
+.icard .k { font-size: 10px; color: rgba(255,255,255,0.38); font-family: 'Courier New', monospace; }
+.icard .v { font-size: 10px; color: #fff; font-weight: 500; }
+
+#statement { position: absolute; width: 100%; text-align: center; pointer-events: none; opacity: 0; transition: opacity 0.75s ease; }
+#statement.on { opacity: 1; }
+.stmt-big   { font-size: 52px; font-weight: 700; letter-spacing: -2px; background: linear-gradient(130deg,#4a8fff 20%,#a855f7 55%,#f59e0b 90%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.stmt-small { margin-top: 10px; font-size: 17px; font-weight: 300; color: rgba(255,255,255,0.42); letter-spacing: 1px; }
+</style>
+</head>
+<body>
+
+<svg id="main-svg">
+  <g id="bg"></g>
+  <g id="world">
+    <g id="gLinks"></g>
+    <g id="gNodes"></g>
+  </g>
+</svg>
+
+<div id="ui">
+  <div id="brand">REC Space Model · v3.3 · CH</div>
+  <div id="step-title"></div>
+  <div id="step-sub"></div>
+  <div id="counter"></div>
+  <div id="nav-hint">Klick · Space · → Weiter &nbsp;|&nbsp; ← Neustart</div>
+  <div id="progress" style="width:0%"></div>
+</div>
+<div id="statement"></div>
+
+<script>
+// ── Dimensions ──────────────────────────────────────────────────
+const W = window.innerWidth, H = window.innerHeight;
+const CX = W / 2, CY = H / 2;
+const MODULE_R = 720; // world-space radius of the full REC ring
+
+// ── SVG refs ────────────────────────────────────────────────────
+const svg   = d3.select('#main-svg').attr('width', W).attr('height', H);
+const world = d3.select('#world')
+  .style('transform-origin', '0 0')
+  .style('transform', 'translate(0px,0px) scale(1)'); // CSS transform for reliable animation
+const gL    = d3.select('#gLinks');
+const gN    = d3.select('#gNodes');
+const defs  = svg.append('defs');
+
+// Glow filters
+function mkGlow(id, blur) {
+  const f = defs.append('filter').attr('id', id)
+    .attr('x','-80%').attr('y','-80%').attr('width','260%').attr('height','260%');
+  f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation',blur).attr('result','b');
+  const m = f.append('feMerge');
+  m.append('feMergeNode').attr('in','b');
+  m.append('feMergeNode').attr('in','SourceGraphic');
+}
+mkGlow('glow-s',3); mkGlow('glow-m',7); mkGlow('glow-lg',13);
+
+// Dot grid (static, outside world)
+const bgG = d3.select('#bg');
+for (let x=0;x<W;x+=44) for (let y=0;y<H;y+=44)
+  bgG.append('circle').attr('cx',x).attr('cy',y).attr('r',0.7).attr('fill','rgba(255,255,255,0.04)');
+
+// Soft radial glow in world
+const rg0 = defs.append('radialGradient').attr('id','bg-glow').attr('cx','50%').attr('cy','50%').attr('r','50%');
+rg0.append('stop').attr('offset','0%').attr('stop-color','#1a2a5e').attr('stop-opacity',0.5);
+rg0.append('stop').attr('offset','100%').attr('stop-color','#060b1a').attr('stop-opacity',0);
+world.insert('ellipse','#gLinks').attr('cx',CX).attr('cy',CY).attr('rx',W*.36).attr('ry',H*.36).attr('fill','url(#bg-glow)');
+
+// ── Process nodes ────────────────────────────────────────────────
+// Layout: AGENT(top-left) → LEASE(top-mid) → ZONE(top-right)
+//                                              ↓ (locationId)
+//                        SERVICE(left) ← ASSET cluster (center) → TASK_P → TASK_C
+const NODES = {
+  AGENT: {
+    id:'AGENT', label:'Anna Meier', sub:'Agent · Tenant',
+    module:'Agent', color:'#a855f7', r:44,
+    x: CX-265, y: CY-145,
+    data:[
+      ['id',    'AGT_TEN_01'],
+      ['role',  'Tenant'],
+      ['name',  'Anna Meier'],
+      ['email', 'anna.meier@…'],
+      ['phone', '+41 79 111 22 33'],
+    ]
+  },
+  LEASE: {
+    id:'LEASE', label:'Miete W1', sub:'Lease · active',
+    module:'Lease', color:'#10b981', r:40,
+    x: CX+10, y: CY-205,
+    data:[
+      ['id',           'LSE_W1_2024'],
+      ['lesseeId',     'AGT_TEN_01'],
+      ['leasedSpaceId','ZN_W1'],
+      ['status',       'active'],
+      ['rent',         "CHF 1'650 / Mt."],
+    ]
+  },
+  ZONE: {
+    id:'ZONE', label:'Wohnung W1', sub:'Space · TenantUnit',
+    module:'Space', color:'#06b6d4', r:44,
+    x: CX+275, y: CY-110,
+    data:[
+      ['id',        'ZN_W1'],
+      ['zoneType',  'TenantUnit'],
+      ['roomCount', '3.5 Zi'],
+      ['netArea_m2','82 m²'],
+      ['ewid',      '12345'],
+      ['floor',     'Erdgeschoss'],
+    ]
+  },
+  ASSET_BK: {
+    id:'ASSET_BK', label:'Briefkasten', sub:'Asset · Nameplate',
+    module:'Asset', color:'#F59E0B', r:36,
+    x: CX-90, y: CY+35,
+    data:[
+      ['id',        'AST_006'],
+      ['subtype',   'Nameplate'],
+      ['locationId','ZN_W1'],
+      ['width_mm',  '80 mm'],
+      ['height_mm', '25 mm'],
+      ['unitPrice', 'CHF 15.–'],
+    ]
+  },
+  ASSET_TS: {
+    id:'ASSET_TS', label:'Türschild', sub:'Asset · Nameplate',
+    module:'Asset', color:'#FBBF24', r:36,
+    x: CX+90, y: CY+35,
+    data:[
+      ['id',        'AST_007'],
+      ['subtype',   'Nameplate'],
+      ['locationId','ZN_W1'],
+      ['width_mm',  '100 mm'],
+      ['height_mm', '30 mm'],
+      ['unitPrice', 'CHF 18.–'],
+    ]
+  },
+  ASSET_KS: {
+    id:'ASSET_KS', label:'Klingelschild', sub:'Asset · Nameplate',
+    module:'Asset', color:'#D97706', r:36,
+    x: CX, y: CY+130,
+    data:[
+      ['id',        'AST_008'],
+      ['subtype',   'Nameplate'],
+      ['locationId','ZN_W1'],
+      ['width_mm',  '60 mm'],
+      ['height_mm', '20 mm'],
+      ['unitPrice', 'CHF 12.–'],
+    ]
+  },
+  SERVICE: {
+    id:'SERVICE', label:'Müller Holzbau', sub:'ServiceAssignment*',
+    module:'ServiceAssign.', color:'#f97316', r:43,
+    x: CX-285, y: CY+85,
+    data:[
+      ['id',          'SA_NP_001'],
+      ['supplier',    'Müller Holzbau AG'],
+      ['category',    'Nameplate'],
+      ['deliveryDays','7 Tage'],
+      ['priority',    '1 (primary)'],
+    ]
+  },
+  TASK_P: {
+    id:'TASK_P', label:'Bestellung', sub:'Task* · Parent',
+    module:'Task', color:'#ef4444', r:40,
+    x: CX-95, y: CY+245,
+    data:[
+      ['id',    'TSK_2026_045'],
+      ['type',  'Parent'],
+      ['title', 'Namensschilder W1'],
+      ['items', '3 Schilder · CHF 45.–'],
+      ['status','completed'],
+    ]
+  },
+  TASK_C: {
+    id:'TASK_C', label:'Lieferauftrag', sub:'Task* · Child · ⭐⭐⭐⭐⭐',
+    module:'Task', color:'#ec4899', r:36,
+    x: CX+175, y: CY+280,
+    data:[
+      ['id',             'TSK_2026_045_SUB'],
+      ['type',           'Child'],
+      ['serviceProvider','Müller Holzbau AG'],
+      ['rating',         '5 / 5 ⭐'],
+      ['status',         'completed'],
+    ]
+  },
+};
+
+// ── Steps ────────────────────────────────────────────────────────
+// Correct flow: Mieter → Lease → Zone → Assets (via locationId) → ServiceAssignment → Tasks
+const STEPS = [
+  {
+    title:'Demo: Namensschilder-Bestellung',
+    sub:  'Mieter Anna Meier bestellt neue Namensschilder im Portal',
+    nodes:[], links:[], card:null,
+  },
+  {
+    title:'Schritt 1 – Mieter identifiziert',
+    sub:  'tbl_Agent: Mieter Anna Meier meldet sich im Portal an → AGT_TEN_01',
+    nodes:['AGENT'], links:[], card:'AGENT',
+  },
+  {
+    title:'Schritt 2 – Mietverhältnis geprüft',
+    sub:  'tbl_Lease: lesseeId = AGT_TEN_01 → leasedSpaceId = ZN_W1',
+    nodes:['LEASE'], links:[{s:'AGENT',t:'LEASE'}], card:'LEASE',
+  },
+  {
+    title:'Schritt 3 – Wohnung lokalisiert',
+    sub:  'tbl_Space_Zone: ZN_W1 · TenantUnit · 3.5-Zi · EG · 82 m²',
+    nodes:['ZONE'], links:[{s:'LEASE',t:'ZONE'}], card:'ZONE',
+  },
+  {
+    title:'Schritt 4 – Asset gefunden: Briefkasten',
+    sub:  'tbl_Asset: locationId = ZN_W1 → AST_006 · Nameplate · 80×25 mm · CHF 15.–',
+    nodes:['ASSET_BK'], links:[{s:'ZONE',t:'ASSET_BK'}], card:'ASSET_BK',
+  },
+  {
+    title:'Schritt 5 – Asset gefunden: Türschild',
+    sub:  'tbl_Asset: locationId = ZN_W1 → AST_007 · Nameplate · 100×30 mm · CHF 18.–',
+    nodes:['ASSET_TS'], links:[{s:'ZONE',t:'ASSET_TS'},{s:'ASSET_BK',t:'ASSET_TS'}], card:'ASSET_TS',
+  },
+  {
+    title:'Schritt 6 – Asset gefunden: Klingelschild',
+    sub:  'tbl_Asset: locationId = ZN_W1 → AST_008 · Nameplate · 60×20 mm · CHF 12.– · Total: CHF 45.–',
+    nodes:['ASSET_KS'], links:[{s:'ZONE',t:'ASSET_KS'},{s:'ASSET_BK',t:'ASSET_KS'},{s:'ASSET_TS',t:'ASSET_KS'}], card:'ASSET_KS',
+  },
+  {
+    title:'Schritt 7 – Lieferant zugewiesen',
+    sub:  'tbl_ServiceAssignment: category=Nameplate → Müller Holzbau AG · Priority 1 · 7 Tage',
+    nodes:['SERVICE'], links:[{s:'ASSET_BK',t:'SERVICE'}], card:'SERVICE',
+  },
+  {
+    title:'Schritt 8 – Tasks erstellt',
+    sub:  'tbl_Task: Parent-Task (alle 3 Schilder) + Sub-Task an Lieferant · vollautomatisch',
+    nodes:['TASK_P'],
+    links:[
+      {s:'TASK_P',t:'ASSET_BK'},{s:'TASK_P',t:'ASSET_TS'},{s:'TASK_P',t:'ASSET_KS'},
+      {s:'TASK_P',t:'AGENT'},{s:'TASK_P',t:'SERVICE'},
+    ],
+    card:'TASK_P',
+  },
+  {
+    title:'Schritt 9 – Abgeschlossen & bewertet',
+    sub:  'Lieferung bestätigt · Rating: 5/5 Sterne · Prozess 100% digital',
+    nodes:['TASK_C'], links:[{s:'TASK_C',t:'TASK_P'},{s:'TASK_C',t:'SERVICE'}], card:'TASK_C',
+  },
+  {
+    title:'', sub:'', nodes:[], links:[], card:null,
+    stmt:{ big:'3 Assets. 7 Module. 30+ Felder.', small:'Eine Anfrage. Vollautomatisiert. In Sekunden.' },
+  },
+  {
+    title:'Das Netzwerk dahinter', sub:'Zoom out – alle 20 REC-Module erscheinen',
+    nodes:[], links:[], card:null, finale:'phase1',
+  },
+  {
+    title:'Das volle REC-Potential', sub:'315 Attribute · 20 Module · Schweizer Immobilien-Standard',
+    nodes:[], links:[], card:null, finale:'phase2',
+  },
+];
+
+// ── All REC modules ──────────────────────────────────────────────
+const ALL_MODULES = [
+  {id:'M_SPACE',label:'Space',            records:59, color:'#06b6d4',ch:false,core:true },
+  {id:'M_ASSET',label:'Asset',            records:43, color:'#F59E0B',ch:false,core:true },
+  {id:'M_AGENT',label:'Agent',            records:22, color:'#a855f7',ch:false,core:true },
+  {id:'M_LEASE',label:'Lease',            records:12, color:'#10b981',ch:false,core:true },
+  {id:'M_TASK', label:'Task *',           records:27, color:'#ef4444',ch:true, core:true },
+  {id:'M_SA',   label:'Service\nAssign.*',records:35, color:'#f97316',ch:true, core:true },
+  {id:'M_BLDG', label:'Building\nElement',records:34, color:'#6366f1',ch:false,core:false},
+  {id:'M_POINT',label:'Point',            records:26, color:'#14b8a6',ch:false,core:false},
+  {id:'M_INFO', label:'Information',      records:86, color:'#a78bfa',ch:false,core:false},
+  {id:'M_COLL', label:'Collection *',     records:16, color:'#60a5fa',ch:true, core:false},
+  {id:'M_ADDR', label:'Address',          records:16, color:'#34d399',ch:false,core:false},
+  {id:'M_LC',   label:'Lease\nCharge *',  records:30, color:'#fbbf24',ch:true, core:false},
+  {id:'M_REC',  label:'Receivable *',     records:11, color:'#fb923c',ch:true, core:false},
+  {id:'M_MR',   label:'Market\nRent *',   records:11, color:'#4ade80',ch:true, core:false},
+  {id:'M_BUD',  label:'Budget *',         records:10, color:'#a3e635',ch:true, core:false},
+  {id:'M_NA',   label:'Notif.\nAuth. *',  records:10, color:'#67e8f9',ch:true, core:false},
+  {id:'M_SC',   label:'Service\nContract*',records:10,color:'#f0abfc',ch:true, core:false},
+  {id:'M_OP',   label:'Owner\nPolicy *',  records:18, color:'#fca5a5',ch:true, core:false},
+  {id:'M_WL',   label:'Waitlist *',       records:12, color:'#86efac',ch:true, core:false},
+  {id:'M_RPTS', label:'Reports',          records:0,  color:'#e2e8f0',ch:false,core:false},
+];
+const MODULE_LINKS = [
+  ['M_ASSET','M_SPACE'],['M_AGENT','M_LEASE'],['M_LEASE','M_SPACE'],
+  ['M_TASK','M_ASSET'],['M_TASK','M_AGENT'],['M_SA','M_AGENT'],
+  ['M_SA','M_ASSET'],['M_LC','M_LEASE'],['M_REC','M_LEASE'],
+  ['M_OP','M_AGENT'],['M_SC','M_SA'],['M_INFO','M_ASSET'],
+  ['M_POINT','M_BLDG'],['M_BLDG','M_SPACE'],['M_ADDR','M_SPACE'],
+  ['M_MR','M_SPACE'],['M_BUD','M_LEASE'],['M_WL','M_SPACE'],
+  ['M_NA','M_AGENT'],['M_COLL','M_SPACE'],['M_INFO','M_SPACE'],
+  ['M_RPTS','M_ASSET'],['M_RPTS','M_LEASE'],['M_TASK','M_SPACE'],
+];
+
+// Tiered web layout: inner=core process modules, mid=secondary, outer=extensions
+const MOD_TIERS = [
+  { r: 360, ids: ['M_SPACE','M_ASSET','M_AGENT','M_LEASE','M_TASK','M_SA'] },
+  { r: 590, ids: ['M_BLDG','M_INFO','M_LC','M_REC','M_OP','M_ADDR','M_MR'] },
+  { r: 800, ids: ['M_POINT','M_COLL','M_BUD','M_NA','M_SC','M_WL','M_RPTS'] },
+];
+const modPos = {};
+MOD_TIERS.forEach(({ r, ids }) => {
+  ids.forEach((id, i) => {
+    const a = (i / ids.length) * 2 * Math.PI - Math.PI / 2;
+    modPos[id] = { x: CX + r * Math.cos(a), y: CY + r * Math.sin(a) };
+  });
+});
+
+// ── State ────────────────────────────────────────────────────────
+let currentStep = -1;
+const shownNodes = new Set(), shownLinks = new Set(), domCards = {};
+let finalePhase = 0;
+
+// ── Render: process node ─────────────────────────────────────────
+function renderNode(nd) {
+  if (shownNodes.has(nd.id)) return;
+  shownNodes.add(nd.id);
+
+  const gid = `g${nd.id}`;
+  const rg = defs.append('radialGradient').attr('id',gid).attr('cx','35%').attr('cy','35%');
+  rg.append('stop').attr('offset','0%').attr('stop-color', d3.color(nd.color).brighter(0.6).formatHex());
+  rg.append('stop').attr('offset','100%').attr('stop-color', nd.color);
+
+  const g = gN.append('g')
+    .attr('class',`pnode pnode-${nd.id}`)
+    .attr('transform',`translate(${nd.x},${nd.y}) scale(0)`)
+    .style('opacity',0);
+
+  g.append('circle').attr('r',nd.r+14).attr('fill','none')
+    .attr('stroke',nd.color).attr('stroke-width',0.6).attr('opacity',0.2);
+
+  const pulse = g.append('circle').attr('r',nd.r+8)
+    .attr('fill','none').attr('stroke',nd.color).attr('stroke-width',1.2).attr('opacity',0);
+  (function doPulse(){
+    pulse.attr('r',nd.r+6).attr('opacity',0.8)
+      .transition().duration(1500).ease(d3.easeCubicOut)
+      .attr('r',nd.r+32).attr('opacity',0).on('end',doPulse);
+  })();
+
+  g.append('circle').attr('r',nd.r).attr('fill',`url(#${gid})`).attr('filter','url(#glow-m)');
+  g.append('circle').attr('r',nd.r-3).attr('fill','none').attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1);
+
+  g.append('text').attr('text-anchor','middle').attr('dy',-7)
+    .attr('font-size',8).attr('fill','rgba(255,255,255,0.5)').attr('letter-spacing',1.2)
+    .text(nd.module.toUpperCase());
+  g.append('text').attr('text-anchor','middle').attr('dy',9)
+    .attr('font-size',11).attr('fill','#fff').attr('font-weight',600).text(nd.label);
+  g.append('text').attr('text-anchor','middle').attr('dy',nd.r+17)
+    .attr('font-size',8.5).attr('fill',nd.color).attr('opacity',0.7).text(nd.sub);
+
+  g.transition().duration(620).ease(d3.easeBackOut.overshoot(1.15))
+    .attr('transform',`translate(${nd.x},${nd.y}) scale(1)`).style('opacity',1);
+}
+
+// ── Render: link ─────────────────────────────────────────────────
+function renderLink(sid,tid) {
+  const key=`${sid}|${tid}`;
+  if (shownLinks.has(key)) return;
+  shownLinks.add(key);
+  const s=NODES[sid], t=NODES[tid];
+  if (!s||!t) return;
+  const dx=t.x-s.x, dy=t.y-s.y, dist=Math.hypot(dx,dy);
+  const ux=dx/dist, uy=dy/dist;
+  const x1=s.x+ux*(s.r+2), y1=s.y+uy*(s.r+2);
+  const x2=t.x-ux*(t.r+2), y2=t.y-uy*(t.r+2);
+  const mid=d3.interpolateRgb(s.color,t.color)(0.5);
+  const len=Math.hypot(x2-x1,y2-y1);
+  gL.append('line').attr('x1',x1).attr('y1',y1).attr('x2',x2).attr('y2',y2)
+    .attr('stroke',mid).attr('stroke-width',5).attr('opacity',0.1)
+    .attr('stroke-dasharray',len).attr('stroke-dashoffset',len)
+    .transition().duration(500).ease(d3.easeLinear).attr('stroke-dashoffset',0);
+  gL.append('line').attr('x1',x1).attr('y1',y1).attr('x2',x2).attr('y2',y2)
+    .attr('stroke',mid).attr('stroke-width',1.4).attr('opacity',0.52)
+    .attr('stroke-dasharray',len).attr('stroke-dashoffset',len)
+    .transition().duration(500).ease(d3.easeLinear).attr('stroke-dashoffset',0);
+}
+
+// ── Info cards ───────────────────────────────────────────────────
+function showCard(nodeId) {
+  Object.entries(domCards).forEach(([,el])=>{
+    el.classList.remove('on'); const e=el; setTimeout(()=>e.remove(),360);
+  });
+  Object.keys(domCards).forEach(k=>delete domCards[k]);
+  if (!nodeId) return;
+  const nd=NODES[nodeId]; if(!nd) return;
+  const el=document.createElement('div');
+  el.className='icard';
+  el.innerHTML=`<h4 style="color:${nd.color}">${nd.module}: ${nd.label}</h4>`+
+    nd.data.map(([k,v])=>`<div class="row"><span class="k">${k}</span><span class="v">${v}</span></div>`).join('');
+  const cw=210, ch=nd.data.length*22+52;
+  let cx=nd.x+nd.r+18, cy=nd.y-ch/2;
+  if (cx+cw>W-20) cx=nd.x-cw-nd.r-18;
+  cy=Math.max(90,Math.min(cy,H-ch-20));
+  el.style.left=`${cx}px`; el.style.top=`${cy}px`;
+  document.body.appendChild(el);
+  domCards[nodeId]=el;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
+}
+
+// ── Statement ────────────────────────────────────────────────────
+function setStatement(data) {
+  const el=document.getElementById('statement');
+  if (!data) { el.classList.remove('on'); el.innerHTML=''; return; }
+  el.style.top=`${H*0.38}px`;
+  el.innerHTML=`<div class="stmt-big">${data.big}</div><div class="stmt-small">${data.small}</div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('on')));
+}
+
+// ── Zoom: CSS transition on #world — bypasses D3 SVG attr interpolation issues ──
+function zoomWorld(scale, ms) {
+  const tx = CX*(1-scale), ty = CY*(1-scale);
+  const el = document.getElementById('world');
+  el.style.transition = `transform ${ms}ms cubic-bezier(0.37,0,0.63,1)`;
+  el.getBoundingClientRect(); // force reflow so transition is registered before value change
+  el.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+}
+
+// ── Finale phase 1: spider-web expansion ────────────────────────
+function showFinalePhase1() {
+  Object.entries(domCards).forEach(([,el])=>{
+    el.classList.remove('on'); const e=el; setTimeout(()=>e.remove(),360);
+  });
+  Object.keys(domCards).forEach(k=>delete domCards[k]);
+
+  // ① Zoom to 50% — all 3 tiers fit on screen
+  zoomWorld(0.50, 1400);
+
+  // ② Dim process web
+  gN.selectAll('.pnode').transition().delay(1100).duration(800).style('opacity',0.2);
+  gL.selectAll('*').transition().delay(1100).duration(800).style('opacity',0.08);
+
+  const WEB = 550; // web threads begin drawing mid-zoom
+
+  // ③ Radial spoke threads: center → each module (the "frame" of the web)
+  ALL_MODULES.forEach((m, i) => {
+    const { x, y } = modPos[m.id];
+    const len = Math.hypot(x - CX, y - CY);
+    gL.append('line')
+      .attr('x1', CX).attr('y1', CY).attr('x2', x).attr('y2', y)
+      .attr('stroke', m.color).attr('stroke-width', 0.4).attr('opacity', 0)
+      .attr('stroke-dasharray', len).attr('stroke-dashoffset', len)
+      .transition().delay(WEB + i * 52).duration(500).ease(d3.easeLinear)
+      .attr('stroke-dashoffset', 0).attr('opacity', 0.28);
+  });
+
+  // ④ Circular ring threads: connect adjacent modules within each tier (concentric web rings)
+  MOD_TIERS.forEach(({ ids }, ti) => {
+    ids.forEach((id, i) => {
+      const next = ids[(i + 1) % ids.length];
+      const pa = modPos[id], pb = modPos[next];
+      const len = Math.hypot(pb.x - pa.x, pb.y - pa.y);
+      gL.append('line')
+        .attr('x1', pa.x).attr('y1', pa.y).attr('x2', pb.x).attr('y2', pb.y)
+        .attr('stroke', `rgba(255,255,255,${0.16 - ti * 0.04})`).attr('stroke-width', 0.7)
+        .style('opacity', 0)
+        .attr('stroke-dasharray', len).attr('stroke-dashoffset', len)
+        .transition().delay(WEB + 280 + ti * 130 + i * 48).duration(480).ease(d3.easeLinear)
+        .attr('stroke-dashoffset', 0).style('opacity', 1);
+    });
+  });
+
+  // ⑤ MODULE_LINKS as diagonal cross-threads
+  MODULE_LINKS.forEach(([a, b], i) => {
+    const pa = modPos[a], pb = modPos[b]; if (!pa || !pb) return;
+    const len = Math.hypot(pb.x - pa.x, pb.y - pa.y);
+    gL.append('line')
+      .attr('x1', pa.x).attr('y1', pa.y).attr('x2', pb.x).attr('y2', pb.y)
+      .attr('stroke', 'rgba(255,255,255,0.055)').attr('stroke-width', 0.85).style('opacity', 0)
+      .attr('stroke-dasharray', len).attr('stroke-dashoffset', len)
+      .transition().delay(WEB + 520 + i * 26).duration(340)
+      .attr('stroke-dashoffset', 0).style('opacity', 1);
+  });
+
+  // ⑥ Module nodes pop in along the spokes
+  ALL_MODULES.forEach((m, i) => {
+    const { x, y } = modPos[m.id];
+    const mr = 30 + Math.sqrt(m.records) * 2.2;
+    const g = gN.append('g').attr('class', 'mnode')
+      .attr('transform', `translate(${x},${y}) scale(0)`).style('opacity', 0);
+    if (m.core) g.append('circle').attr('r', mr + 12).attr('fill', m.color).attr('opacity', 0.07).attr('filter', 'url(#glow-s)');
+    g.append('circle').attr('r', mr)
+      .attr('fill', `${m.color}22`).attr('stroke', m.color)
+      .attr('stroke-width', m.core ? 2.5 : 1.2).attr('filter', m.core ? 'url(#glow-m)' : null);
+    if (m.ch) g.append('text').attr('text-anchor', 'middle').attr('dy', -mr - 7)
+      .attr('font-size', 11).attr('fill', m.color).attr('opacity', 0.6).text('CH');
+    const lines = m.label.split('\n');
+    if (lines.length === 1) {
+      g.append('text').attr('text-anchor', 'middle').attr('dy', '0.35em')
+        .attr('font-size', Math.min(15, mr * 0.42)).attr('fill', '#fff').attr('font-weight', m.core ? 700 : 400)
+        .text(m.label);
+    } else {
+      lines.forEach((ln, li) => g.append('text').attr('text-anchor', 'middle').attr('dy', -5 + li * 13)
+        .attr('font-size', 12).attr('fill', '#fff').attr('font-weight', m.core ? 700 : 400).text(ln));
+    }
+    if (m.records > 0) g.append('text').attr('text-anchor', 'middle').attr('dy', mr + 16)
+      .attr('font-size', 11).attr('fill', m.color).attr('opacity', 0.45).text(`${m.records} records`);
+    g.transition().delay(1450 + i * 62).duration(540).ease(d3.easeBackOut.overshoot(1.1))
+      .attr('transform', `translate(${x},${y}) scale(1)`).style('opacity', 1);
+  });
+}
+
+// ── Finale phase 2: galaxy — erschlagend unglaublich gross ───────
+function showFinalePhase2() {
+  // ① Zoom WAY out — the web becomes a tiny galaxy in a vast universe
+  zoomWorld(0.19, 1600);
+
+  // ② Process nodes vanish almost completely
+  gN.selectAll('.pnode').transition().duration(700).style('opacity', 0.03);
+
+  const ERUPT = 450;
+
+  // ③ Each module erupts into its attribute fields — one dot per record/attribute
+  ALL_MODULES.forEach((m, mi) => {
+    const { x, y } = modPos[m.id];
+    const mr = 30 + Math.sqrt(m.records) * 2.2;
+    const count = Math.max(m.records, 6);
+    for (let j = 0; j < count; j++) {
+      const a = (j / count) * 2 * Math.PI + mi * 0.41;
+      const ring = Math.floor(j / 12);
+      const orbitR = mr + 52 + ring * 44;
+      const jitter = (Math.sin(j * 1.7 + mi) * 0.5 + 0.5) * 18 - 9;
+      const finalOrbit = orbitR + jitter;
+      gN.append('circle')
+        .attr('cx', x + Math.cos(a) * finalOrbit * 0.25)
+        .attr('cy', y + Math.sin(a) * finalOrbit * 0.25)
+        .attr('r', ring === 0 ? 3.4 : ring === 1 ? 2.5 : 1.8)
+        .attr('fill', m.color).attr('opacity', 0)
+        .transition().delay(ERUPT + mi * 16 + j * 10).duration(520).ease(d3.easeBackOut.overshoot(0.8))
+        .attr('cx', x + Math.cos(a) * finalOrbit)
+        .attr('cy', y + Math.sin(a) * finalOrbit)
+        .attr('opacity', ring === 0 ? 0.78 : ring === 1 ? 0.5 : 0.28);
+    }
+  });
+
+  // ④ Outer "data universe" rings — showing the overwhelming volume of real data
+  const UNIVERSE = [
+    { r: 1080, count: 80,  color: '#6366f1', delay: 1300 },
+    { r: 1320, count: 110, color: '#10b981', delay: 1650 },
+    { r: 1560, count: 145, color: '#F59E0B', delay: 2000 },
+    { r: 1820, count: 185, color: '#a855f7', delay: 2350 },
+  ];
+  UNIVERSE.forEach(({ r, count, color, delay }) => {
+    for (let j = 0; j < count; j++) {
+      const a = (j / count) * 2 * Math.PI;
+      const jitter = (Math.sin(j * 2.3) * 0.5 + 0.5) * 90 - 45;
+      const rr = r + jitter;
+      gN.append('circle')
+        .attr('cx', CX + Math.cos(a) * rr * 0.35)
+        .attr('cy', CY + Math.sin(a) * rr * 0.35)
+        .attr('r', 1.4 + Math.abs(Math.sin(j * 1.9)) * 2.2)
+        .attr('fill', color).attr('opacity', 0)
+        .transition().delay(delay + j * 6).duration(380)
+        .attr('cx', CX + Math.cos(a) * rr)
+        .attr('cy', CY + Math.sin(a) * rr)
+        .attr('opacity', 0.12 + Math.abs(Math.sin(j * 0.7)) * 0.22);
+    }
+  });
+
+  // ⑤ Outer universe glow halo
+  gN.append('circle').attr('cx', CX).attr('cy', CY).attr('r', 1950)
+    .attr('fill', 'none').attr('stroke', 'rgba(74,143,255,0.05)').attr('stroke-width', 80)
+    .attr('filter', 'url(#glow-lg)').style('opacity', 0)
+    .transition().delay(3000).duration(1800).style('opacity', 1);
+
+  // ⑥ Center label — appearing as everything explodes outward
+  const cg = gN.append('g').attr('transform', `translate(${CX},${CY})`).style('opacity', 0);
+  cg.append('circle').attr('r', 135).attr('fill', 'rgba(4,8,22,0.96)')
+    .attr('stroke', 'rgba(74,143,255,0.12)').attr('stroke-width', 1.5);
+  cg.append('text').attr('text-anchor', 'middle').attr('dy', -48)
+    .attr('font-size', 56).attr('font-weight', 700).attr('fill', '#fff').attr('letter-spacing', -2).text('REC');
+  cg.append('text').attr('text-anchor', 'middle').attr('dy', 8)
+    .attr('font-size', 22).attr('fill', 'rgba(255,255,255,0.5)').attr('letter-spacing', 2).text('Space Model');
+  cg.append('text').attr('text-anchor', 'middle').attr('dy', 36)
+    .attr('font-size', 14).attr('fill', 'rgba(255,255,255,0.25)').attr('letter-spacing', 0.5).text('20 Module · 315 Attribute');
+  const chN = ALL_MODULES.filter(m => m.ch).length, stdN = ALL_MODULES.filter(m => !m.ch).length;
+  cg.append('text').attr('text-anchor', 'middle').attr('dy', 58)
+    .attr('font-size', 12).attr('fill', '#fbbf24').attr('opacity', 0.55)
+    .text(`${chN}× CH-Erweiterung  ·  ${stdN}× REC-Standard`);
+  cg.transition().delay(600).duration(1100).style('opacity', 1);
+
+  // ⑦ Universe labels (fixed screen-space, appear late)
+  const labels = [
+    { text: 'Gebäude & Objekte', color: '#6366f1', top: '18%', left: '72%' },
+    { text: 'Mietverhältnisse',  color: '#10b981', top: '72%', left: '68%' },
+    { text: 'Assets & Sensoren', color: '#F59E0B', top: '78%', left: '22%' },
+    { text: 'Mieter & Agenten',  color: '#a855f7', top: '14%', left: '18%' },
+  ];
+  labels.forEach(({ text, color, top, left }, i) => {
+    const d = document.createElement('div');
+    d.style.cssText = `position:absolute;top:${top};left:${left};font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:${color};opacity:0;transition:opacity 0.8s ease;pointer-events:none;`;
+    d.textContent = text;
+    document.body.appendChild(d);
+    setTimeout(() => d.style.opacity = '0.55', 2400 + i * 280);
+  });
+
+  // ⑧ Legend
+  const leg = document.createElement('div');
+  leg.style.cssText = 'position:absolute;bottom:48px;left:38px;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:0.5px;line-height:19px;pointer-events:none;opacity:0;transition:opacity 1s ease;';
+  leg.innerHTML = `
+    <div style="margin-bottom:5px;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:1.5px;font-size:9px">LEGENDE</div>
+    <div><span style="display:inline-block;width:7px;height:7px;border-radius:50%;border:2px solid #4a8fff;margin-right:7px"></span>REC 3.3 Standard</div>
+    <div><span style="display:inline-block;width:7px;height:7px;border-radius:50%;border:2px solid #fbbf24;margin-right:7px"></span>CH-Erweiterung *</div>
+    <div><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.35);margin-right:7px"></span>Attribute & Datenpunkte</div>`;
+  document.body.appendChild(leg);
+  setTimeout(() => leg.style.opacity = '1', 1800);
+}
+
+// ── Step engine ──────────────────────────────────────────────────
+function goToStep(n) {
+  if (n<0||n>=STEPS.length) return;
+  currentStep=n;
+  const s=STEPS[n];
+  document.getElementById('step-title').textContent=s.title;
+  document.getElementById('step-sub').textContent=s.sub;
+  document.getElementById('counter').textContent=`${n+1} / ${STEPS.length}`;
+  document.getElementById('progress').style.width=`${((n+1)/STEPS.length)*100}%`;
+  setStatement(s.stmt||null);
+  if (!s.stmt) {
+    (s.nodes||[]).forEach(id=>renderNode(NODES[id]));
+    (s.links||[]).forEach(({s:sid,t:tid})=>renderLink(sid,tid));
+  }
+  showCard(s.card||null);
+  if (s.finale==='phase1'&&finalePhase<1) { finalePhase=1; showFinalePhase1(); }
+  if (s.finale==='phase2'&&finalePhase<2) { finalePhase=2; showFinalePhase2(); }
+}
+
+function advance() { goToStep(currentStep+1); }
+function retreat() { if(currentStep>0) location.reload(); }
+
+document.addEventListener('click', advance);
+document.addEventListener('keydown', e=>{
+  if([' ','ArrowRight','Enter'].includes(e.key)){e.preventDefault();advance();}
+  if(e.key==='ArrowLeft'){e.preventDefault();retreat();}
+});
+
+goToStep(0);
+</script>
+</body>
+</html>
