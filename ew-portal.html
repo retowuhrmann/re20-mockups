@@ -1,0 +1,1235 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Eigentümer — vision&Immo</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { font-family: 'Inter', ui-sans-serif, system-ui; background: #FAF8F4; color: #1C1917; -webkit-font-smoothing: antialiased; font-feature-settings: "cv11","ss01"; }
+  h1,h2,h3 { letter-spacing: -0.015em; }
+  .card { transition: transform .18s ease, box-shadow .18s ease; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px -12px rgba(28,25,23,0.18); }
+  .soft-shadow { box-shadow: 0 1px 2px rgba(28,25,23,0.04), 0 4px 16px -4px rgba(28,25,23,0.06); }
+  .ink { color: #1C1917; }
+  .muted { color: #78716C; }
+  .hairline { border-color: #E7E3DC; }
+  .chip { display:inline-flex; align-items:center; gap:6px; padding: 3px 9px; border-radius: 999px; font-size:11.5px; font-weight:500; }
+  .dot { width: 6px; height: 6px; border-radius: 999px; display: inline-block; }
+  .pulse { animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.5 } }
+  .kbd { font-family: ui-monospace, monospace; font-size: 10.5px; padding: 2px 6px; border-radius: 5px; background: #F0ECE4; color: #78716C; border: 1px solid #E7E3DC; }
+
+  .g-sage { background: linear-gradient(135deg, #C9D5C5 0%, #8BA98A 100%); }
+  .g-clay { background: linear-gradient(135deg, #E8C9A8 0%, #C89472 100%); }
+  .g-sky  { background: linear-gradient(135deg, #C7D6E3 0%, #8FA8C0 100%); }
+  .g-rose { background: linear-gradient(135deg, #E8C9C9 0%, #C08B8B 100%); }
+  .g-plum { background: linear-gradient(135deg, #D4C5E0 0%, #9A80B5 100%); }
+  .g-sun  { background: linear-gradient(135deg, #EEDBA3 0%, #D4A84A 100%); }
+  .g-fire { background: linear-gradient(135deg, #F3B894 0%, #D97757 100%); }
+  .g-mint { background: linear-gradient(135deg, #B8E0D4 0%, #6FAF9A 100%); }
+
+  .accent-bg { background: #2B3A2E; }
+  .accent-text { color: #2B3A2E; }
+  .accent-soft { background: #EEF1E9; color: #2B3A2E; }
+
+  .sparkline path { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+  [data-view] { display: none; }
+  [data-view].active { display: block; }
+  .nav-item { display:flex; align-items:center; gap:12px; padding:8px 12px; border-radius:8px; color:#78716C; cursor:pointer; }
+  .nav-item:hover { background: rgba(255,255,255,0.6); }
+  .nav-item.is-active { background:#FFFFFF; color:#1C1917; font-weight:500; box-shadow: 0 1px 2px rgba(28,25,23,0.04), 0 4px 16px -4px rgba(28,25,23,0.06); }
+
+  .bar { background: #E7E3DC; border-radius: 4px; height: 8px; overflow: hidden; }
+  .bar > span { display:block; height:100%; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<div class="min-h-screen flex">
+
+  <!-- SIDEBAR -->
+  <aside class="w-[220px] shrink-0 border-r hairline bg-[#F5F1E8] flex flex-col">
+    <div class="px-5 pt-5 pb-4 flex items-center gap-2">
+      <div class="w-7 h-7 rounded-lg accent-bg flex items-center justify-center">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F5F1E8" stroke-width="2"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+      </div>
+      <div class="text-[14px] font-semibold tracking-tight ink">vision&amp;Immo</div>
+    </div>
+
+    <button class="mx-3 mb-4 px-3 py-2.5 rounded-xl bg-white soft-shadow flex items-center gap-2.5 text-left hover:bg-[#FDFCF9]">
+      <div class="w-8 h-8 rounded-lg g-sun flex items-center justify-center text-white text-[12px] font-semibold">FM</div>
+      <div class="min-w-0 flex-1">
+        <div class="text-[10.5px] muted leading-none">Portfolio</div>
+        <div class="text-[12.5px] font-medium truncate ink">Family Office Müller</div>
+      </div>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" stroke-width="2"><path d="M8 9 12 5l4 4M8 15l4 4 4-4"/></svg>
+    </button>
+
+    <nav id="sidebar-nav" class="px-2 flex-1 space-y-0.5 text-[13.5px]">
+      <a data-nav="uebersicht" class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+        Übersicht
+      </a>
+      <a data-nav="liegenschaften" class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v16"/></svg>
+        Liegenschaften
+        <span class="ml-auto text-[11px] muted">12</span>
+      </a>
+      <a data-nav="rendite" class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>
+        Rendite
+      </a>
+      <a data-nav="cashflow" class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Cashflow
+      </a>
+      <a data-nav="reports" class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg>
+        Reports
+        <span class="ml-auto text-[10.5px] px-1.5 py-0.5 rounded-full bg-[#E8B88C] text-[#5C3A1C] font-semibold">2</span>
+      </a>
+      <a data-nav="archiv" class="nav-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/></svg>
+        Archiv
+      </a>
+    </nav>
+
+    <div class="p-3 border-t hairline">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4A84A] to-[#A08030] flex items-center justify-center text-white text-[12px] font-semibold">HM</div>
+        <div class="min-w-0 flex-1">
+          <div class="text-[12.5px] font-medium ink truncate">Heinrich Müller</div>
+          <div class="text-[10.5px] muted">Eigentümer</div>
+        </div>
+        <button class="w-7 h-7 rounded-lg hover:bg-white/80 flex items-center justify-center muted">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 min-w-0">
+
+    <!-- Top bar -->
+    <div class="h-14 px-8 flex items-center gap-4 border-b hairline bg-[#FAF8F4]/80 backdrop-blur sticky top-0 z-20">
+      <div class="flex-1 max-w-xl">
+        <div class="h-9 rounded-full bg-white soft-shadow flex items-center px-4 gap-2.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input placeholder="Suche nach Liegenschaft oder Report…" class="flex-1 bg-transparent text-[13px] outline-none placeholder:text-stone-400" />
+          <span class="kbd">⌘K</span>
+        </div>
+      </div>
+      <button class="h-9 px-3.5 rounded-full bg-white soft-shadow flex items-center gap-2 text-[12.5px] font-medium ink">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V3M6 11l6 6 6-6M5 21h14"/></svg>
+        Export
+      </button>
+      <button class="h-9 w-9 rounded-full bg-white soft-shadow flex items-center justify-center relative">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#44403C" stroke-width="1.8"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21a2 2 0 0 0 4 0"/></svg>
+        <span class="absolute top-2 right-2.5 w-1.5 h-1.5 rounded-full bg-[#D97757]"></span>
+      </button>
+    </div>
+
+    <div class="px-8 py-8 space-y-10">
+
+    <section data-view="uebersicht" class="active space-y-10">
+
+      <!-- GREETING + PULSE -->
+      <section>
+        <div class="mb-6">
+          <div class="text-[13px] muted mb-1.5">Donnerstag, 24. April</div>
+          <h1 class="text-[38px] font-semibold leading-[1.1] ink tracking-tight">Guten Morgen, Heinrich.</h1>
+          <p class="text-[15px] muted mt-2 max-w-2xl">Dein Portfolio hat sich seit Jahresbeginn um <span class="ink font-semibold">CHF 482'000</span> aufgewertet. <span class="ink font-semibold">2 Freigaben</span> warten auf dich.</p>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+
+          <div class="rounded-2xl bg-white soft-shadow p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-[11.5px] muted uppercase tracking-wider">Portfoliowert</div>
+                <div class="text-[30px] font-semibold ink mt-1 leading-none">CHF 24.8<span class="text-[18px] muted font-normal">M</span></div>
+              </div>
+              <div class="w-9 h-9 rounded-xl g-sun flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+              </div>
+            </div>
+            <div class="mt-3 text-[12px] accent-text flex items-center gap-1.5">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m5 14 7-7 7 7"/></svg>
+              +2.0 Prozent seit Januar
+            </div>
+          </div>
+
+          <div class="rounded-2xl bg-white soft-shadow p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-[11.5px] muted uppercase tracking-wider">Nettorendite</div>
+                <div class="text-[30px] font-semibold ink mt-1 leading-none">4.8<span class="text-[18px] muted font-normal">%</span></div>
+              </div>
+              <div class="w-9 h-9 rounded-xl g-mint flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>
+              </div>
+            </div>
+            <div class="mt-3 text-[12px] muted">Zielwert 4.5 Prozent übertroffen</div>
+          </div>
+
+          <div class="rounded-2xl bg-white soft-shadow p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-[11.5px] muted uppercase tracking-wider">Mieteinnahmen</div>
+                <div class="text-[30px] font-semibold ink mt-1 leading-none">CHF 842<span class="text-[18px] muted font-normal">k</span></div>
+              </div>
+              <div class="w-9 h-9 rounded-xl g-sage flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+            </div>
+            <div class="mt-3 text-[12px] muted">seit Jahresbeginn</div>
+          </div>
+
+          <div class="rounded-2xl bg-white soft-shadow p-5">
+            <div class="flex items-start justify-between">
+              <div>
+                <div class="text-[11.5px] muted uppercase tracking-wider">Leerstand</div>
+                <div class="text-[30px] font-semibold ink mt-1 leading-none">1.8<span class="text-[18px] muted font-normal">%</span></div>
+              </div>
+              <div class="w-9 h-9 rounded-xl bg-[#EEF1E9] flex items-center justify-center accent-text">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M7 7h10v10"/></svg>
+              </div>
+            </div>
+            <div class="mt-3 text-[12px] accent-text flex items-center gap-1.5">
+              <span class="dot" style="background:#2B3A2E"></span>deutlich unter Markt
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- HEUTE FÜR DICH -->
+      <section>
+        <div class="flex items-baseline justify-between mb-4">
+          <div>
+            <h2 class="text-[22px] font-semibold ink leading-none tracking-tight">Heute für dich</h2>
+            <p class="text-[13px] muted mt-2">Entscheidungen, die nur du treffen kannst. Alles andere erledigt deine Bewirtschaftung.</p>
+          </div>
+          <a class="text-[12.5px] accent-text font-medium hover:underline">Archiv öffnen →</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+          <!-- Card 1: Wasserschaden Freigabe -->
+          <article class="card rounded-2xl bg-white soft-shadow overflow-hidden cursor-pointer">
+            <div class="h-28 g-fire relative">
+              <div class="absolute top-3 left-3 chip bg-[#FEF2EE] text-[#9A3412]">
+                <span class="dot bg-[#D97757] pulse"></span> dringend
+              </div>
+              <div class="absolute bottom-3 left-3 text-white">
+                <div class="text-[12px] opacity-90 leading-none">Bergweg 8, Zürich</div>
+                <div class="text-[13.5px] font-medium">Wasserschaden Sanierung</div>
+              </div>
+              <div class="absolute bottom-3 right-3 text-right text-white">
+                <div class="text-[11px] opacity-90 leading-none">Offerte</div>
+                <div class="text-[14px] font-semibold">CHF 18'400</div>
+              </div>
+            </div>
+            <div class="p-4">
+              <div class="text-[10.5px] muted uppercase tracking-wider mb-1.5">Freigabe erforderlich</div>
+              <h3 class="text-[15px] font-semibold ink leading-snug">Die Offerte liegt über deiner Schwelle von CHF 15'000. Freigabe für die Sanierung durch Sanitär Meier?</h3>
+              <p class="text-[12.5px] muted mt-2 leading-relaxed">Reto Wuhrmann empfiehlt die Freigabe. Der Handwerker ist verfügbar und jede weitere Stunde erhöht den Folgeschaden. Die Versicherung übernimmt voraussichtlich CHF 14'200.</p>
+              <div class="mt-4 flex items-center gap-2">
+                <button class="h-9 px-4 rounded-full accent-bg text-white text-[12.5px] font-medium hover:opacity-90">Freigeben</button>
+                <button class="h-9 px-3 rounded-full text-[12.5px] font-medium muted hover:bg-stone-100">2. Offerte anfragen</button>
+                <span class="ml-auto text-[11px] text-[#9A3412] font-medium">heute</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 2: Renovation Budget -->
+          <article class="card rounded-2xl bg-white soft-shadow overflow-hidden cursor-pointer">
+            <div class="h-28 g-sky relative">
+              <div class="absolute top-3 left-3 chip bg-white/90 accent-text">
+                <span class="dot bg-[#8FA8C0]"></span> strategisch
+              </div>
+              <div class="absolute bottom-3 left-3 text-white">
+                <div class="text-[12px] opacity-90 leading-none">Seestrasse 12, Zug</div>
+                <div class="text-[13.5px] font-medium">Fassadensanierung 2027</div>
+              </div>
+              <div class="absolute bottom-3 right-3 text-right text-white">
+                <div class="text-[11px] opacity-90 leading-none">Budget</div>
+                <div class="text-[14px] font-semibold">CHF 640'000</div>
+              </div>
+            </div>
+            <div class="p-4">
+              <div class="text-[10.5px] muted uppercase tracking-wider mb-1.5">Planungsentscheid</div>
+              <h3 class="text-[15px] font-semibold ink leading-snug">Die Fassade ist am Ende ihrer Lebensdauer. Möchtest du die Sanierung fürs nächste Jahr einplanen?</h3>
+              <p class="text-[12.5px] muted mt-2 leading-relaxed">Die Agents haben drei Offerten eingeholt und mit vergleichbaren Projekten verglichen. Steuerliche Absetzbarkeit beträgt etwa 41 Prozent.</p>
+              <div class="mt-4 flex items-center gap-2">
+                <button class="h-9 px-4 rounded-full accent-bg text-white text-[12.5px] font-medium hover:opacity-90">Einplanen</button>
+                <button class="h-9 px-3 rounded-full text-[12.5px] font-medium muted hover:bg-stone-100">Offerten ansehen</button>
+                <span class="ml-auto text-[11px] muted">diese Woche</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 3: Q1 Report -->
+          <article class="card rounded-2xl bg-white soft-shadow overflow-hidden cursor-pointer">
+            <div class="h-28 g-mint relative">
+              <div class="absolute top-3 left-3 chip bg-white/90 accent-text">
+                <span class="dot" style="background:#2B3A2E"></span> Report bereit
+              </div>
+              <div class="absolute bottom-3 left-3 text-white">
+                <div class="text-[12px] opacity-90 leading-none">Gesamtes Portfolio</div>
+                <div class="text-[13.5px] font-medium">Quartalsreport Q1 2026</div>
+              </div>
+              <div class="absolute bottom-3 right-3 text-right text-white">
+                <div class="text-[11px] opacity-90 leading-none">Rendite Q1</div>
+                <div class="text-[14px] font-semibold">+1.2 %</div>
+              </div>
+            </div>
+            <div class="p-4">
+              <div class="text-[10.5px] muted uppercase tracking-wider mb-1.5">Freigabe für Treuhänder</div>
+              <h3 class="text-[15px] font-semibold ink leading-snug">Dein Quartalsreport ist fertig und wartet auf deine Freigabe, bevor er an den Treuhänder geht.</h3>
+              <p class="text-[12.5px] muted mt-2 leading-relaxed">Alle Buchungen stimmen mit Bexio überein. Der Narrativ Teil wurde von den Agents vorbereitet und kann direkt übernommen werden.</p>
+              <div class="mt-4 flex items-center gap-2">
+                <button class="h-9 px-4 rounded-full accent-bg text-white text-[12.5px] font-medium hover:opacity-90">Freigeben und senden</button>
+                <button class="h-9 px-3 rounded-full text-[12.5px] font-medium muted hover:bg-stone-100">Vorschau</button>
+                <span class="ml-auto text-[11px] muted">bis Freitag</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- MEINE LIEGENSCHAFTEN -->
+      <section>
+        <div class="flex items-baseline justify-between mb-4">
+          <div>
+            <h2 class="text-[22px] font-semibold ink leading-none tracking-tight">Meine Liegenschaften</h2>
+            <p class="text-[13px] muted mt-2">Jedes Haus auf einen Blick. Klicke auf eine Karte für Details.</p>
+          </div>
+          <a class="text-[12.5px] accent-text font-medium hover:underline">Alle 12 anzeigen →</a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+          <article class="card rounded-2xl bg-white soft-shadow overflow-hidden cursor-pointer">
+            <div class="h-32 g-sage relative">
+              <div class="absolute top-3 right-3 chip bg-white/90 accent-text">
+                <span class="dot" style="background:#2B3A2E"></span> gesund
+              </div>
+              <div class="absolute bottom-3 left-4 text-white">
+                <div class="text-[12px] opacity-90 leading-none">Zug</div>
+                <div class="text-[17px] font-semibold">Seestrasse 12</div>
+              </div>
+            </div>
+            <div class="p-4">
+              <div class="grid grid-cols-3 gap-2 mb-3">
+                <div>
+                  <div class="text-[10.5px] muted uppercase tracking-wider">Wert</div>
+                  <div class="text-[15px] font-semibold ink mt-0.5">CHF 8.4M</div>
+                </div>
+                <div>
+                  <div class="text-[10.5px] muted uppercase tracking-wider">Rendite</div>
+                  <div class="text-[15px] font-semibold ink mt-0.5">5.1 %</div>
+                </div>
+                <div>
+                  <div class="text-[10.5px] muted uppercase tracking-wider">Belegt</div>
+                  <div class="text-[15px] font-semibold ink mt-0.5">18 / 18</div>
+                </div>
+              </div>
+              <svg viewBox="0 0 300 60" class="w-full h-[50px] sparkline">
+                <path d="M0 45 L30 40 L60 42 L90 35 L120 32 L150 28 L180 30 L210 22 L240 18 L270 20 L300 12" stroke="#2B3A2E"/>
+                <path d="M0 45 L30 40 L60 42 L90 35 L120 32 L150 28 L180 30 L210 22 L240 18 L270 20 L300 12 L300 60 L0 60 Z" fill="#EEF1E9" stroke="none"/>
+              </svg>
+              <div class="mt-2 flex items-center justify-between text-[11.5px] muted">
+                <span>Mieteinnahmen YTD</span>
+                <span class="ink font-medium">CHF 356'400</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="card rounded-2xl bg-white soft-shadow overflow-hidden cursor-pointer">
+            <div class="h-32 g-fire relative">
+              <div class="absolute top-3 right-3 chip bg-[#FEF2EE] text-[#9A3412]">
+                <span class="dot bg-[#D97757] pulse"></span> Schaden offen
+              </div>
+              <div class="absolute bottom-3 left-4 text-white">
+                <div class="text-[12px] opacity-90 leading-none">Zürich</div>
+                <div class="text-[17px] font-semibold">Bergweg 8</div>
+              </div>
+            </div>
+            <div class="p-4">
+              <div class="grid grid-cols-3 gap-2 mb-3">
+                <div>
+                  <div class="text-[10.5px] muted uppercase tracking-wider">Wert</div>
+                  <div class="text-[15px] font-semibold ink mt-0.5">CHF 6.2M</div>
+                </div>
+                <div>
+                  <div class="text-[10.5px] muted uppercase tracking-wider">Rendite</div>
+                  <div class="text-[15px] font-semibold ink mt-0.5">4.6 %</div>
+                </div>
+                <div>
+                  <div class="text-[10.5px] muted uppercase tracking-wider">Belegt</div>
+                  <div class="text-[15px] font-semibold ink mt-0.5">12 / 12</div>
+                </div>
+              </div>
+              <svg viewBox="0 0 300 60" class="w-full h-[50px] sparkline">
+                <path d="M0 30 L30 32 L60 28 L90 30 L120 35 L150 32 L180 38 L210 35 L240 40 L270 38 L300 42" stroke="#9A3412"/>
+                <path d="M0 30 L30 32 L60 28 L90 30 L120 35 L150 32 L180 38 L210 35 L240 40 L270 38 L300 42 L300 60 L0 60 Z" fill="#FEF2EE" stroke="none"/>
+              </svg>
+              <div class="mt-2 flex items-center justify-between text-[11.5px] muted">
+                <span>Mieteinnahmen YTD</span>
+                <span class="ink font-medium">CHF 238'900</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="card rounded-2xl bg-white soft-shadow overflow-hidden cursor-pointer">
+            <div class="h-32 g-plum relative">
+              <div class="absolute top-3 right-3 chip bg-white/90 accent-text">
+                <span class="dot bg-[#9A80B5]"></span> Neuvermietung
+              </div>
+              <div class="absolute bottom-3 left-4 text-white">
+                <div class="text-[12px] opacity-90 leading-none">Winterthur</div>
+                <div class="text-[17px] font-semibold">Gartenweg 5</div>
+              </div>
+            </div>
+            <div class="p-4">
+              <div class="grid grid-cols-3 gap-2 mb-3">
+                <div>
+                  <div class="text-[10.5px] muted uppercase tracking-wider">Wert</div>
+                  <div class="text-[15px] font-semibold ink mt-0.5">CHF 4.8M</div>
+                </div>
+                <div>
+                  <div class="text-[10.5px] muted uppercase tracking-wider">Rendite</div>
+                  <div class="text-[15px] font-semibold ink mt-0.5">4.9 %</div>
+                </div>
+                <div>
+                  <div class="text-[10.5px] muted uppercase tracking-wider">Belegt</div>
+                  <div class="text-[15px] font-semibold ink mt-0.5">8 / 9</div>
+                </div>
+              </div>
+              <svg viewBox="0 0 300 60" class="w-full h-[50px] sparkline">
+                <path d="M0 35 L30 32 L60 30 L90 28 L120 30 L150 25 L180 22 L210 25 L240 20 L270 22 L300 18" stroke="#9A80B5"/>
+                <path d="M0 35 L30 32 L60 30 L90 28 L120 30 L150 25 L180 22 L210 25 L240 20 L270 22 L300 18 L300 60 L0 60 Z" fill="#F3EFF8" stroke="none"/>
+              </svg>
+              <div class="mt-2 flex items-center justify-between text-[11.5px] muted">
+                <span>Mieteinnahmen YTD</span>
+                <span class="ink font-medium">CHF 189'200</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- IM HINTERGRUND -->
+      <section>
+        <div class="flex items-baseline justify-between mb-4">
+          <div>
+            <h2 class="text-[22px] font-semibold ink leading-none tracking-tight">Im Hintergrund</h2>
+            <p class="text-[13px] muted mt-2">Tasks, die deine Bewirtschaftung und die Agents bereits für dich erledigt haben.</p>
+          </div>
+          <span class="text-[12px] muted flex items-center gap-1.5"><span class="dot bg-[#8BA98A] pulse"></span>live</span>
+        </div>
+
+        <div class="rounded-2xl bg-white soft-shadow divide-y hairline">
+
+          <div class="px-5 py-3 bg-[#FDFCF9] rounded-t-2xl">
+            <div class="text-[11.5px] font-semibold uppercase tracking-wider muted">Diese Woche</div>
+          </div>
+
+          <div class="p-4 flex items-start gap-4 hover:bg-[#FDFCF9]">
+            <div class="w-10 h-10 rounded-xl g-sage shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[13.5px] ink leading-snug"><span class="font-semibold">Mieteingänge verbucht.</span> 42 Mietzinse fristgerecht eingegangen und automatisch in Bexio abgeglichen.</div>
+              <div class="text-[12px] muted mt-0.5">Summe CHF 184'320. Drei Zahlungen wurden nach Rückfrage manuell zugeordnet.</div>
+            </div>
+            <div class="text-[11.5px] muted whitespace-nowrap">heute</div>
+          </div>
+
+          <div class="p-4 flex items-start gap-4 hover:bg-[#FDFCF9]">
+            <div class="w-10 h-10 rounded-xl g-mint shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="m5 14 7-7 7 7"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[13.5px] ink leading-snug"><span class="font-semibold">Mietzinsanpassungen umgesetzt.</span> 23 Mieter profitieren von der Referenzzinssenkung, formgerecht signiert.</div>
+              <div class="text-[12px] muted mt-0.5">Reduktion für dich etwa CHF 12'400 pro Jahr. Alle Mieter informiert.</div>
+            </div>
+            <div class="text-[11.5px] muted whitespace-nowrap">gestern</div>
+          </div>
+
+          <div class="p-4 flex items-start gap-4 hover:bg-[#FDFCF9]">
+            <div class="w-10 h-10 rounded-xl g-plum shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[13.5px] ink leading-snug"><span class="font-semibold">Neuer Mietvertrag abgeschlossen.</span> Gartenweg 5, Wohnung 2.04 ist ab 1. Juli wieder vermietet.</div>
+              <div class="text-[12px] muted mt-0.5">Neue Mieterin Anna Fischer, Mietzins CHF 2'180 netto. Leerstand nur 14 Tage.</div>
+            </div>
+            <div class="text-[11.5px] muted whitespace-nowrap">vor 2 Tagen</div>
+          </div>
+
+          <div class="p-4 flex items-start gap-4 hover:bg-[#FDFCF9]">
+            <div class="w-10 h-10 rounded-xl g-clay shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16v16H4zM4 9h16M9 4v16"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[13.5px] ink leading-snug"><span class="font-semibold">Nebenkostenabrechnung versendet.</span> 18 Mietparteien der Seestrasse 12 haben ihre Abrechnung erhalten.</div>
+              <div class="text-[12px] muted mt-0.5">14 Mieter bekommen Geld zurück, 4 müssen nachzahlen. Durchschnittlicher Saldo plus CHF 82.</div>
+            </div>
+            <div class="text-[11.5px] muted whitespace-nowrap">vor 3 Tagen</div>
+          </div>
+
+          <div class="px-5 py-3 bg-[#FDFCF9]">
+            <div class="text-[11.5px] font-semibold uppercase tracking-wider muted">Bald wichtig</div>
+          </div>
+
+          <div class="p-4 flex items-start gap-4 hover:bg-[#FDFCF9]">
+            <div class="w-10 h-10 rounded-xl g-sun shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M9 11H5a2 2 0 0 0-2 2v5h18v-5a2 2 0 0 0-2-2h-4M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[13.5px] ink leading-snug"><span class="font-semibold">Steuerunterlagen für 2025 bereit.</span> Die Agents haben alle relevanten Dokumente zusammengestellt und an deinen Treuhänder vorbereitet.</div>
+              <div class="text-[12px] muted mt-0.5">Freigabe jederzeit möglich. Abgabefrist beim Kanton am 30. September.</div>
+            </div>
+            <div class="text-[11.5px] muted whitespace-nowrap">bis September</div>
+          </div>
+
+          <div class="p-4 flex items-start gap-4 hover:bg-[#FDFCF9]">
+            <div class="w-10 h-10 rounded-xl g-sky shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[13.5px] ink leading-snug"><span class="font-semibold">Vorkaufsrecht auf Nachbargrundstück endet in 45 Tagen.</span> Die Parzelle grenzt direkt an deine Seestrasse 12.</div>
+              <div class="text-[12px] muted mt-0.5">Die Agents haben eine Erstbewertung erstellt, geschätzter Wert CHF 2.8 Millionen.</div>
+            </div>
+            <div class="text-[11.5px] muted whitespace-nowrap">in 45 Tagen</div>
+          </div>
+
+          <div class="p-4 flex items-start gap-4 hover:bg-[#FDFCF9] rounded-b-2xl">
+            <div class="w-10 h-10 rounded-xl g-rose shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[13.5px] ink leading-snug"><span class="font-semibold">Marktanalyse verfügbar.</span> Deine Objekte liegen im Durchschnitt 2.1 Prozent über vergleichbaren Angeboten in der Region.</div>
+              <div class="text-[12px] muted mt-0.5">Besonders Seestrasse 12 und Gartenweg 5 zeigen solides Wertsteigerungspotenzial.</div>
+            </div>
+            <div class="text-[11.5px] muted whitespace-nowrap">aktualisiert heute</div>
+          </div>
+
+        </div>
+      </section>
+
+      <div class="h-10"></div>
+    </section>
+
+    <!-- ================== VIEW: LIEGENSCHAFTEN ================== -->
+    <section data-view="liegenschaften" class="space-y-6">
+      <div class="flex items-end justify-between">
+        <div>
+          <div class="text-[13px] muted mb-1.5">12 Objekte · 142 Wohnungen · 8 Gewerbeeinheiten</div>
+          <h1 class="text-[32px] font-semibold leading-[1.1] ink tracking-tight">Liegenschaften</h1>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="h-9 rounded-full bg-white soft-shadow flex items-center px-4 gap-2 text-[12.5px] muted">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M7 12h10M11 18h2"/></svg>
+            Sortieren: Wert ↓
+          </div>
+          <button class="h-9 px-4 rounded-full accent-bg text-white text-[12.5px] font-medium">+ Objekt hinzufügen</button>
+        </div>
+      </div>
+
+      <div class="flex gap-2 flex-wrap">
+        <button class="chip accent-bg text-white" style="padding:7px 14px">Alle 12</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">Wohnhäuser 9</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">Gewerbe 2</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">Gemischt 1</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">Neu im Portfolio 2</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">Mit offenen Tasks 3</button>
+      </div>
+
+      <div class="rounded-2xl bg-white soft-shadow overflow-hidden">
+        <div class="grid grid-cols-[1fr_110px_90px_90px_110px_60px] gap-3 px-5 py-3 bg-[#FDFCF9] text-[11px] muted uppercase tracking-wider font-semibold border-b hairline">
+          <div>Objekt</div><div>Wert</div><div>Rendite</div><div>Belegt</div><div>Status</div><div></div>
+        </div>
+
+        <button data-nav="liegenschaft-detail" class="w-full grid grid-cols-[1fr_110px_90px_90px_110px_60px] gap-3 items-center px-5 py-4 text-left hover:bg-[#FDFCF9] border-b hairline">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-lg g-sage shrink-0"></div>
+            <div class="min-w-0">
+              <div class="text-[13.5px] font-semibold ink truncate">Seestrasse 12</div>
+              <div class="text-[11.5px] muted truncate">Zug · Wohnhaus · 18 Einheiten</div>
+            </div>
+          </div>
+          <div class="text-[13px] ink font-medium">CHF 8.4M</div>
+          <div class="text-[13px] ink font-medium">5.1 %</div>
+          <div class="text-[13px] ink font-medium">18 / 18</div>
+          <div><span class="chip accent-soft"><span class="dot" style="background:#2B3A2E"></span>gesund</span></div>
+          <div class="text-right muted">›</div>
+        </button>
+
+        <div class="grid grid-cols-[1fr_110px_90px_90px_110px_60px] gap-3 items-center px-5 py-4 border-b hairline hover:bg-[#FDFCF9]">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-lg g-fire shrink-0"></div>
+            <div class="min-w-0">
+              <div class="text-[13.5px] font-semibold ink truncate">Bergweg 8</div>
+              <div class="text-[11.5px] muted truncate">Zürich · Wohnhaus · 12 Einheiten</div>
+            </div>
+          </div>
+          <div class="text-[13px] ink font-medium">CHF 6.2M</div>
+          <div class="text-[13px] ink font-medium">4.6 %</div>
+          <div class="text-[13px] ink font-medium">12 / 12</div>
+          <div><span class="chip bg-[#FEF2EE] text-[#9A3412]"><span class="dot bg-[#D97757] pulse"></span>Schaden</span></div>
+          <div class="text-right muted">›</div>
+        </div>
+
+        <div class="grid grid-cols-[1fr_110px_90px_90px_110px_60px] gap-3 items-center px-5 py-4 border-b hairline hover:bg-[#FDFCF9]">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-lg g-plum shrink-0"></div>
+            <div class="min-w-0">
+              <div class="text-[13.5px] font-semibold ink truncate">Gartenweg 5</div>
+              <div class="text-[11.5px] muted truncate">Winterthur · Wohnhaus · 9 Einheiten</div>
+            </div>
+          </div>
+          <div class="text-[13px] ink font-medium">CHF 4.8M</div>
+          <div class="text-[13px] ink font-medium">4.9 %</div>
+          <div class="text-[13px] ink font-medium">8 / 9</div>
+          <div><span class="chip bg-white border hairline accent-text"><span class="dot bg-[#9A80B5]"></span>Vermietung</span></div>
+          <div class="text-right muted">›</div>
+        </div>
+
+        <div class="grid grid-cols-[1fr_110px_90px_90px_110px_60px] gap-3 items-center px-5 py-4 border-b hairline hover:bg-[#FDFCF9]">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-lg g-sky shrink-0"></div>
+            <div class="min-w-0">
+              <div class="text-[13.5px] font-semibold ink truncate">Bahnhofstrasse 41</div>
+              <div class="text-[11.5px] muted truncate">Luzern · Gemischt · 14 Einheiten</div>
+            </div>
+          </div>
+          <div class="text-[13px] ink font-medium">CHF 3.1M</div>
+          <div class="text-[13px] ink font-medium">4.2 %</div>
+          <div class="text-[13px] ink font-medium">14 / 14</div>
+          <div><span class="chip accent-soft"><span class="dot" style="background:#2B3A2E"></span>gesund</span></div>
+          <div class="text-right muted">›</div>
+        </div>
+
+        <div class="grid grid-cols-[1fr_110px_90px_90px_110px_60px] gap-3 items-center px-5 py-4 border-b hairline hover:bg-[#FDFCF9]">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-lg g-mint shrink-0"></div>
+            <div class="min-w-0">
+              <div class="text-[13.5px] font-semibold ink truncate">Wiesenweg 3</div>
+              <div class="text-[11.5px] muted truncate">Bern · Wohnhaus · 24 Einheiten</div>
+            </div>
+          </div>
+          <div class="text-[13px] ink font-medium">CHF 12.4M</div>
+          <div class="text-[13px] ink font-medium">4.8 %</div>
+          <div class="text-[13px] ink font-medium">23 / 24</div>
+          <div><span class="chip accent-soft"><span class="dot" style="background:#2B3A2E"></span>gesund</span></div>
+          <div class="text-right muted">›</div>
+        </div>
+
+        <div class="grid grid-cols-[1fr_110px_90px_90px_110px_60px] gap-3 items-center px-5 py-4 border-b hairline hover:bg-[#FDFCF9]">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-lg g-clay shrink-0"></div>
+            <div class="min-w-0">
+              <div class="text-[13.5px] font-semibold ink truncate">Industriestrasse 7</div>
+              <div class="text-[11.5px] muted truncate">Dietikon · Gewerbe · 8 Einheiten</div>
+            </div>
+          </div>
+          <div class="text-[13px] ink font-medium">CHF 5.6M</div>
+          <div class="text-[13px] ink font-medium">5.7 %</div>
+          <div class="text-[13px] ink font-medium">7 / 8</div>
+          <div><span class="chip bg-[#FEF3C7] text-[#854D0E]"><span class="dot bg-[#D4A84A]"></span>Leerstand</span></div>
+          <div class="text-right muted">›</div>
+        </div>
+
+        <div class="grid grid-cols-[1fr_110px_90px_90px_110px_60px] gap-3 items-center px-5 py-4 border-b hairline hover:bg-[#FDFCF9]">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-lg g-rose shrink-0"></div>
+            <div class="min-w-0">
+              <div class="text-[13.5px] font-semibold ink truncate">Dorfplatz 2</div>
+              <div class="text-[11.5px] muted truncate">Rapperswil · Wohnhaus · 11 Einheiten</div>
+            </div>
+          </div>
+          <div class="text-[13px] ink font-medium">CHF 4.2M</div>
+          <div class="text-[13px] ink font-medium">4.4 %</div>
+          <div class="text-[13px] ink font-medium">11 / 11</div>
+          <div><span class="chip accent-soft"><span class="dot" style="background:#2B3A2E"></span>gesund</span></div>
+          <div class="text-right muted">›</div>
+        </div>
+
+        <div class="grid grid-cols-[1fr_110px_90px_90px_110px_60px] gap-3 items-center px-5 py-4 hover:bg-[#FDFCF9]">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-lg g-sun shrink-0"></div>
+            <div class="min-w-0">
+              <div class="text-[13.5px] font-semibold ink truncate">Obere Gasse 15</div>
+              <div class="text-[11.5px] muted truncate">St. Gallen · Wohnhaus · 6 Einheiten · neu seit 02.2026</div>
+            </div>
+          </div>
+          <div class="text-[13px] ink font-medium">CHF 2.8M</div>
+          <div class="text-[13px] ink font-medium">4.1 %</div>
+          <div class="text-[13px] ink font-medium">6 / 6</div>
+          <div><span class="chip bg-[#EEF1E9] accent-text"><span class="dot bg-[#8BA98A]"></span>Onboarding</span></div>
+          <div class="text-right muted">›</div>
+        </div>
+      </div>
+
+      <div class="text-[12px] muted text-center">4 weitere Objekte anzeigen</div>
+    </section>
+
+    <!-- ================== VIEW: LIEGENSCHAFT DETAIL ================== -->
+    <section data-view="liegenschaft-detail" class="space-y-8">
+      <div>
+        <button data-nav="liegenschaften" class="text-[12.5px] muted hover:ink flex items-center gap-1.5 mb-3">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+          Liegenschaften
+        </button>
+        <div class="rounded-3xl overflow-hidden soft-shadow">
+          <div class="h-48 g-sage relative">
+            <div class="absolute top-4 right-4 chip bg-white/95 accent-text"><span class="dot" style="background:#2B3A2E"></span> gesund</div>
+            <div class="absolute bottom-5 left-6 text-white">
+              <div class="text-[13px] opacity-90 leading-none">Zug · Wohnhaus · Baujahr 2014</div>
+              <div class="text-[34px] font-semibold leading-tight mt-1">Seestrasse 12</div>
+              <div class="text-[13px] opacity-90 mt-1">18 Einheiten · 1'840 m² NF · Grundstück 920 m²</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-4 bg-white divide-x hairline">
+            <div class="p-5"><div class="text-[11px] muted uppercase tracking-wider">Verkehrswert</div><div class="text-[22px] font-semibold ink mt-1">CHF 8.4M</div><div class="text-[11.5px] accent-text mt-0.5">+3.2 % YoY</div></div>
+            <div class="p-5"><div class="text-[11px] muted uppercase tracking-wider">Rendite netto</div><div class="text-[22px] font-semibold ink mt-1">5.1 %</div><div class="text-[11.5px] muted mt-0.5">Zielwert 4.5 %</div></div>
+            <div class="p-5"><div class="text-[11px] muted uppercase tracking-wider">Mieteinnahmen YTD</div><div class="text-[22px] font-semibold ink mt-1">CHF 356k</div><div class="text-[11.5px] muted mt-0.5">von CHF 1.07M Jahr</div></div>
+            <div class="p-5"><div class="text-[11px] muted uppercase tracking-wider">Belegung</div><div class="text-[22px] font-semibold ink mt-1">18 / 18</div><div class="text-[11.5px] muted mt-0.5">0 Tage Leerstand</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <section class="xl:col-span-2 rounded-2xl bg-white soft-shadow p-6">
+          <div class="flex items-baseline justify-between mb-4">
+            <h3 class="text-[17px] font-semibold ink">Cashflow 12 Monate</h3>
+            <div class="flex gap-1.5 text-[11.5px]">
+              <span class="chip accent-soft">Einnahmen</span>
+              <span class="chip bg-[#FEF2EE] text-[#9A3412]">Ausgaben</span>
+            </div>
+          </div>
+          <svg viewBox="0 0 600 180" class="w-full h-[180px]">
+            <g stroke="#E7E3DC" stroke-width="1"><line x1="40" y1="40" x2="600" y2="40"/><line x1="40" y1="90" x2="600" y2="90"/><line x1="40" y1="140" x2="600" y2="140"/></g>
+            <g font-family="Inter" font-size="10" fill="#A8A29E"><text x="0" y="44">120k</text><text x="0" y="94">80k</text><text x="0" y="144">40k</text></g>
+            <g fill="#2B3A2E">
+              <rect x="60"  y="55" width="26" height="85" rx="3"/><rect x="105" y="52" width="26" height="88" rx="3"/>
+              <rect x="150" y="50" width="26" height="90" rx="3"/><rect x="195" y="58" width="26" height="82" rx="3"/>
+              <rect x="240" y="48" width="26" height="92" rx="3"/><rect x="285" y="46" width="26" height="94" rx="3"/>
+              <rect x="330" y="44" width="26" height="96" rx="3"/><rect x="375" y="42" width="26" height="98" rx="3"/>
+              <rect x="420" y="40" width="26" height="100" rx="3"/><rect x="465" y="45" width="26" height="95" rx="3"/>
+              <rect x="510" y="43" width="26" height="97" rx="3"/><rect x="555" y="41" width="26" height="99" rx="3"/>
+            </g>
+            <g fill="#D97757" opacity="0.85">
+              <rect x="68"  y="115" width="14" height="25" rx="2"/><rect x="113" y="118" width="14" height="22" rx="2"/>
+              <rect x="158" y="110" width="14" height="30" rx="2"/><rect x="203" y="120" width="14" height="20" rx="2"/>
+              <rect x="248" y="108" width="14" height="32" rx="2"/><rect x="293" y="112" width="14" height="28" rx="2"/>
+              <rect x="338" y="105" width="14" height="35" rx="2"/><rect x="383" y="115" width="14" height="25" rx="2"/>
+              <rect x="428" y="95"  width="14" height="45" rx="2"/><rect x="473" y="110" width="14" height="30" rx="2"/>
+              <rect x="518" y="108" width="14" height="32" rx="2"/><rect x="563" y="105" width="14" height="35" rx="2"/>
+            </g>
+            <g font-family="Inter" font-size="10" fill="#78716C" text-anchor="middle">
+              <text x="73" y="165">Mai</text><text x="118" y="165">Jun</text><text x="163" y="165">Jul</text><text x="208" y="165">Aug</text>
+              <text x="253" y="165">Sep</text><text x="298" y="165">Okt</text><text x="343" y="165">Nov</text><text x="388" y="165">Dez</text>
+              <text x="433" y="165">Jan</text><text x="478" y="165">Feb</text><text x="523" y="165">Mrz</text><text x="568" y="165">Apr</text>
+            </g>
+          </svg>
+          <div class="grid grid-cols-4 gap-4 mt-5 pt-5 border-t hairline">
+            <div><div class="text-[11px] muted uppercase tracking-wider">Einnahmen YTD</div><div class="text-[16px] font-semibold ink mt-1">CHF 356'400</div></div>
+            <div><div class="text-[11px] muted uppercase tracking-wider">Unterhalt</div><div class="text-[16px] font-semibold ink mt-1">CHF 48'200</div></div>
+            <div><div class="text-[11px] muted uppercase tracking-wider">Hypo / Zins</div><div class="text-[16px] font-semibold ink mt-1">CHF 86'400</div></div>
+            <div><div class="text-[11px] muted uppercase tracking-wider">Netto YTD</div><div class="text-[16px] font-semibold accent-text mt-1">CHF 221'800</div></div>
+          </div>
+        </section>
+
+        <section class="rounded-2xl bg-white soft-shadow p-6">
+          <h3 class="text-[17px] font-semibold ink mb-4">Offene Tasks</h3>
+          <div class="space-y-3">
+            <div class="p-3 rounded-xl bg-[#FDFCF9] border hairline">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="chip bg-[#FEF2EE] text-[#9A3412]"><span class="dot bg-[#D97757] pulse"></span>Freigabe</span>
+                <span class="text-[11px] muted ml-auto">heute</span>
+              </div>
+              <div class="text-[13px] ink font-medium leading-snug">Fassadensanierung — Offerte CHF 640k</div>
+              <div class="text-[11.5px] muted mt-0.5">3 Offerten eingeholt</div>
+            </div>
+            <div class="p-3 rounded-xl bg-[#FDFCF9] border hairline">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="chip accent-soft">in Arbeit</span>
+                <span class="text-[11px] muted ml-auto">14 Tage</span>
+              </div>
+              <div class="text-[13px] ink font-medium leading-snug">NK-Abrechnung 2025 vorbereiten</div>
+              <div class="text-[11.5px] muted mt-0.5">Bewirtschaftung · Reto Wuhrmann</div>
+            </div>
+            <div class="p-3 rounded-xl bg-[#FDFCF9] border hairline">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="chip bg-[#FEF3C7] text-[#854D0E]">geplant</span>
+                <span class="text-[11px] muted ml-auto">Juni</span>
+              </div>
+              <div class="text-[13px] ink font-medium leading-snug">Lift-Wartung</div>
+              <div class="text-[11.5px] muted mt-0.5">Schindler AG · CHF 1'200</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section class="rounded-2xl bg-white soft-shadow overflow-hidden">
+        <div class="flex items-baseline justify-between px-6 pt-5 pb-3">
+          <h3 class="text-[17px] font-semibold ink">Einheiten · 18</h3>
+          <div class="text-[12px] muted">Ø Mietzins CHF 2'140</div>
+        </div>
+        <div class="grid grid-cols-[80px_1fr_1fr_120px_110px_90px] gap-3 px-6 py-3 bg-[#FDFCF9] text-[11px] muted uppercase tracking-wider font-semibold border-y hairline">
+          <div>Einheit</div><div>Typ</div><div>Mieter</div><div>Mietbeginn</div><div>Mietzins</div><div>Status</div>
+        </div>
+        <div class="divide-y hairline">
+          <div class="grid grid-cols-[80px_1fr_1fr_120px_110px_90px] gap-3 px-6 py-3 items-center text-[13px]"><div class="font-medium ink">1.01</div><div class="muted">3.5 Zi · 78 m²</div><div class="ink">Müller-Brunner</div><div class="muted">01.03.2022</div><div class="ink font-medium">CHF 2'180</div><div><span class="chip accent-soft">aktiv</span></div></div>
+          <div class="grid grid-cols-[80px_1fr_1fr_120px_110px_90px] gap-3 px-6 py-3 items-center text-[13px]"><div class="font-medium ink">1.02</div><div class="muted">4.5 Zi · 108 m²</div><div class="ink">Keller-Brunner</div><div class="muted">01.03.2022</div><div class="ink font-medium">CHF 2'370</div><div><span class="chip accent-soft">aktiv</span></div></div>
+          <div class="grid grid-cols-[80px_1fr_1fr_120px_110px_90px] gap-3 px-6 py-3 items-center text-[13px]"><div class="font-medium ink">2.01</div><div class="muted">2.5 Zi · 62 m²</div><div class="ink">Fischer</div><div class="muted">01.11.2023</div><div class="ink font-medium">CHF 1'820</div><div><span class="chip accent-soft">aktiv</span></div></div>
+          <div class="grid grid-cols-[80px_1fr_1fr_120px_110px_90px] gap-3 px-6 py-3 items-center text-[13px]"><div class="font-medium ink">2.02</div><div class="muted">3.5 Zi · 82 m²</div><div class="ink">Bühler</div><div class="muted">01.06.2020</div><div class="ink font-medium">CHF 2'240</div><div><span class="chip accent-soft">aktiv</span></div></div>
+          <div class="grid grid-cols-[80px_1fr_1fr_120px_110px_90px] gap-3 px-6 py-3 items-center text-[13px]"><div class="font-medium ink">3.01</div><div class="muted">4.5 Zi · 108 m²</div><div class="ink">Brunner</div><div class="muted">01.01.2019</div><div class="ink font-medium">CHF 2'310</div><div><span class="chip accent-soft">aktiv</span></div></div>
+          <div class="grid grid-cols-[80px_1fr_1fr_120px_110px_90px] gap-3 px-6 py-3 items-center text-[13px]"><div class="font-medium ink">3.02</div><div class="muted">4.5 Zi · 108 m²</div><div class="ink">Hofmann</div><div class="muted">01.09.2024</div><div class="ink font-medium">CHF 2'450</div><div><span class="chip accent-soft">aktiv</span></div></div>
+        </div>
+        <div class="px-6 py-3 text-center text-[12px] muted border-t hairline">12 weitere Einheiten anzeigen</div>
+      </section>
+    </section>
+
+    <!-- ================== VIEW: RENDITE ================== -->
+    <section data-view="rendite" class="space-y-8">
+      <div>
+        <div class="text-[13px] muted mb-1.5">Portfolio-weit · rollierend 12 Monate</div>
+        <h1 class="text-[32px] font-semibold leading-[1.1] ink tracking-tight">Rendite</h1>
+      </div>
+
+      <div class="grid grid-cols-4 gap-4">
+        <div class="rounded-2xl bg-white soft-shadow p-5">
+          <div class="text-[11px] muted uppercase tracking-wider">Bruttorendite</div>
+          <div class="text-[28px] font-semibold ink mt-1">5.9 %</div>
+          <div class="text-[11.5px] muted mt-1">Mietertrag / Verkehrswert</div>
+        </div>
+        <div class="rounded-2xl bg-white soft-shadow p-5">
+          <div class="text-[11px] muted uppercase tracking-wider">Nettorendite</div>
+          <div class="text-[28px] font-semibold accent-text mt-1">4.8 %</div>
+          <div class="text-[11.5px] muted mt-1">nach Unterhalt &amp; Verwaltung</div>
+        </div>
+        <div class="rounded-2xl bg-white soft-shadow p-5">
+          <div class="text-[11px] muted uppercase tracking-wider">Eigenkapitalrendite</div>
+          <div class="text-[28px] font-semibold ink mt-1">8.2 %</div>
+          <div class="text-[11.5px] muted mt-1">bei 45 % Fremdfinanz.</div>
+        </div>
+        <div class="rounded-2xl bg-white soft-shadow p-5">
+          <div class="text-[11px] muted uppercase tracking-wider">Benchmark CH</div>
+          <div class="text-[28px] font-semibold ink mt-1">3.6 %</div>
+          <div class="text-[11.5px] accent-text mt-1">+1.2 pp über Markt</div>
+        </div>
+      </div>
+
+      <section class="rounded-2xl bg-white soft-shadow p-6">
+        <div class="flex items-baseline justify-between mb-4">
+          <h3 class="text-[17px] font-semibold ink">Rendite-Entwicklung</h3>
+          <div class="flex gap-2 text-[12px]"><button class="chip accent-bg text-white" style="padding:5px 10px">5J</button><button class="chip bg-[#F5F1E8] muted" style="padding:5px 10px">YTD</button><button class="chip bg-[#F5F1E8] muted" style="padding:5px 10px">12M</button></div>
+        </div>
+        <svg viewBox="0 0 800 200" class="w-full h-[200px]">
+          <g stroke="#E7E3DC" stroke-width="1"><line x1="40" y1="40" x2="800" y2="40"/><line x1="40" y1="90" x2="800" y2="90"/><line x1="40" y1="140" x2="800" y2="140"/></g>
+          <g font-family="Inter" font-size="10" fill="#A8A29E"><text x="0" y="44">5.5%</text><text x="0" y="94">4.5%</text><text x="0" y="144">3.5%</text></g>
+          <path d="M50 140 Q150 135 250 125 T 450 95 T 650 70 T 800 55" fill="none" stroke="#2B3A2E" stroke-width="2.5"/>
+          <path d="M50 140 Q150 135 250 125 T 450 95 T 650 70 T 800 55 L800 180 L50 180 Z" fill="#EEF1E9" opacity="0.7"/>
+          <path d="M50 155 Q150 150 250 148 T 450 140 T 650 138 T 800 135" fill="none" stroke="#A8A29E" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <g font-family="Inter" font-size="10" fill="#78716C"><text x="50" y="195">2021</text><text x="200" y="195">2022</text><text x="350" y="195">2023</text><text x="500" y="195">2024</text><text x="650" y="195">2025</text><text x="780" y="195">2026</text></g>
+          <g><circle cx="800" cy="55" r="4" fill="#2B3A2E"/><text x="720" y="45" font-family="Inter" font-size="11" fill="#2B3A2E" font-weight="600">Portfolio 4.8%</text></g>
+          <g><circle cx="800" cy="135" r="4" fill="#A8A29E"/><text x="720" y="155" font-family="Inter" font-size="11" fill="#78716C">Markt 3.6%</text></g>
+        </svg>
+      </section>
+
+      <section class="rounded-2xl bg-white soft-shadow p-6">
+        <h3 class="text-[17px] font-semibold ink mb-5">Rendite nach Objekt</h3>
+        <div class="space-y-4">
+          <div>
+            <div class="flex items-baseline justify-between text-[12.5px] mb-1.5"><span class="ink font-medium">Industriestrasse 7</span><span class="muted">5.7 %</span></div>
+            <div class="bar"><span class="accent-bg" style="width:95%"></span></div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between text-[12.5px] mb-1.5"><span class="ink font-medium">Seestrasse 12</span><span class="muted">5.1 %</span></div>
+            <div class="bar"><span class="accent-bg" style="width:85%"></span></div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between text-[12.5px] mb-1.5"><span class="ink font-medium">Gartenweg 5</span><span class="muted">4.9 %</span></div>
+            <div class="bar"><span class="accent-bg" style="width:82%"></span></div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between text-[12.5px] mb-1.5"><span class="ink font-medium">Wiesenweg 3</span><span class="muted">4.8 %</span></div>
+            <div class="bar"><span class="accent-bg" style="width:80%"></span></div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between text-[12.5px] mb-1.5"><span class="ink font-medium">Bergweg 8</span><span class="muted">4.6 %</span></div>
+            <div class="bar"><span class="accent-bg" style="width:77%"></span></div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between text-[12.5px] mb-1.5"><span class="ink font-medium">Dorfplatz 2</span><span class="muted">4.4 %</span></div>
+            <div class="bar"><span class="accent-bg" style="width:73%"></span></div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between text-[12.5px] mb-1.5"><span class="ink font-medium">Bahnhofstrasse 41</span><span class="muted">4.2 %</span></div>
+            <div class="bar"><span class="accent-bg" style="width:70%"></span></div>
+          </div>
+          <div>
+            <div class="flex items-baseline justify-between text-[12.5px] mb-1.5"><span class="ink font-medium">Obere Gasse 15</span><span class="muted">4.1 %</span></div>
+            <div class="bar"><span class="accent-bg" style="width:68%"></span></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid grid-cols-2 gap-6">
+        <section class="rounded-2xl bg-white soft-shadow p-6">
+          <h3 class="text-[15px] font-semibold ink mb-4">Rendite-Treiber YTD</h3>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between text-[13px]"><span class="muted">Mieteinnahmen</span><span class="ink font-semibold">+ CHF 842k</span></div>
+            <div class="flex items-center justify-between text-[13px]"><span class="muted">— davon Mietanpassung Referenzzins</span><span class="text-[#9A3412]">– CHF 12k</span></div>
+            <div class="flex items-center justify-between text-[13px]"><span class="muted">— davon Neuvermietung</span><span class="accent-text font-medium">+ CHF 18k</span></div>
+            <div class="flex items-center justify-between text-[13px] pt-2 border-t hairline"><span class="muted">Unterhalt &amp; Reparaturen</span><span class="text-[#9A3412]">– CHF 86k</span></div>
+            <div class="flex items-center justify-between text-[13px]"><span class="muted">Verwaltung (vision&amp;Immo)</span><span class="text-[#9A3412]">– CHF 38k</span></div>
+            <div class="flex items-center justify-between text-[13px]"><span class="muted">Hypothekarzinsen</span><span class="text-[#9A3412]">– CHF 142k</span></div>
+            <div class="flex items-center justify-between text-[14px] pt-3 border-t hairline"><span class="ink font-semibold">Netto-Cashflow</span><span class="accent-text font-semibold">+ CHF 576k</span></div>
+          </div>
+        </section>
+
+        <section class="rounded-2xl bg-white soft-shadow p-6">
+          <h3 class="text-[15px] font-semibold ink mb-4">Empfehlungen der Agents</h3>
+          <div class="space-y-3">
+            <div class="p-3 rounded-xl border hairline">
+              <div class="text-[12.5px] font-semibold ink mb-1">💡 Mietzins-Review Bergweg 8</div>
+              <div class="text-[11.5px] muted leading-relaxed">7 Einheiten liegen 4–9 % unter Marktmiete. Bei Fluktuation realisierbar: +CHF 14k/Jahr.</div>
+            </div>
+            <div class="p-3 rounded-xl border hairline">
+              <div class="text-[12.5px] font-semibold ink mb-1">💡 Refinanzierung Tranche B</div>
+              <div class="text-[11.5px] muted leading-relaxed">Fixe 2.1 % laufen im Q3 aus. Aktuell 1.4 % am Markt — potenziell +0.35 pp Rendite.</div>
+            </div>
+            <div class="p-3 rounded-xl border hairline">
+              <div class="text-[12.5px] font-semibold ink mb-1">💡 Solaranlage Wiesenweg 3</div>
+              <div class="text-[11.5px] muted leading-relaxed">Payback 9 Jahre · +CHF 8k/Jahr ab Jahr 2 (NK-Reduktion und Einspeisevergütung).</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- ================== VIEW: CASHFLOW ================== -->
+    <section data-view="cashflow" class="space-y-8">
+      <div class="flex items-end justify-between">
+        <div>
+          <div class="text-[13px] muted mb-1.5">Portfolio · alle Liegenschaften</div>
+          <h1 class="text-[32px] font-semibold leading-[1.1] ink tracking-tight">Cashflow</h1>
+        </div>
+        <div class="flex gap-1.5 text-[12px]">
+          <button class="chip accent-bg text-white" style="padding:6px 12px">YTD</button>
+          <button class="chip bg-white soft-shadow ink" style="padding:6px 12px">Letzte 12 Mt.</button>
+          <button class="chip bg-white soft-shadow ink" style="padding:6px 12px">2025</button>
+          <button class="chip bg-white soft-shadow ink" style="padding:6px 12px">2024</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4">
+        <div class="rounded-2xl bg-white soft-shadow p-5">
+          <div class="text-[11px] muted uppercase tracking-wider">Einnahmen YTD</div>
+          <div class="text-[28px] font-semibold ink mt-1">CHF 842k</div>
+          <div class="text-[11.5px] accent-text mt-1">+2.4 % vs. Plan</div>
+        </div>
+        <div class="rounded-2xl bg-white soft-shadow p-5">
+          <div class="text-[11px] muted uppercase tracking-wider">Ausgaben YTD</div>
+          <div class="text-[28px] font-semibold ink mt-1">CHF 266k</div>
+          <div class="text-[11.5px] muted mt-1">31.6 % der Einnahmen</div>
+        </div>
+        <div class="rounded-2xl bg-white soft-shadow p-5">
+          <div class="text-[11px] muted uppercase tracking-wider">Netto-Cashflow</div>
+          <div class="text-[28px] font-semibold accent-text mt-1">CHF 576k</div>
+          <div class="text-[11.5px] muted mt-1">+CHF 128k auf Konto</div>
+        </div>
+      </div>
+
+      <section class="rounded-2xl bg-white soft-shadow p-6">
+        <div class="flex items-baseline justify-between mb-4">
+          <h3 class="text-[17px] font-semibold ink">Monatsverlauf</h3>
+          <div class="flex items-center gap-3 text-[11.5px]"><span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm accent-bg inline-block"></span>Einnahmen</span><span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#D97757] inline-block"></span>Ausgaben</span><span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#8BA98A] inline-block"></span>Netto</span></div>
+        </div>
+        <svg viewBox="0 0 800 220" class="w-full h-[220px]">
+          <g stroke="#E7E3DC" stroke-width="1"><line x1="50" y1="40" x2="800" y2="40"/><line x1="50" y1="100" x2="800" y2="100"/><line x1="50" y1="160" x2="800" y2="160"/></g>
+          <g font-family="Inter" font-size="10" fill="#A8A29E"><text x="0" y="44">90k</text><text x="0" y="104">60k</text><text x="0" y="164">30k</text></g>
+          <g fill="#2B3A2E">
+            <rect x="70" y="50" width="26" height="110" rx="3"/><rect x="155" y="48" width="26" height="112" rx="3"/>
+            <rect x="240" y="46" width="26" height="114" rx="3"/><rect x="325" y="44" width="26" height="116" rx="3"/>
+            <rect x="410" y="42" width="26" height="118" rx="3"/><rect x="495" y="40" width="26" height="120" rx="3"/>
+            <rect x="580" y="45" width="26" height="115" rx="3"/><rect x="665" y="43" width="26" height="117" rx="3"/>
+          </g>
+          <g fill="#D97757" opacity="0.9">
+            <rect x="100" y="120" width="18" height="40" rx="2"/><rect x="185" y="125" width="18" height="35" rx="2"/>
+            <rect x="270" y="115" width="18" height="45" rx="2"/><rect x="355" y="128" width="18" height="32" rx="2"/>
+            <rect x="440" y="110" width="18" height="50" rx="2"/><rect x="525" y="118" width="18" height="42" rx="2"/>
+            <rect x="610" y="105" width="18" height="55" rx="2"/><rect x="695" y="120" width="18" height="40" rx="2"/>
+          </g>
+          <path d="M83 65 L168 60 L253 58 L338 52 L423 48 L508 45 L593 55 L678 50" fill="none" stroke="#8BA98A" stroke-width="2.5"/>
+          <g font-family="Inter" font-size="10" fill="#78716C" text-anchor="middle">
+            <text x="96" y="195">Sep</text><text x="181" y="195">Okt</text><text x="266" y="195">Nov</text><text x="351" y="195">Dez</text>
+            <text x="436" y="195">Jan</text><text x="521" y="195">Feb</text><text x="606" y="195">Mrz</text><text x="691" y="195">Apr</text>
+          </g>
+        </svg>
+      </section>
+
+      <div class="grid grid-cols-2 gap-6">
+        <section class="rounded-2xl bg-white soft-shadow p-6">
+          <h3 class="text-[15px] font-semibold ink mb-4">Einnahmen YTD</h3>
+          <div class="space-y-3 text-[13px]">
+            <div class="flex items-center justify-between"><span class="muted">Wohnungsmieten</span><span class="ink font-semibold">CHF 724'200</span></div>
+            <div class="flex items-center justify-between"><span class="muted">Gewerbemieten</span><span class="ink font-semibold">CHF 86'400</span></div>
+            <div class="flex items-center justify-between"><span class="muted">Parkplätze &amp; Nebenobjekte</span><span class="ink font-semibold">CHF 24'800</span></div>
+            <div class="flex items-center justify-between"><span class="muted">Nebenkosten-Akonto</span><span class="ink font-semibold">CHF 6'600</span></div>
+            <div class="flex items-center justify-between pt-3 border-t hairline text-[14px]"><span class="ink font-semibold">Total</span><span class="accent-text font-semibold">CHF 842'000</span></div>
+          </div>
+        </section>
+
+        <section class="rounded-2xl bg-white soft-shadow p-6">
+          <h3 class="text-[15px] font-semibold ink mb-4">Ausgaben YTD</h3>
+          <div class="space-y-3 text-[13px]">
+            <div class="flex items-center justify-between"><span class="muted">Hypothekarzinsen</span><span class="ink font-semibold">CHF 142'000</span></div>
+            <div class="flex items-center justify-between"><span class="muted">Unterhalt &amp; Reparaturen</span><span class="ink font-semibold">CHF 48'200</span></div>
+            <div class="flex items-center justify-between"><span class="muted">Verwaltung vision&amp;Immo</span><span class="ink font-semibold">CHF 38'400</span></div>
+            <div class="flex items-center justify-between"><span class="muted">Versicherungen</span><span class="ink font-semibold">CHF 18'600</span></div>
+            <div class="flex items-center justify-between"><span class="muted">Rückstellungen</span><span class="ink font-semibold">CHF 18'800</span></div>
+            <div class="flex items-center justify-between pt-3 border-t hairline text-[14px]"><span class="ink font-semibold">Total</span><span class="text-[#9A3412] font-semibold">CHF 266'000</span></div>
+          </div>
+        </section>
+      </div>
+
+      <section class="rounded-2xl bg-white soft-shadow p-6">
+        <div class="flex items-baseline justify-between mb-4">
+          <h3 class="text-[17px] font-semibold ink">Prognose 12 Monate</h3>
+          <span class="text-[12px] muted">vorbereitet von Finanz-Agent</span>
+        </div>
+        <div class="grid grid-cols-4 gap-3">
+          <div class="rounded-xl bg-[#FDFCF9] border hairline p-4"><div class="text-[11px] muted uppercase tracking-wider">Erwartete Einnahmen</div><div class="text-[18px] font-semibold ink mt-1">CHF 2.56M</div></div>
+          <div class="rounded-xl bg-[#FDFCF9] border hairline p-4"><div class="text-[11px] muted uppercase tracking-wider">Erwartete Ausgaben</div><div class="text-[18px] font-semibold ink mt-1">CHF 0.81M</div></div>
+          <div class="rounded-xl bg-[#FDFCF9] border hairline p-4"><div class="text-[11px] muted uppercase tracking-wider">Grossinvestitionen</div><div class="text-[18px] font-semibold text-[#9A3412] mt-1">CHF 640k</div><div class="text-[10.5px] muted mt-0.5">Fassade Seestrasse</div></div>
+          <div class="rounded-xl bg-[#EEF1E9] border hairline p-4"><div class="text-[11px] muted uppercase tracking-wider">Netto frei verfügbar</div><div class="text-[18px] font-semibold accent-text mt-1">CHF 1.11M</div></div>
+        </div>
+      </section>
+    </section>
+
+    <!-- ================== VIEW: REPORTS ================== -->
+    <section data-view="reports" class="space-y-8">
+      <div class="flex items-end justify-between">
+        <div>
+          <div class="text-[13px] muted mb-1.5">Regelmässige und ad-hoc Berichte</div>
+          <h1 class="text-[32px] font-semibold leading-[1.1] ink tracking-tight">Reports</h1>
+        </div>
+        <button class="h-9 px-4 rounded-full accent-bg text-white text-[12.5px] font-medium">+ Ad-hoc Report</button>
+      </div>
+
+      <div>
+        <div class="text-[11px] muted uppercase tracking-wider mb-3">Warten auf dich</div>
+        <div class="grid grid-cols-2 gap-4">
+          <article class="card rounded-2xl bg-white soft-shadow overflow-hidden cursor-pointer">
+            <div class="h-24 g-mint relative">
+              <div class="absolute top-3 left-3 chip bg-white/95 accent-text"><span class="dot" style="background:#2B3A2E"></span>bereit</div>
+              <div class="absolute bottom-3 left-3 text-white">
+                <div class="text-[12px] opacity-90 leading-none">Q1 2026</div>
+                <div class="text-[15px] font-semibold">Quartalsreport Q1</div>
+              </div>
+            </div>
+            <div class="p-4">
+              <div class="text-[12.5px] muted leading-relaxed">Rendite, Cashflow, Tasks und Narrativ für den Treuhänder. Bexio-Abgleich abgeschlossen.</div>
+              <div class="mt-3 flex items-center gap-2">
+                <button class="h-8 px-3 rounded-full accent-bg text-white text-[12px] font-medium">Freigeben &amp; senden</button>
+                <button class="h-8 px-3 rounded-full text-[12px] muted hover:bg-stone-100">Vorschau</button>
+                <span class="ml-auto text-[11px] muted">bis Freitag</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="card rounded-2xl bg-white soft-shadow overflow-hidden cursor-pointer">
+            <div class="h-24 g-sky relative">
+              <div class="absolute top-3 left-3 chip bg-white/95 accent-text"><span class="dot" style="background:#8FA8C0"></span>zur Freigabe</div>
+              <div class="absolute bottom-3 left-3 text-white">
+                <div class="text-[12px] opacity-90 leading-none">2025 · Seestrasse 12</div>
+                <div class="text-[15px] font-semibold">Nebenkostenabrechnung</div>
+              </div>
+            </div>
+            <div class="p-4">
+              <div class="text-[12.5px] muted leading-relaxed">18 Mietparteien · 14 Guthaben · 4 Nachzahlungen. Kontrolle durch Finanz-Agent abgeschlossen.</div>
+              <div class="mt-3 flex items-center gap-2">
+                <button class="h-8 px-3 rounded-full accent-bg text-white text-[12px] font-medium">Freigeben</button>
+                <button class="h-8 px-3 rounded-full text-[12px] muted hover:bg-stone-100">Detail prüfen</button>
+                <span class="ml-auto text-[11px] muted">heute</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div>
+        <div class="text-[11px] muted uppercase tracking-wider mb-3">In Vorbereitung</div>
+        <div class="rounded-2xl bg-white soft-shadow divide-y hairline overflow-hidden">
+          <div class="p-4 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl g-sun flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[13.5px] font-semibold ink">Steuerreport 2025</div>
+              <div class="text-[12px] muted mt-0.5">Unterlagen zusammengestellt · wartet auf Deklaration Kanton · Abgabe 30.09.</div>
+            </div>
+            <div class="text-[11.5px] muted">80 % fertig</div>
+          </div>
+          <div class="p-4 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl g-plum flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[13.5px] font-semibold ink">Marktanalyse Q2 2026</div>
+              <div class="text-[12px] muted mt-0.5">Benchmarking aller Objekte · Agents sammeln Daten</div>
+            </div>
+            <div class="text-[11.5px] muted">in 3 Wochen</div>
+          </div>
+          <div class="p-4 flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl g-clay flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18M8 4v16"/></svg></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-[13.5px] font-semibold ink">Investitionsplan 2027</div>
+              <div class="text-[12px] muted mt-0.5">inkl. Fassade Seestrasse, Solar Wiesenweg, Refinanzierung Tranche B</div>
+            </div>
+            <div class="text-[11.5px] muted">Juni</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="text-[11px] muted uppercase tracking-wider mb-3">Archiv · freigegebene Reports</div>
+        <div class="rounded-2xl bg-white soft-shadow divide-y hairline overflow-hidden">
+          <div class="p-4 flex items-center gap-4">
+            <div class="w-9 h-9 rounded-lg bg-[#F5F1E8] flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#44403C" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg></div>
+            <div class="flex-1"><div class="text-[13px] ink font-medium">Jahresabschluss 2025</div><div class="text-[11.5px] muted">freigegeben 18.03.2026 · an Treuhänder versendet</div></div>
+            <button class="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center muted"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M6 11l6 6 6-6M5 21h14"/></svg></button>
+          </div>
+          <div class="p-4 flex items-center gap-4">
+            <div class="w-9 h-9 rounded-lg bg-[#F5F1E8] flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#44403C" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg></div>
+            <div class="flex-1"><div class="text-[13px] ink font-medium">Quartalsreport Q4 2025</div><div class="text-[11.5px] muted">freigegeben 12.01.2026</div></div>
+            <button class="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center muted"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M6 11l6 6 6-6M5 21h14"/></svg></button>
+          </div>
+          <div class="p-4 flex items-center gap-4">
+            <div class="w-9 h-9 rounded-lg bg-[#F5F1E8] flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#44403C" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg></div>
+            <div class="flex-1"><div class="text-[13px] ink font-medium">NK-Abrechnung 2024 · alle Liegenschaften</div><div class="text-[11.5px] muted">freigegeben 20.03.2025 · 142 Mieter informiert</div></div>
+            <button class="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center muted"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M6 11l6 6 6-6M5 21h14"/></svg></button>
+          </div>
+          <div class="p-4 flex items-center gap-4">
+            <div class="w-9 h-9 rounded-lg bg-[#F5F1E8] flex items-center justify-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#44403C" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg></div>
+            <div class="flex-1"><div class="text-[13px] ink font-medium">Steuerreport 2024</div><div class="text-[11.5px] muted">abgeschlossen 15.09.2025</div></div>
+            <button class="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center muted"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M6 11l6 6 6-6M5 21h14"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================== VIEW: ARCHIV ================== -->
+    <section data-view="archiv" class="space-y-8">
+      <div>
+        <div class="text-[13px] muted mb-1.5">Alle abgeschlossenen Entscheidungen und Vorgänge</div>
+        <h1 class="text-[32px] font-semibold leading-[1.1] ink tracking-tight">Archiv</h1>
+      </div>
+
+      <div class="flex gap-2 flex-wrap">
+        <button class="chip accent-bg text-white" style="padding:7px 14px">Alle 184</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">Freigaben</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">Reports</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">Verträge</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">Schäden</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">2026</button>
+        <button class="chip bg-white soft-shadow ink" style="padding:7px 14px">2025</button>
+      </div>
+
+      <div class="rounded-2xl bg-white soft-shadow divide-y hairline overflow-hidden">
+        <div class="p-4 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl g-mint flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[13.5px] ink"><span class="font-semibold">Fenstersanierung Bergweg 8</span> freigegeben · CHF 28'400 an Glaser Keller &amp; Co AG.</div>
+            <div class="text-[12px] muted mt-0.5">Abgeschlossen 14.04.2026 · unter Budget geliefert (–CHF 1'200)</div>
+          </div>
+          <div class="text-[11.5px] muted whitespace-nowrap">10 Tage</div>
+        </div>
+        <div class="p-4 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl g-sage flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[13.5px] ink"><span class="font-semibold">Referenzzins-Senkung umgesetzt</span> · 23 Mieter profitieren.</div>
+            <div class="text-[12px] muted mt-0.5">Signiert 05.04.2026 · Rückwirkend per Mai · Alle Mieter informiert</div>
+          </div>
+          <div class="text-[11.5px] muted whitespace-nowrap">19 Tage</div>
+        </div>
+        <div class="p-4 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl g-sky flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v16"/></svg></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[13.5px] ink"><span class="font-semibold">Kauf Obere Gasse 15 St. Gallen abgeschlossen.</span> 6 Wohnungen für CHF 2.8M.</div>
+            <div class="text-[12px] muted mt-0.5">Kaufvertrag signiert 22.02.2026 · Onboarding läuft</div>
+          </div>
+          <div class="text-[11.5px] muted whitespace-nowrap">Feb</div>
+        </div>
+        <div class="p-4 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl g-clay flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16v16H4zM4 9h16M9 4v16"/></svg></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[13.5px] ink"><span class="font-semibold">Jahresabschluss 2025 freigegeben.</span> Netto-Rendite 4.6 %, +12.8 % Portfoliowert.</div>
+            <div class="text-[12px] muted mt-0.5">Freigegeben 18.03.2026 · An Dr. Keller Treuhand AG versendet</div>
+          </div>
+          <div class="text-[11.5px] muted whitespace-nowrap">Mrz</div>
+        </div>
+        <div class="p-4 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl g-fire flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v6M12 12a4 4 0 0 0-4 4c0 3 4 6 4 6s4-3 4-6a4 4 0 0 0-4-4z"/></svg></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[13.5px] ink"><span class="font-semibold">Wasserschaden Wiesenweg 3 — Gebäudehaftung</span>.</div>
+            <div class="text-[12px] muted mt-0.5">CHF 8'400 · Versicherung übernommen 98 % · Erledigt 02.02.2026</div>
+          </div>
+          <div class="text-[11.5px] muted whitespace-nowrap">Feb</div>
+        </div>
+        <div class="p-4 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl g-plum flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[13.5px] ink"><span class="font-semibold">Refinanzierung Tranche A abgeschlossen.</span> CHF 4.2M bei UBS zu 1.35 % auf 10 Jahre.</div>
+            <div class="text-[12px] muted mt-0.5">Signiert via Skribble 14.01.2026 · Ersparnis CHF 26k/Jahr</div>
+          </div>
+          <div class="text-[11.5px] muted whitespace-nowrap">Jan</div>
+        </div>
+        <div class="p-4 flex items-start gap-4">
+          <div class="w-10 h-10 rounded-xl g-rose flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8"/></svg></div>
+          <div class="flex-1 min-w-0">
+            <div class="text-[13.5px] ink"><span class="font-semibold">2. Offerte abgelehnt — Dachsanierung Dorfplatz 2.</span></div>
+            <div class="text-[12px] muted mt-0.5">Dachbau Gerber günstiger (CHF 112k vs. 138k) · Entschieden 08.01.2026</div>
+          </div>
+          <div class="text-[11.5px] muted whitespace-nowrap">Jan</div>
+        </div>
+      </div>
+
+      <div class="text-[12px] muted text-center">177 ältere Einträge laden</div>
+    </section>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  const VIEWS = ['uebersicht','liegenschaften','liegenschaft-detail','rendite','cashflow','reports','archiv'];
+  const NAV_FOR = {'uebersicht':'uebersicht','liegenschaften':'liegenschaften','liegenschaft-detail':'liegenschaften','rendite':'rendite','cashflow':'cashflow','reports':'reports','archiv':'archiv'};
+  function show(view){
+    if(!VIEWS.includes(view)) view = 'uebersicht';
+    document.querySelectorAll('[data-view]').forEach(el => el.classList.toggle('active', el.dataset.view === view));
+    const activeNav = NAV_FOR[view];
+    document.querySelectorAll('#sidebar-nav [data-nav]').forEach(a => {
+      a.classList.toggle('is-active', a.dataset.nav === activeNav);
+    });
+    window.scrollTo({top:0, behavior:'instant'});
+  }
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-nav]');
+    if(el){ e.preventDefault(); show(el.dataset.nav); }
+  });
+  show('uebersicht');
+</script>
+
+</body>
+</html>

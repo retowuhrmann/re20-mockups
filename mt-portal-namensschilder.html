@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mieterportal — Namensschilder</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { font-family: 'Inter', ui-sans-serif, system-ui; background: #FFFFFF; color: #1C1917; -webkit-font-smoothing: antialiased; font-feature-settings: "cv11","ss01"; }
+  h1,h2,h3 { letter-spacing: -0.015em; }
+  .soft-shadow { box-shadow: 0 1px 2px rgba(28,25,23,0.04), 0 4px 16px -4px rgba(28,25,23,0.06); }
+  .ink { color: #1C1917; }
+  .muted { color: #78716C; }
+  .hairline { border-color: #E7E3DC; }
+  .chip { display:inline-flex; align-items:center; gap:6px; padding: 3px 9px; border-radius: 999px; font-size:11px; font-weight:500; }
+  .dot { width: 6px; height: 6px; border-radius: 999px; display: inline-block; }
+  .pulse { animation: pulse 2.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.5 } }
+
+  .g-sage { background: linear-gradient(135deg, #C9D5C5 0%, #8BA98A 100%); }
+  .g-clay { background: linear-gradient(135deg, #E8C9A8 0%, #C89472 100%); }
+  .g-sky  { background: linear-gradient(135deg, #C7D6E3 0%, #8FA8C0 100%); }
+  .g-rose { background: linear-gradient(135deg, #E8C9C9 0%, #C08B8B 100%); }
+  .g-plum { background: linear-gradient(135deg, #D4C5E0 0%, #9A80B5 100%); }
+  .g-sun  { background: linear-gradient(135deg, #EEDBA3 0%, #D4A84A 100%); }
+  .g-mint { background: linear-gradient(135deg, #B8E0D4 0%, #6FAF9A 100%); }
+  .g-fire { background: linear-gradient(135deg, #F3B894 0%, #D97757 100%); }
+
+  .accent-bg { background: #2B3A2E; }
+  .accent-text { color: #2B3A2E; }
+  .accent-soft { background: #EEF1E9; color: #2B3A2E; }
+
+  .phone-frame {
+    max-width: 420px; margin: 0 auto; background: #FAF8F4;
+    min-height: 100vh;
+  }
+  @media (min-width: 768px) {
+    body { display: flex; align-items: flex-start; justify-content: center; padding: 32px 0; }
+    .phone-frame {
+      border-radius: 38px; overflow: hidden; min-height: auto;
+      height: calc(100vh - 64px); max-height: 900px;
+      box-shadow: 0 20px 60px -20px rgba(28,25,23,0.25), 0 0 0 10px #1C1917, 0 0 0 11px #3F3A32;
+      display: flex; flex-direction: column;
+    }
+    .phone-scroll { overflow-y: auto; flex: 1; }
+  }
+
+  .phone-scroll::-webkit-scrollbar { width: 0; }
+
+  [data-view] { display: none; }
+  [data-view].active { display: block; }
+
+  .bubble { max-width: 78%; padding: 9px 13px; border-radius: 18px; font-size: 13.5px; line-height: 1.45; }
+  .bubble-me  { background: #2B3A2E; color: #F5F1E8; border-bottom-right-radius: 6px; margin-left: auto; }
+  .bubble-ai  { background: #FFFFFF; color: #1C1917; border-bottom-left-radius: 6px; box-shadow: 0 1px 2px rgba(28,25,23,0.04), 0 4px 12px -4px rgba(28,25,23,0.06); }
+  .bubble-sys { background: #EEF1E9; color: #2B3A2E; border-radius: 14px; font-size: 11.5px; padding: 8px 12px; max-width: 88%; }
+  .meta { font-size: 10.5px; color: #A8A29E; margin: 2px 6px; }
+  .typing span { display:inline-block; width:5px; height:5px; border-radius:50%; background:#A8A29E; margin:0 1px; animation: typing 1.2s infinite ease-in-out; }
+  .typing span:nth-child(2) { animation-delay: .15s; }
+  .typing span:nth-child(3) { animation-delay: .30s; }
+  @keyframes typing { 0%,60%,100% { transform: translateY(0); opacity:.4 } 30% { transform: translateY(-3px); opacity:1 } }
+</style>
+</head>
+<body>
+
+<div class="phone-frame flex flex-col">
+
+  <!-- Status bar -->
+  <div class="hidden md:flex h-7 px-7 items-center justify-between text-[12px] font-semibold ink shrink-0">
+    <span>9:41</span>
+    <div class="flex items-center gap-1">
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor"><path d="M1 7h2v3H1zM5 5h2v5H5zM9 3h2v7H9zM13 1h2v9h-2z"/></svg>
+      <svg width="16" height="11" viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M1 4a10 10 0 0 1 14 0M3 6.5a6.5 6.5 0 0 1 10 0M6 9a3 3 0 0 1 4 0"/></svg>
+      <svg width="22" height="11" viewBox="0 0 22 11" fill="none"><rect x="1" y="1" width="18" height="9" rx="2" stroke="currentColor" stroke-width="1"/><rect x="3" y="3" width="14" height="5" rx="1" fill="currentColor"/><rect x="20" y="4" width="1.5" height="3" rx="0.5" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- App header -->
+  <div class="px-5 pt-5 pb-3 flex items-center gap-3 shrink-0">
+    <div class="w-9 h-9 rounded-xl accent-bg flex items-center justify-center">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#F5F1E8" stroke-width="2"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="text-[12px] muted leading-none">vision&amp;Immo</div>
+      <div class="text-[14px] font-semibold ink">Mieterportal</div>
+    </div>
+    <button class="w-9 h-9 rounded-full bg-white soft-shadow flex items-center justify-center relative">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#44403C" stroke-width="1.8"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21a2 2 0 0 0 4 0"/></svg>
+      <span class="absolute top-2 right-2.5 w-1.5 h-1.5 rounded-full bg-[#D97757]"></span>
+    </button>
+    <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#C08B8B] to-[#8B5C5C] flex items-center justify-center text-white text-[12px] font-semibold">SK</div>
+  </div>
+
+  <!-- Scrollable content -->
+  <div class="phone-scroll pb-24">
+
+  <!-- ================== VIEW: START ================== -->
+  <section data-view="start" class="active px-5 space-y-5">
+
+    <section class="pt-2">
+      <div class="text-[12.5px] muted mb-1">Guten Morgen, Mittwoch 22. April</div>
+      <h1 class="text-[28px] font-semibold leading-[1.15] ink">Hallo Sandra.</h1>
+      <p class="text-[14px] muted mt-1.5">Wie können wir dir heute helfen?</p>
+    </section>
+
+    <!-- Assistent (Namensschilder-Demo) -->
+    <section class="rounded-3xl bg-white soft-shadow overflow-hidden">
+      <div class="p-5 pb-3 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl accent-bg flex items-center justify-center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F5F1E8" stroke-width="2"><path d="M12 2 3 7l9 5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[14px] font-semibold ink">Dein Assistent</div>
+          <div class="text-[11.5px] muted flex items-center gap-1.5"><span class="dot bg-[#8BA98A] pulse"></span>rund um die Uhr verfügbar</div>
+        </div>
+        <button id="chat-reset" class="chip accent-soft hidden" style="padding:5px 10px;">Neu starten</button>
+      </div>
+
+      <div id="chat-thread" class="bg-[#FAF8F4] space-y-2.5 empty:hidden px-4 py-3"></div>
+      <div id="chat-actions" class="p-4 border-t hairline"></div>
+    </section>
+
+    <!-- Deine Einheiten -->
+    <section>
+      <div class="flex items-baseline justify-between mb-3 px-1">
+        <h2 class="text-[17px] font-semibold ink">Deine Einheiten</h2>
+        <span class="text-[12px] muted">3</span>
+      </div>
+
+      <article class="rounded-2xl bg-white soft-shadow overflow-hidden mb-3">
+        <div class="h-32 g-rose relative">
+          <div class="absolute bottom-3 left-4 text-white">
+            <div class="text-[11.5px] opacity-90 leading-none">Wohnung · Hauptmietobjekt</div>
+            <div class="text-[17px] font-semibold leading-tight">Rosengasse 14</div>
+            <div class="text-[12.5px] opacity-90">3. OG, Wohnung 3.02 · 4.5 Zi · 108 m²</div>
+          </div>
+        </div>
+        <div class="p-4 divide-y hairline">
+          <div class="flex items-center justify-between py-2.5"><div class="text-[12.5px] muted">Mietzins monatlich</div><div class="text-[14px] font-semibold ink">CHF 2'370</div></div>
+          <div class="flex items-center justify-between py-2.5"><div class="text-[12.5px] muted">Nächste Zahlung</div><div class="text-[14px] ink">1. Mai 2026</div></div>
+          <div class="flex items-center justify-between py-2.5"><div class="text-[12.5px] muted">Vertragsbeginn</div><div class="text-[14px] ink">1. März 2022</div></div>
+          <div class="flex items-center justify-between py-2.5"><div class="text-[12.5px] muted">Nebenkosten Stand</div><div class="chip accent-soft">Guthaben CHF 142</div></div>
+        </div>
+      </article>
+
+      <div class="grid grid-cols-2 gap-3">
+        <article class="rounded-2xl bg-white soft-shadow overflow-hidden">
+          <div class="h-20 g-sky relative flex items-center justify-center">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6"><path d="M5 11V7a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v4M3 11h18v5a2 2 0 0 1-2 2h-1v2h-2v-2H8v2H6v-2H5a2 2 0 0 1-2-2z"/><circle cx="7" cy="14" r="1" fill="white"/><circle cx="17" cy="14" r="1" fill="white"/></svg>
+          </div>
+          <div class="p-3">
+            <div class="text-[11px] muted uppercase tracking-wider leading-none">Parkplatz</div>
+            <div class="text-[14px] font-semibold ink leading-tight mt-1">PP-12</div>
+            <div class="text-[11.5px] muted mt-0.5">UG · CHF 140 / Mt.</div>
+          </div>
+        </article>
+        <article class="rounded-2xl bg-white soft-shadow overflow-hidden">
+          <div class="h-20 g-clay relative flex items-center justify-center">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.6"><path d="M14.7 6.3a1 1 0 0 1 0 1.4L7 15.4V17h1.6l7.7-7.7a1 1 0 0 1 1.4 1.4L9 19H5v-4zM12 3l9 9M18 3l3 3"/></svg>
+          </div>
+          <div class="p-3">
+            <div class="text-[11px] muted uppercase tracking-wider leading-none">Bastelraum</div>
+            <div class="text-[14px] font-semibold ink leading-tight mt-1">B-03</div>
+            <div class="text-[11.5px] muted mt-0.5">Keller · CHF 45 / Mt.</div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- In Bearbeitung -->
+    <section>
+      <div class="flex items-baseline justify-between mb-3 px-1">
+        <h2 class="text-[17px] font-semibold ink">In Bearbeitung</h2>
+        <a data-nav="gespraeche" class="text-[12px] accent-text font-medium cursor-pointer">Alle</a>
+      </div>
+
+      <div class="space-y-3">
+
+        <!-- Namensschilder — gerade eben bestellt -->
+        <article class="rounded-2xl bg-white soft-shadow p-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl g-mint shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M8 12h8M8 16h5"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <div class="chip accent-soft"><span class="dot" style="background:#2B3A2E"></span>Bestätigt</div>
+              </div>
+              <h3 class="text-[14px] font-semibold ink leading-snug">Namensschilder · A-2026-0341</h3>
+              <p class="text-[12.5px] muted mt-1 leading-relaxed">3 Schilder bei Müller Holzbau AG bestellt. Lieferung in 5–7 Werktagen.</p>
+              <div class="mt-2.5 flex items-center gap-2">
+                <button data-nav="gespraeche" class="h-8 px-3 rounded-full bg-[#F5F1E8] text-[11.5px] font-medium ink">Gespräch öffnen</button>
+                <span class="ml-auto text-[11px] muted">gerade eben</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="rounded-2xl bg-white soft-shadow p-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl g-fire shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v6M12 12a4 4 0 0 0-4 4c0 3 4 6 4 6s4-3 4-6a4 4 0 0 0-4-4z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <div class="chip bg-[#FEF2EE] text-[#9A3412]"><span class="dot bg-[#D97757] pulse"></span>Handwerker unterwegs</div>
+              </div>
+              <h3 class="text-[14px] font-semibold ink leading-snug">Wasserflecken im Bad gemeldet</h3>
+              <p class="text-[12.5px] muted mt-1 leading-relaxed">Sanitär Meier kommt morgen um 10:00 Uhr. Du musst nichts weiter tun.</p>
+              <div class="mt-2.5 flex items-center gap-2">
+                <button data-nav="gespraeche" class="h-8 px-3 rounded-full bg-[#F5F1E8] text-[11.5px] font-medium ink">Gespräch öffnen</button>
+                <span class="ml-auto text-[11px] muted">vor 3 Std</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="rounded-2xl bg-white soft-shadow p-4">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl g-mint shrink-0 flex items-center justify-center">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <div class="chip accent-soft"><span class="dot" style="background:#2B3A2E"></span>Guthaben</div>
+              </div>
+              <h3 class="text-[14px] font-semibold ink leading-snug">NK-Abrechnung 2024: Guthaben CHF 142</h3>
+              <p class="text-[12.5px] muted mt-1 leading-relaxed">Wird mit deiner nächsten Mietzahlung verrechnet.</p>
+              <div class="mt-2.5 flex items-center gap-2">
+                <button data-nav="dokumente" class="h-8 px-3 rounded-full bg-[#F5F1E8] text-[11.5px] font-medium ink">Abrechnung ansehen</button>
+                <span class="ml-auto text-[11px] muted">vor 3 Tagen</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+  </section>
+
+  <!-- ================== VIEW: GESPRÄCHE ================== -->
+  <section data-view="gespraeche" class="px-5 space-y-4">
+    <div class="pt-2">
+      <div class="text-[12.5px] muted mb-1">Alle Unterhaltungen mit deinem Assistenten</div>
+      <h1 class="text-[26px] font-semibold leading-[1.15] ink">Gespräche</h1>
+    </div>
+
+    <div class="rounded-2xl border hairline bg-[#FDFCF9] px-4 py-3 flex items-center gap-3">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="gesp-search" autocomplete="off" placeholder="Suchen…" class="flex-1 min-w-0 bg-transparent text-[14px] outline-none placeholder:text-stone-400" />
+    </div>
+
+    <div id="gesp-empty" class="hidden rounded-2xl bg-white soft-shadow p-6 text-center">
+      <div class="text-[13px] muted">Keine Treffer</div>
+    </div>
+
+    <div id="gesp-list" class="rounded-2xl bg-white soft-shadow divide-y hairline overflow-hidden">
+
+      <!-- Namensschilder — gerade eben -->
+      <button data-nav="start" data-search="namensschilder bestellung türschild müller holzbau auftrag" class="gesp-item w-full text-left p-3.5 flex items-start gap-3 hover:bg-stone-50">
+        <div class="w-10 h-10 rounded-xl g-mint shrink-0 flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 12h8M8 16h5"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2">
+            <div class="text-[13.5px] font-semibold ink truncate">Namensschilder bestellen</div>
+            <span class="chip accent-soft" style="font-size:10px;padding:2px 7px">Bestätigt</span>
+          </div>
+          <div class="text-[12px] muted truncate mt-0.5">A-2026-0341 · Müller Holzbau AG · Lieferung 5–7 Werktage</div>
+        </div>
+        <div class="text-[11px] muted whitespace-nowrap">jetzt</div>
+      </button>
+
+      <button data-search="wasserflecken bad sanitär meier wasser schaden" class="gesp-item w-full text-left p-3.5 flex items-start gap-3 hover:bg-stone-50">
+        <div class="w-10 h-10 rounded-xl g-fire shrink-0 flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v6M12 12a4 4 0 0 0-4 4c0 3 4 6 4 6s4-3 4-6a4 4 0 0 0-4-4z"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[13.5px] font-semibold ink truncate">Wasserflecken im Bad</div>
+          <div class="text-[12px] muted truncate mt-0.5">Sanitär Meier kommt morgen um 10:00</div>
+        </div>
+        <div class="text-[11px] muted whitespace-nowrap">3 Std</div>
+      </button>
+
+      <button data-search="namensänderung heirat vertrag aktualisiert" class="gesp-item w-full text-left p-3.5 flex items-start gap-3 hover:bg-stone-50">
+        <div class="w-10 h-10 rounded-xl g-mint shrink-0 flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[13.5px] font-semibold ink truncate">Namensänderung nach Heirat</div>
+          <div class="text-[12px] muted truncate mt-0.5">Erledigt · Vertrag aktualisiert</div>
+        </div>
+        <div class="text-[11px] muted whitespace-nowrap">heute</div>
+      </button>
+
+      <button data-search="thomas mitbewohner zugriff portal mai" class="gesp-item w-full text-left p-3.5 flex items-start gap-3 hover:bg-stone-50">
+        <div class="w-10 h-10 rounded-xl g-sage shrink-0 flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2 2"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[13.5px] font-semibold ink truncate">Thomas als Mitbewohner</div>
+          <div class="text-[12px] muted truncate mt-0.5">Registriert per 1. Mai</div>
+        </div>
+        <div class="text-[11px] muted whitespace-nowrap">gestern</div>
+      </button>
+
+      <button data-search="blumenkästen balkon pflanzen innenseite aussenseite" class="gesp-item w-full text-left p-3.5 flex items-start gap-3 hover:bg-stone-50">
+        <div class="w-10 h-10 rounded-xl g-plum shrink-0 flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2 4 6v6c0 5 3.5 9 8 10 4.5-1 8-5 8-10V6z"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[13.5px] font-semibold ink truncate">Blumenkästen am Balkon</div>
+          <div class="text-[12px] muted truncate mt-0.5">Innenseite erlaubt · Aussenseite nicht</div>
+        </div>
+        <div class="text-[11px] muted whitespace-nowrap">4 T</div>
+      </button>
+    </div>
+
+    <button data-nav="start" class="w-full h-12 rounded-2xl accent-bg text-white text-[13.5px] font-medium flex items-center justify-center gap-2">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      Neues Anliegen melden
+    </button>
+  </section>
+
+  <!-- ================== VIEW: DOKUMENTE ================== -->
+  <section data-view="dokumente" class="px-5 space-y-4">
+    <div class="pt-2">
+      <div class="text-[12.5px] muted mb-1">Alles Wichtige zu deiner Wohnung</div>
+      <h1 class="text-[26px] font-semibold leading-[1.15] ink">Dokumente</h1>
+    </div>
+    <div class="rounded-2xl border hairline bg-[#FDFCF9] px-4 py-3 flex items-center gap-3">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A8A29E" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="dok-search" autocomplete="off" placeholder="Dokument suchen…" class="flex-1 min-w-0 bg-transparent text-[14px] outline-none placeholder:text-stone-400" />
+    </div>
+    <div id="dok-chips" class="flex gap-2 overflow-x-auto -mx-5 px-5 pb-1" style="scrollbar-width:none;">
+      <button data-cat="alle" class="dok-chip chip accent-bg text-white shrink-0" style="padding:7px 14px">Alle 7</button>
+      <button data-cat="vertrag" class="dok-chip chip bg-white soft-shadow ink shrink-0" style="padding:7px 14px">Vertrag</button>
+      <button data-cat="nebenkosten" class="dok-chip chip bg-white soft-shadow ink shrink-0" style="padding:7px 14px">Nebenkosten</button>
+      <button data-cat="rechnungen" class="dok-chip chip bg-white soft-shadow ink shrink-0" style="padding:7px 14px">Rechnungen</button>
+      <button data-cat="hausordnung" class="dok-chip chip bg-white soft-shadow ink shrink-0" style="padding:7px 14px">Hausordnung</button>
+    </div>
+    <div id="dok-empty" class="hidden rounded-2xl bg-white soft-shadow p-6 text-center"><div class="text-[13px] muted">Keine Dokumente in dieser Kategorie</div></div>
+    <div class="dok-group">
+      <div class="text-[11px] muted uppercase tracking-wider px-1 mb-2">Angeheftet</div>
+      <div class="rounded-2xl bg-white soft-shadow p-4 flex items-center gap-3 dok-item" data-cat="vertrag" data-search="mietvertrag rosengasse vertrag">
+        <div class="w-11 h-11 rounded-xl g-sky shrink-0 flex items-center justify-center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg></div>
+        <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold ink truncate">Mietvertrag Rosengasse 14</div><div class="text-[11.5px] muted mt-0.5">Version 14.04.2026 · signiert · 12 Seiten</div></div>
+        <button class="w-9 h-9 rounded-lg bg-[#F5F1E8] flex items-center justify-center ink shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M6 11l6 6 6-6M5 21h14"/></svg></button>
+      </div>
+    </div>
+    <div class="dok-group">
+      <div class="text-[11px] muted uppercase tracking-wider px-1 mb-2">Dieses Jahr</div>
+      <div class="rounded-2xl bg-white soft-shadow divide-y hairline overflow-hidden">
+        <div class="p-3.5 flex items-center gap-3 dok-item" data-cat="nebenkosten" data-search="nebenkostenabrechnung nk guthaben 2024">
+          <div class="w-9 h-9 rounded-lg g-mint shrink-0 flex items-center justify-center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16v16H4zM4 9h16M9 4v16"/></svg></div>
+          <div class="flex-1 min-w-0"><div class="text-[13.5px] font-medium ink leading-tight truncate">Nebenkostenabrechnung 2024</div><div class="text-[11.5px] muted mt-0.5 truncate">Guthaben CHF 142 · 18.03.2025</div></div>
+          <button class="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center muted shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M6 11l6 6 6-6M5 21h14"/></svg></button>
+        </div>
+        <div class="p-3.5 flex items-center gap-3 dok-item" data-cat="vertrag" data-search="mietzinsanpassung senkung mai 2026 mietzins">
+          <div class="w-9 h-9 rounded-lg g-sage shrink-0 flex items-center justify-center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="m5 14 7-7 7 7"/></svg></div>
+          <div class="flex-1 min-w-0"><div class="text-[13.5px] font-medium ink leading-tight truncate">Mietzinsanpassung Mai 2026</div><div class="text-[11.5px] muted mt-0.5 truncate">Senkung um CHF 80 · 05.04.2026</div></div>
+          <button class="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center muted shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M6 11l6 6 6-6M5 21h14"/></svg></button>
+        </div>
+        <div class="p-3.5 flex items-center gap-3 dok-item" data-cat="hausordnung" data-search="hausordnung regeln rosengasse">
+          <div class="w-9 h-9 rounded-lg g-plum shrink-0 flex items-center justify-center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16v16H4zM8 4v16"/></svg></div>
+          <div class="flex-1 min-w-0"><div class="text-[13.5px] font-medium ink leading-tight truncate">Hausordnung Rosengasse 14</div><div class="text-[11.5px] muted mt-0.5 truncate">Gültig seit 01.2024</div></div>
+          <button class="w-8 h-8 rounded-lg hover:bg-stone-100 flex items-center justify-center muted shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M6 11l6 6 6-6M5 21h14"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================== VIEW: ICH ================== -->
+  <section data-view="ich" class="px-5 space-y-5">
+    <div class="pt-2 flex items-center gap-4">
+      <div class="relative">
+        <div class="w-16 h-16 rounded-full g-rose flex items-center justify-center text-white text-[22px] font-semibold">SK</div>
+        <button class="absolute -bottom-0.5 -right-0.5 w-6 h-6 rounded-full bg-white soft-shadow flex items-center justify-center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#44403C" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 1 0 1.4L7 15.4V17h1.6l7.7-7.7a1 1 0 0 1 1.4 1.4L9 19H5v-4z"/></svg></button>
+      </div>
+      <div class="min-w-0">
+        <div class="text-[11.5px] muted">Mieterin seit 01.03.2022</div>
+        <h1 class="text-[22px] font-semibold leading-tight ink">Sandra Keller-Brunner</h1>
+        <div class="text-[12px] muted">sandra.keller@bluewin.ch</div>
+      </div>
+    </div>
+    <div>
+      <div class="text-[11px] muted uppercase tracking-wider px-1 mb-2">Ansprechpartner</div>
+      <div class="rounded-2xl bg-white soft-shadow p-4 flex items-center gap-3">
+        <div class="w-11 h-11 rounded-full g-sage flex items-center justify-center text-white text-[13px] font-semibold">RW</div>
+        <div class="flex-1 min-w-0"><div class="text-[13.5px] ink font-medium">Reto Wuhrmann</div><div class="text-[11.5px] muted">Bewirtschafter · vision&Immo AG</div></div>
+        <button class="w-9 h-9 rounded-lg bg-[#F5F1E8] flex items-center justify-center ink"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.4 2.1L7.9 9.8a16 16 0 0 0 6 6l1.4-1.3a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg></button>
+      </div>
+    </div>
+    <button class="w-full h-11 rounded-2xl bg-white soft-shadow text-[13px] font-medium text-[#B91C1C]">Abmelden</button>
+  </section>
+
+  </div>
+
+  <!-- Bottom navigation -->
+  <div class="shrink-0 bg-white/95 backdrop-blur border-t hairline">
+    <nav id="bottom-nav" class="flex items-center justify-around px-2 pt-2 pb-3">
+      <button data-nav="start" class="flex-1 flex flex-col items-center gap-1 py-1.5 rounded-xl">
+        <svg class="nav-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+        <span class="nav-lbl text-[10.5px]">Start</span>
+      </button>
+      <button data-nav="gespraeche" class="flex-1 flex flex-col items-center gap-1 py-1.5">
+        <svg class="nav-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></svg>
+        <span class="nav-lbl text-[10.5px]">Gespräche</span>
+      </button>
+      <button data-nav="dokumente" class="flex-1 flex flex-col items-center gap-1 py-1.5">
+        <svg class="nav-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg>
+        <span class="nav-lbl text-[10.5px]">Dokumente</span>
+      </button>
+      <button data-nav="ich" class="flex-1 flex flex-col items-center gap-1 py-1.5">
+        <svg class="nav-ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v2"/></svg>
+        <span class="nav-lbl text-[10.5px]">Ich</span>
+      </button>
+    </nav>
+    <div class="h-1 w-32 rounded-full bg-[#1C1917] mx-auto mb-1"></div>
+  </div>
+
+</div>
+
+<script>
+  // ── Navigation ──────────────────────────────────────────────────────────
+  const VIEWS = ['start','gespraeche','dokumente','ich'];
+  const scroll = document.querySelector('.phone-scroll');
+  function show(view){
+    if(!VIEWS.includes(view)) view = 'start';
+    document.querySelectorAll('[data-view]').forEach(el => el.classList.toggle('active', el.dataset.view === view));
+    document.querySelectorAll('#bottom-nav [data-nav]').forEach(b => {
+      const on = b.dataset.nav === view;
+      b.querySelector('.nav-ic').setAttribute('fill', on ? '#2B3A2E' : 'none');
+      b.querySelector('.nav-ic').setAttribute('stroke', on ? 'none' : '#A8A29E');
+      const lbl = b.querySelector('.nav-lbl');
+      lbl.classList.toggle('font-semibold', on);
+      lbl.classList.toggle('accent-text', on);
+      lbl.classList.toggle('muted', !on);
+    });
+    scroll?.scrollTo({top:0, behavior:'instant'});
+  }
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-nav]');
+    if(el) show(el.dataset.nav);
+  });
+  show('start');
+
+  // ── Chat Demo: Namensschilder-Bestellung ────────────────────────────────
+  const thread  = document.getElementById('chat-thread');
+  const actions = document.getElementById('chat-actions');
+  const resetBtn= document.getElementById('chat-reset');
+
+  function el(html){ const d=document.createElement('div'); d.innerHTML=html.trim(); return d.firstChild; }
+  function scrollThread(){ thread.lastElementChild?.scrollIntoView({block:'nearest',behavior:'smooth'}); }
+
+  function addUser(text){
+    thread.appendChild(el(`<div class="flex flex-col items-end"><div class="bubble bubble-me">${text}</div></div>`));
+    scrollThread();
+  }
+  function addAi(html){
+    thread.appendChild(el(`<div class="flex flex-col items-start"><div class="bubble bubble-ai">${html}</div></div>`));
+    scrollThread();
+  }
+  function addSys(html){
+    thread.appendChild(el(`<div class="flex justify-center"><div class="bubble-sys">${html}</div></div>`));
+    scrollThread();
+  }
+  function addOrderPreview(){
+    thread.appendChild(el(`
+      <div class="flex justify-center">
+        <div class="rounded-2xl bg-white soft-shadow p-3.5 w-[94%]">
+          <div class="text-[12px] font-semibold ink mb-2.5 flex items-center gap-1.5">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2B3A2E" stroke-width="2.2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 12h8M8 16h5"/></svg>
+            Bestellung prüfen
+          </div>
+          <div class="space-y-2 text-[12px]">
+            <div class="flex justify-between"><span class="muted">Einheit</span><span class="font-medium ink">Rosengasse 14, 3.02</span></div>
+            <div class="flex justify-between"><span class="muted">Beschriftung</span><span class="font-medium ink">Keller-Brunner</span></div>
+            <div class="flex justify-between"><span class="muted">Anzahl</span><span class="font-medium ink">3 Schilder</span></div>
+            <div class="flex justify-between"><span class="muted">Lieferant</span><span class="font-medium ink">Müller Holzbau AG</span></div>
+            <div class="flex justify-between"><span class="muted">Preis</span><span class="font-medium ink">CHF 45 inkl. Montage</span></div>
+            <div class="mt-1 pt-2 border-t hairline flex justify-between items-center">
+              <span class="muted">Genehmigung</span>
+              <span class="chip accent-soft" style="font-size:10.5px;padding:2px 8px;">✓ Auto-Approved</span>
+            </div>
+          </div>
+        </div>
+      </div>`));
+    scrollThread();
+  }
+  function addOrderConfirm(){
+    thread.appendChild(el(`
+      <div class="flex justify-center">
+        <div class="rounded-2xl bg-white soft-shadow p-3 w-[94%]">
+          <div class="flex items-center gap-2 mb-1.5">
+            <div class="w-6 h-6 rounded-lg g-mint flex items-center justify-center">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="text-[12px] font-semibold ink">Auftrag platziert</div>
+            <span class="chip accent-soft ml-auto" style="padding:2px 8px;font-size:10.5px;">A-2026-0341</span>
+          </div>
+          <div class="text-[11.5px] muted leading-relaxed">Müller Holzbau AG hat die Bestellung erhalten. Hauswart Daniel koordiniert die Montage nach Lieferung.</div>
+        </div>
+      </div>`));
+    scrollThread();
+  }
+  function showTyping(){
+    const t=el(`<div class="flex flex-col items-start" data-typing><div class="bubble bubble-ai typing"><span></span><span></span><span></span></div></div>`);
+    thread.appendChild(t); scrollThread(); return t;
+  }
+  function removeTyping(){ thread.querySelectorAll('[data-typing]').forEach(n=>n.remove()); }
+  function setActions(html){ actions.innerHTML=html; }
+  function delay(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+  function resetChat(){
+    thread.innerHTML='';
+    resetBtn.classList.add('hidden');
+    renderStart();
+  }
+
+  function renderStart(){
+    // Initial greeting in thread
+    thread.appendChild(el(`<div class="flex flex-col items-start"><div class="bubble bubble-ai">Hallo Sandra 👋 Womit kann ich dir helfen?</div></div>`));
+
+    setActions(`
+      <div class="space-y-2">
+        <div class="flex flex-wrap gap-2 mb-3">
+          <button id="chip-ns" class="chip bg-white soft-shadow ink text-[12px]" style="padding:7px 12px">
+            🪧 Namensschilder bestellen
+          </button>
+          <button class="chip bg-white soft-shadow muted text-[12px]" style="padding:7px 12px">🔧 Schaden melden</button>
+          <button class="chip bg-white soft-shadow muted text-[12px]" style="padding:7px 12px">📄 Dokument anfordern</button>
+        </div>
+        <form id="chat-form" class="rounded-2xl border hairline bg-[#FDFCF9] px-3 py-2 flex items-center gap-2">
+          <input id="chat-input" autocomplete="off" placeholder="Oder tippen…" class="flex-1 min-w-0 bg-transparent text-[14px] outline-none placeholder:text-stone-400 px-1" />
+          <button type="submit" class="w-8 h-8 rounded-full accent-bg text-white flex items-center justify-center shrink-0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
+          </button>
+        </form>
+      </div>
+    `);
+
+    document.getElementById('chip-ns').onclick = () => step1('Namensschilder bestellen');
+    const form = document.getElementById('chat-form');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const val = document.getElementById('chat-input').value.trim();
+      if(val) step1(val);
+    });
+  }
+
+  async function step1(userText){
+    addUser(userText);
+    setActions('');
+    await delay(400);
+    showTyping();
+    await delay(1000);
+    removeTyping();
+
+    // System bubble showing what the AI checked automatically
+    addSys('🔍 Prüfe Mietverhältnis · Space 3.02 · Asset Türschild · OwnerPolicy…');
+    await delay(700);
+    removeTyping();
+    addSys('✓ Rosengasse 14, 3.02 · Lease aktiv · CHF 45 &lt; Limit CHF 50 · <strong>Auto-Approved</strong>');
+    await delay(500);
+
+    addAi('Alles bereit! Ich habe deine Wohnung, die gültige Preislimite und den Lieferanten geprüft. Hier ist deine Bestellung:');
+    addOrderPreview();
+
+    setActions(`
+      <div class="space-y-2">
+        <button id="act-confirm" class="w-full h-11 rounded-xl accent-bg text-white text-[13.5px] font-medium flex items-center justify-center gap-2">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
+          Jetzt bestellen
+        </button>
+        <button id="act-name" class="w-full h-9 rounded-xl bg-[#F5F1E8] ink text-[12.5px] font-medium">Anderen Namen angeben</button>
+      </div>
+    `);
+    resetBtn.classList.remove('hidden');
+    document.getElementById('act-confirm').onclick = step2;
+    document.getElementById('act-name').onclick = () => {
+      addUser('Anderen Namen angeben');
+      addAi('Kein Problem — welchen Namen soll auf den Schildern stehen?');
+      setActions(`
+        <form id="name-form" class="flex gap-2">
+          <input id="name-input" placeholder="z.B. Keller-Brunner / Thomas" class="flex-1 rounded-xl border hairline bg-[#FDFCF9] px-3 py-2 text-[14px] outline-none" />
+          <button type="submit" class="px-4 h-10 rounded-xl accent-bg text-white text-[13px] font-medium">OK</button>
+        </form>
+      `);
+      document.getElementById('name-form').addEventListener('submit', e => {
+        e.preventDefault();
+        const v = document.getElementById('name-input').value.trim() || 'Keller-Brunner';
+        addUser(v);
+        addAi(`Verstanden — ich trage <strong>${v}</strong> ein. Willst du jetzt bestellen?`);
+        setActions(`<button id="act-confirm2" class="w-full h-11 rounded-xl accent-bg text-white text-[13.5px] font-medium">Ja, bestellen</button>`);
+        document.getElementById('act-confirm2').onclick = step2;
+      });
+    };
+  }
+
+  async function step2(){
+    addUser('Jetzt bestellen');
+    setActions('');
+    await delay(300);
+    showTyping();
+    await delay(900);
+    removeTyping();
+    addOrderConfirm();
+    await delay(400);
+    addAi('Erledigt ✓ Die Namensschilder sind bestellt. Müller Holzbau AG liefert in <strong>5–7 Werktagen</strong>, danach koordiniert Hauswart Daniel die Montage. Du bekommst eine Push-Meldung bei jeder Statusänderung.');
+    setActions(`
+      <button id="act-done" class="w-full h-11 rounded-xl accent-bg text-white text-[13.5px] font-medium flex items-center justify-center gap-2">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 6 9 17l-5-5"/></svg>
+        Perfekt, danke
+      </button>
+      <div class="text-[10.5px] muted text-center mt-2">Auftrag A-2026-0341 ist unter «Gespräche» verfügbar</div>
+    `);
+    document.getElementById('act-done').onclick = () => {
+      setActions(`<div class="rounded-xl accent-soft p-4 text-center"><div class="text-[13px] font-semibold accent-text mb-1">✓ Auftrag A-2026-0341 gespeichert</div><div class="text-[11.5px] muted">Namensschilder in Produktion · Lieferung 5–7 Werktage</div></div>`);
+    };
+  }
+
+  resetBtn.addEventListener('click', resetChat);
+  resetChat();
+
+  // ── Gespräche Suche ─────────────────────────────────────────────────────
+  const gespSearch = document.getElementById('gesp-search');
+  const gespEmpty  = document.getElementById('gesp-empty');
+  const gespList   = document.getElementById('gesp-list');
+  gespSearch?.addEventListener('input', () => {
+    const q = gespSearch.value.trim().toLowerCase();
+    let visible = 0;
+    document.querySelectorAll('.gesp-item').forEach(it => {
+      const hay = (it.dataset.search+' '+it.textContent).toLowerCase();
+      const show = !q || hay.includes(q);
+      it.style.display = show ? '' : 'none';
+      if(show) visible++;
+    });
+    gespEmpty.classList.toggle('hidden', visible > 0);
+    gespList.classList.toggle('hidden', visible === 0);
+  });
+
+  // ── Dokumente Filter ────────────────────────────────────────────────────
+  const dokSearch = document.getElementById('dok-search');
+  const dokEmpty  = document.getElementById('dok-empty');
+  const dokChips  = document.querySelectorAll('.dok-chip');
+  let dokCat = 'alle';
+  function applyDokFilter(){
+    const q = (dokSearch?.value||'').trim().toLowerCase();
+    let visible = 0;
+    document.querySelectorAll('.dok-item').forEach(it => {
+      const show = (dokCat==='alle'||it.dataset.cat===dokCat) && (!q||(it.dataset.search+' '+it.textContent).toLowerCase().includes(q));
+      it.style.display = show ? '' : 'none';
+      if(show) visible++;
+    });
+    document.querySelectorAll('.dok-group').forEach(g => {
+      g.style.display = Array.from(g.querySelectorAll('.dok-item')).some(i=>i.style.display!=='none') ? '' : 'none';
+    });
+    dokEmpty.classList.toggle('hidden', visible > 0);
+  }
+  dokSearch?.addEventListener('input', applyDokFilter);
+  dokChips.forEach(c => c.addEventListener('click', () => {
+    dokCat = c.dataset.cat;
+    dokChips.forEach(x => {
+      const on = x===c;
+      x.classList.toggle('accent-bg',on); x.classList.toggle('text-white',on);
+      x.classList.toggle('bg-white',!on); x.classList.toggle('soft-shadow',!on); x.classList.toggle('ink',!on);
+    });
+    applyDokFilter();
+  }));
+</script>
+
+</body>
+</html>

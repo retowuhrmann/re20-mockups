@@ -1,0 +1,1400 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=1280"/>
+<title>vision&Immo · Bewirtschafter Cockpit</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --cream:#FAF8F4; --paper:#F5F1E8; --ink:#1F2A22; --muted:#6B6A63;
+    --accent:#2B3A2E; --line:rgba(31,42,34,.08);
+  }
+  html,body{background:var(--cream); color:var(--ink); font-family:'Inter',ui-sans-serif,system-ui,sans-serif; -webkit-font-smoothing:antialiased;}
+  .ink{color:var(--ink);} .muted{color:var(--muted);}
+  .soft-shadow{box-shadow:0 1px 0 rgba(31,42,34,.04),0 6px 24px -12px rgba(31,42,34,.18);}
+  .line{border-color:var(--line);}
+  .g-sage{background:linear-gradient(135deg,#5a7a5c 0%,#3f5a42 100%);color:#fff;}
+  .g-clay{background:linear-gradient(135deg,#c48c5f 0%,#a06941 100%);color:#fff;}
+  .g-sky{background:linear-gradient(135deg,#6c94b5 0%,#4a7293 100%);color:#fff;}
+  .g-rose{background:linear-gradient(135deg,#c67a7d 0%,#9f5457 100%);color:#fff;}
+  .g-plum{background:linear-gradient(135deg,#8a6a94 0%,#614770 100%);color:#fff;}
+  .g-sun{background:linear-gradient(135deg,#d4a85c 0%,#ad823a 100%);color:#fff;}
+  .g-mint{background:linear-gradient(135deg,#6fae93 0%,#468470 100%);color:#fff;}
+  .g-fire{background:linear-gradient(135deg,#c8704a 0%,#9e4d2b 100%);color:#fff;}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:11.5px;color:var(--ink);}
+  .chip .dot{width:6px;height:6px;border-radius:999px;background:#6fae93;}
+  .nav-a{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:10px;color:var(--muted);font-size:13.5px;cursor:pointer;}
+  .nav-a:hover{background:rgba(255,255,255,.6);}
+  .nav-a.active{background:#fff;color:var(--ink);font-weight:500;box-shadow:0 1px 0 rgba(31,42,34,.04),0 6px 24px -12px rgba(31,42,34,.18);}
+  .row{display:grid;align-items:center;gap:16px;padding:14px 16px;border-top:1px solid var(--line);cursor:pointer;transition:background .15s;}
+  .row:hover{background:#fff;}
+  .row.selected{background:#fff;box-shadow:inset 3px 0 0 var(--accent);}
+  .crumb a{color:var(--muted);cursor:pointer;} .crumb a:hover{color:var(--ink);}
+  .crumb .sep{color:#c8c6bd;margin:0 8px;}
+  [data-view]{display:none;} [data-view].active{display:block;}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11.5px;font-weight:500;}
+  .pill-ok{background:#e8f0ea;color:#3f5a42;} .pill-warn{background:#fbeed6;color:#8a6326;} .pill-err{background:#f8e0d6;color:#8a3a1e;} .pill-muted{background:#eeece5;color:#6B6A63;}
+  .fact{display:flex;flex-direction:column;gap:2px;padding:12px 14px;border-radius:12px;background:#fff;border:1px solid var(--line);}
+  .fact-k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .fact-v{font-size:14px;color:var(--ink);font-weight:500;}
+  .agent-item{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;padding:10px 12px;border-radius:10px;}
+  .agent-item:hover{background:#faf8f4;}
+  .agent-ic{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+  .tab{padding:8px 14px;border-radius:10px;font-size:13px;cursor:pointer;color:var(--muted);}
+  .tab.active{background:#fff;color:var(--ink);font-weight:500;box-shadow:0 1px 0 rgba(31,42,34,.04),0 4px 14px -8px rgba(31,42,34,.2);}
+  .hero-card{border-radius:20px;padding:22px;color:white;position:relative;overflow:hidden;min-height:170px;display:flex;flex-direction:column;justify-content:space-between;}
+  .search-overlay{position:fixed;inset:0;background:rgba(31,42,34,.35);z-index:50;display:none;align-items:flex-start;justify-content:center;padding-top:80px;}
+  .search-overlay.open{display:flex;}
+  .search-box{background:#fff;border-radius:16px;width:620px;max-width:92vw;box-shadow:0 30px 60px -20px rgba(31,42,34,.4);overflow:hidden;}
+  .search-hit{display:grid;grid-template-columns:32px 1fr auto;gap:12px;align-items:center;padding:10px 14px;cursor:pointer;border-top:1px solid var(--line);}
+  .search-hit:hover, .search-hit.focus{background:#faf8f4;}
+  .kbd{display:inline-flex;align-items:center;justify-content:center;min-width:18px;padding:1px 5px;border-radius:4px;background:#eeece5;color:#6B6A63;font-size:10.5px;border:1px solid var(--line);}
+</style>
+</head>
+<body class="min-h-screen">
+
+<div class="flex min-h-screen">
+
+  <aside class="w-[220px] shrink-0 flex flex-col py-6 px-3" style="background:var(--paper)">
+    <div class="px-3 mb-6">
+      <div class="text-[13px] muted">Mandat</div>
+      <div class="text-[15px] font-semibold ink leading-tight mt-0.5">Family Office Müller</div>
+    </div>
+    <nav class="flex-1 space-y-0.5">
+      <a data-nav="start" class="nav-a">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+        Start
+      </a>
+      <a data-nav="liegenschaften" class="nav-a">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M8 4v16"/></svg>
+        Liegenschaften <span class="ml-auto text-[11px] muted">47</span>
+      </a>
+      <a data-nav="personen" class="nav-a">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M17 11a4 4 0 0 0 0-8M22 21v-2a4 4 0 0 0-3-3.87"/></svg>
+        Personen <span class="ml-auto text-[11px] muted">312</span>
+      </a>
+      <a data-nav="vertraege" class="nav-a">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg>
+        Verträge <span class="ml-auto text-[11px] muted">589</span>
+      </a>
+      <a data-nav="vermietung" class="nav-a">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M3 12l6-6M3 12l6 6M21 18V6"/></svg>
+        Vermietung <span class="ml-auto text-[11px] muted">8</span>
+      </a>
+      <a data-nav="agents" class="nav-a">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/></svg>
+        Agents <span class="ml-auto text-[11px] muted">14</span>
+      </a>
+    </nav>
+    <div class="px-3 pt-4 border-t line">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full g-sage flex items-center justify-center text-[12px] font-semibold">RW</div>
+        <div>
+          <div class="text-[12.5px] ink font-medium">Reto Wuhrmann</div>
+          <div class="text-[11px] muted">Bewirtschafter</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+
+    <div class="flex items-center justify-between px-8 py-4 border-b line bg-[#FAF8F4] sticky top-0 z-20">
+      <div class="crumb text-[13px] flex items-center" id="crumb"></div>
+      <div class="flex items-center gap-2">
+        <div id="search-trigger" class="flex items-center gap-2 bg-white rounded-lg px-3 py-1.5 border line text-[12.5px] muted w-72 cursor-pointer hover:ink">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>Liegenschaft, Einheit oder Person</span><span class="ml-auto text-[11px]">⌘K</span>
+        </div>
+        <button class="bg-[color:var(--accent)] text-white rounded-lg px-3 py-1.5 text-[12.5px]">+ Neu</button>
+      </div>
+    </div>
+
+    <!-- ===== VIEW: START ===== -->
+    <section data-view="start" class="p-8">
+      <div class="mb-6">
+        <div class="text-[13px] muted">Dienstag, 22. April 2026</div>
+        <h1 class="text-[32px] font-semibold ink leading-tight tracking-tight">Guten Morgen, Reto.</h1>
+        <p class="text-[15px] muted mt-2">Heute warten <span class="ink font-semibold">3 Tasks</span> auf deine Entscheidung. Die Agents haben über Nacht <span class="ink font-semibold">14 Vorgänge</span> selbständig erledigt.</p>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 mb-8">
+        <div class="bg-white rounded-2xl soft-shadow p-5">
+          <div class="flex items-start justify-between"><div><div class="text-[11.5px] muted uppercase tracking-wider">Liegenschaften</div><div class="text-[28px] font-semibold ink mt-1 leading-none">47</div></div><div class="w-9 h-9 rounded-xl g-sage flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 10 12 3l9 7v10a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg></div></div>
+          <div class="mt-3 text-[12px] muted">alle bewohnbar</div>
+        </div>
+        <div class="bg-white rounded-2xl soft-shadow p-5">
+          <div class="flex items-start justify-between"><div><div class="text-[11.5px] muted uppercase tracking-wider">Leerstand</div><div class="text-[28px] font-semibold ink mt-1 leading-none">1.8%</div></div><div class="w-9 h-9 rounded-xl g-sky flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg></div></div>
+          <div class="mt-3 text-[12px] muted">Ziel 2.5% übertroffen</div>
+        </div>
+        <div class="bg-white rounded-2xl soft-shadow p-5">
+          <div class="flex items-start justify-between"><div><div class="text-[11.5px] muted uppercase tracking-wider">Automatisch erledigt</div><div class="text-[28px] font-semibold ink mt-1 leading-none">94%</div></div><div class="w-9 h-9 rounded-xl g-mint flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div></div>
+          <div class="mt-3 text-[12px] muted">Anfragen durch Agents</div>
+        </div>
+        <div class="bg-white rounded-2xl soft-shadow p-5">
+          <div class="flex items-start justify-between"><div><div class="text-[11.5px] muted uppercase tracking-wider">Mieterzufriedenheit</div><div class="text-[28px] font-semibold ink mt-1 leading-none">4.7</div></div><div class="w-9 h-9 rounded-xl g-rose flex items-center justify-center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2l3 7 7 .6-5.3 4.7L18 22l-6-3.5L6 22l1.3-7.7L2 9.6 9 9z"/></svg></div></div>
+          <div class="mt-3 text-[12px] muted">von 5 · 312 Rückmeldungen</div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h2 class="text-[20px] font-semibold ink">Heute für dich</h2>
+        <p class="text-[13.5px] muted mt-1">Drei Entscheidungen, bei denen die Agents deinen Input brauchen bevor es weitergeht.</p>
+      </div>
+      <div class="grid grid-cols-3 gap-4 mb-10">
+        <div class="hero-card g-plum soft-shadow">
+          <div>
+            <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">Kündigung</span>
+            <h3 class="text-[18px] font-semibold mt-3 leading-snug">Marco Benz möchte seine Wohnung auf den 30. Juni kündigen und bittet um eine frühere Nachvermietung.</h3>
+            <p class="text-[12.5px] opacity-85 mt-2">Rosengasse 14 · Whg 2.03 · Mieter seit 2017</p>
+          </div>
+          <div class="flex items-center gap-2 mt-4">
+            <button class="bg-white text-[color:var(--ink)] text-[12.5px] px-3 py-1.5 rounded-lg">Jetzt entscheiden</button>
+            <div class="text-[12px] opacity-85 ml-auto">eingegangen vor 2 Std</div>
+          </div>
+        </div>
+        <div class="hero-card g-fire soft-shadow">
+          <div>
+            <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">Wasserschaden</span>
+            <h3 class="text-[18px] font-semibold mt-3 leading-snug">Im Bergweg 8 steht die Taskforce mit Handwerker, Versicherung und Mieter bereit und wartet auf deinen Startschuss.</h3>
+            <p class="text-[12.5px] opacity-85 mt-2">Bergweg 8 · Whg 2.01 · 4 Beteiligte koordiniert</p>
+          </div>
+          <div class="flex items-center gap-2 mt-4">
+            <div class="flex -space-x-2">
+              <div class="w-7 h-7 rounded-full bg-white/30 border border-white flex items-center justify-center text-[10px] font-semibold">LH</div>
+              <div class="w-7 h-7 rounded-full bg-white/30 border border-white flex items-center justify-center text-[10px] font-semibold">MS</div>
+              <div class="w-7 h-7 rounded-full bg-white/30 border border-white flex items-center justify-center text-[10px] font-semibold">ZV</div>
+              <div class="w-7 h-7 rounded-full bg-white/30 border border-white flex items-center justify-center text-[10px] font-semibold">+1</div>
+            </div>
+            <button class="ml-auto bg-white text-[color:var(--ink)] text-[12.5px] px-3 py-1.5 rounded-lg">Taskforce starten</button>
+          </div>
+        </div>
+        <div class="hero-card g-sage soft-shadow">
+          <div>
+            <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">Referenzzinssenkung</span>
+            <h3 class="text-[18px] font-semibold mt-3 leading-snug">23 Mieter können von der neuen Referenzzinssenkung profitieren. Eine Sammelsignatur ist vorbereitet.</h3>
+            <p class="text-[12.5px] opacity-85 mt-2">CHF -41'400 p.a. · OR 269d Formulare erzeugt</p>
+          </div>
+          <div class="flex items-center gap-2 mt-4">
+            <div class="flex -space-x-2">
+              <div class="w-7 h-7 rounded-full bg-white/30 border border-white flex items-center justify-center text-[10px] font-semibold">SK</div>
+              <div class="w-7 h-7 rounded-full bg-white/30 border border-white flex items-center justify-center text-[10px] font-semibold">DH</div>
+              <div class="w-7 h-7 rounded-full bg-white/30 border border-white flex items-center justify-center text-[10px] font-semibold">AF</div>
+              <div class="w-7 h-7 rounded-full bg-white/30 border border-white flex items-center justify-center text-[10px] font-semibold">+20</div>
+            </div>
+            <button class="ml-auto bg-white text-[color:var(--ink)] text-[12.5px] px-3 py-1.5 rounded-lg">Freigeben und senden</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <h2 class="text-[20px] font-semibold ink">Im Hintergrund</h2>
+        <p class="text-[13.5px] muted mt-1">Was deine Agents gerade erledigen und worauf du dich in den nächsten Wochen vorbereiten kannst.</p>
+      </div>
+      <div class="bg-white rounded-2xl soft-shadow p-2">
+        <div class="px-4 py-2 text-[11px] muted uppercase tracking-wider">Was gerade läuft</div>
+        <div class="agent-item"><div class="agent-ic g-mint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div><div><div class="text-[13px] ink font-medium">Namensänderung Wohnung 3.02 Seestrasse 12</div><div class="text-[11.5px] muted">Nachtrag generiert, an Skribble übergeben · vor 12 Min.</div></div><span class="pill pill-ok">erledigt</span></div>
+        <div class="agent-item"><div class="agent-ic g-sky"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div><div><div class="text-[13px] ink font-medium">18 Anfragen zu Inseraten beantwortet</div><div class="text-[11.5px] muted">3 Besichtigungen koordiniert · vor 1 Std.</div></div><span class="pill pill-ok">aktiv</span></div>
+        <div class="agent-item"><div class="agent-ic g-clay"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="6" width="18" height="12" rx="2"/></svg></div><div><div class="text-[13px] ink font-medium">Zahlungseingänge aus Bexio importiert</div><div class="text-[11.5px] muted">camt.054 verarbeitet, 4 Mahnungen Stufe 1 versendet</div></div><span class="pill pill-ok">aktiv</span></div>
+        <div class="agent-item"><div class="agent-ic g-mint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg></div><div><div class="text-[13px] ink font-medium">NK-Abrechnung 2025 für 12 Liegenschaften</div><div class="text-[11.5px] muted">Zählerdaten eingelesen · Entwurf bis 18.08.</div></div><span class="pill pill-ok">läuft</span></div>
+        <div class="agent-item"><div class="agent-ic g-plum"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16v16H4zM4 10h16"/></svg></div><div><div class="text-[13px] ink font-medium">18 Dokumente archiviert und verknüpft</div><div class="text-[11.5px] muted">automatisch an Liegenschaft, Objekt oder Vertrag gehängt</div></div><span class="pill pill-muted">Hintergrund</span></div>
+
+        <div class="px-4 py-2 text-[11px] muted uppercase tracking-wider mt-3 border-t line pt-3">Bald wichtig</div>
+        <div class="agent-item"><div class="agent-ic g-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><div class="text-[13px] ink font-medium">NK-Abrechnung geht an 312 Mieter</div><div class="text-[11.5px] muted">in 14 Tagen · Freigabe durch dich nötig</div></div><span class="pill pill-warn">HITL</span></div>
+        <div class="agent-item"><div class="agent-ic g-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><div class="text-[13px] ink font-medium">Vertragsende Rosengasse 14 · Whg 1.01</div><div class="text-[11.5px] muted">in 3 Wochen · Inserat vorbereitet</div></div><span class="pill pill-warn">bald</span></div>
+        <div class="agent-item"><div class="agent-ic g-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><div class="text-[13px] ink font-medium">GEAK Prüfung Gartenweg 5 fällig</div><div class="text-[11.5px] muted">in 6 Wochen · Termin offen</div></div><span class="pill pill-muted">Planung</span></div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: LIEGENSCHAFTEN ===== -->
+    <section data-view="liegenschaften" class="p-8">
+      <div class="mb-6"><div class="text-[13px] muted">47 Liegenschaften im Mandat</div><h1 class="text-[30px] font-semibold ink leading-tight tracking-tight">Liegenschaften</h1></div>
+
+      <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Objekte</div><div class="text-[28px] font-semibold ink mt-1">612</div><div class="text-[12px] muted mt-1">über 47 Liegenschaften</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Aktive Verträge</div><div class="text-[28px] font-semibold ink mt-1">589</div><div class="text-[12px] muted mt-1">23 Objekte im Leerstand</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Mieteinnahmen YTD</div><div class="text-[28px] font-semibold ink mt-1">CHF 4.2M</div><div class="text-[12px] muted mt-1">+3.1% vs. Vorjahr</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Ø Rendite</div><div class="text-[28px] font-semibold ink mt-1">4.8%</div><div class="text-[12px] muted mt-1">netto · 12 Monate</div></div>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow p-5 mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <div><div class="text-[11px] muted uppercase tracking-wider">Agents</div><div class="text-[15px] font-semibold ink">6 Agents arbeiten gerade im Mandat</div></div>
+          <a class="text-[12.5px] muted">Alle Aktivitäten</a>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="agent-item"><div class="agent-ic g-mint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg></div><div><div class="text-[13px] ink font-medium">Nebenkostenabrechnung 2025</div><div class="text-[11.5px] muted">läuft für 12 Liegenschaften</div></div><span class="pill pill-ok">aktiv</span></div>
+          <div class="agent-item"><div class="agent-ic g-sky"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div><div><div class="text-[13px] ink font-medium">Inserate Leerstände</div><div class="text-[11.5px] muted">3 Wohnungen · 18 Anfragen</div></div><span class="pill pill-ok">aktiv</span></div>
+          <div class="agent-item"><div class="agent-ic g-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg></div><div><div class="text-[13px] ink font-medium">Referenzzinssatz-Monitoring</div><div class="text-[11.5px] muted">Senkung für 127 Verträge bereit</div></div><span class="pill pill-warn">wartet auf dich</span></div>
+          <div class="agent-item"><div class="agent-ic g-clay"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 8h18v13H3zM8 8V4a4 4 0 0 1 8 0v4"/></svg></div><div><div class="text-[13px] ink font-medium">Mahnläufe Bexio</div><div class="text-[11.5px] muted">4 Stufe 1, 1 Stufe 2</div></div><span class="pill pill-ok">aktiv</span></div>
+          <div class="agent-item"><div class="agent-ic g-fire"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2 2 22h20z"/></svg></div><div><div class="text-[13px] ink font-medium">Wasserschaden Taskforce</div><div class="text-[11.5px] muted">Bergweg 8 · 4 Beteiligte</div></div><span class="pill pill-err">eskaliert</span></div>
+          <div class="agent-item"><div class="agent-ic g-plum"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16v16H4zM4 10h16"/></svg></div><div><div class="text-[13px] ink font-medium">Vertragsarchivierung</div><div class="text-[11.5px] muted">18 neue Dokumente verknüpft</div></div><span class="pill pill-muted">Hintergrund</span></div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="chip" style="background:var(--accent);color:white;border:0;">Alle 47</span>
+        <span class="chip">Wohnen 38</span><span class="chip">Gewerbe 6</span><span class="chip">Gemischt 3</span>
+        <span class="mx-2 muted text-[12px]">·</span>
+        <span class="chip">Stadt</span><span class="chip">Eigentümer</span><span class="chip">Status</span>
+        <div class="ml-auto flex bg-[#F5F1E8] rounded-lg p-0.5"><button class="tab active">Tabelle</button><button class="tab">Karten</button></div>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow overflow-hidden" id="lg-table">
+        <div class="grid text-[11px] muted uppercase tracking-wider px-4 py-3" style="grid-template-columns:40px 1.5fr 1fr 80px 90px 90px 80px 110px 24px;">
+          <div></div><div>Liegenschaft</div><div>Eigentümer</div><div>Objekte</div><div>Belegt</div><div>Rendite</div><div>Baujahr</div><div>Status</div><div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: LIEGENSCHAFT ===== -->
+    <section data-view="liegenschaft" class="p-8">
+      <div class="rounded-2xl g-sage soft-shadow p-6 mb-5 relative overflow-hidden">
+        <svg class="absolute right-6 bottom-0 opacity-30" width="220" height="140" viewBox="0 0 220 140" fill="none" stroke="white" stroke-width="1.5"><path d="M20 130V50l40-30 40 30v80M60 130v-40h30v40M20 70h80M70 50V30M120 130V65l35-20 35 20v65M155 130V90h25v40"/></svg>
+        <div class="flex items-start justify-between relative">
+          <div>
+            <div class="text-[12.5px] opacity-80">6300 Zug</div>
+            <h1 class="text-[32px] font-semibold leading-tight tracking-tight mt-1">Seestrasse 12</h1>
+            <div class="flex items-center gap-2 mt-3">
+              <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;"><span class="dot"></span>alle 24 Objekte belegt</span>
+              <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">EGID 90231425</span>
+              <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">Wohnen</span>
+            </div>
+          </div>
+          <div class="flex gap-2"><button class="bg-white/20 hover:bg-white/30 text-white text-[12.5px] px-3 py-1.5 rounded-lg">Plan öffnen</button><button class="bg-white text-[color:var(--ink)] text-[12.5px] px-3 py-1.5 rounded-lg">Bearbeiten</button></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Verkehrswert</div><div class="text-[24px] font-semibold ink mt-1">CHF 8.4M</div><div class="text-[12px] muted mt-1">+2.1% YTD</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Nettorendite</div><div class="text-[24px] font-semibold ink mt-1">5.1%</div><div class="text-[12px] muted mt-1">Ø Portfolio 4.8%</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Mieteinnahmen YTD</div><div class="text-[24px] font-semibold ink mt-1">CHF 356'400</div><div class="text-[12px] muted mt-1">100% Belegung</div></div>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow p-5 mb-6">
+        <div class="flex items-center justify-between mb-3"><div class="text-[15px] font-semibold ink">Agents auf dieser Liegenschaft</div><span class="text-[12px] muted">3 aktiv</span></div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="agent-item"><div class="agent-ic g-mint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg></div><div><div class="text-[13px] ink font-medium">NK-Abrechnung 2025</div><div class="text-[11.5px] muted">Entwurf 18.08.</div></div><span class="pill pill-ok">läuft</span></div>
+          <div class="agent-item"><div class="agent-ic g-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg></div><div><div class="text-[13px] ink font-medium">Mietzinsanpassung Referenzzins</div><div class="text-[11.5px] muted">23 Verträge · Signatur offen</div></div><span class="pill pill-warn">HITL</span></div>
+          <div class="agent-item"><div class="agent-ic g-plum"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 7 9 18l-5-5"/></svg></div><div><div class="text-[13px] ink font-medium">GEAK-Monitoring</div><div class="text-[11.5px] muted">Klasse B · Prüfung 2029</div></div><span class="pill pill-muted">Hintergrund</span></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-5 mb-6">
+        <div class="col-span-2">
+          <div class="text-[15px] font-semibold ink mb-3">Auf einen Blick</div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="fact"><div class="fact-k">Baujahr</div><div class="fact-v">1978 · Sanierung 2014</div></div>
+            <div class="fact"><div class="fact-k">Grundstück</div><div class="fact-v">Parz. 4821 · 1'840 m²</div></div>
+            <div class="fact"><div class="fact-k">Etagen</div><div class="fact-v">UG · EG · 1–3 OG · DG</div></div>
+            <div class="fact"><div class="fact-k">Nutzfläche</div><div class="fact-v">2'340 m²</div></div>
+            <div class="fact"><div class="fact-k">Heizung</div><div class="fact-v">Erdsonden-Wärmepumpe</div></div>
+            <div class="fact"><div class="fact-k">GEAK</div><div class="fact-v">B · gut</div></div>
+            <div class="fact"><div class="fact-k">Gebäudeversicherung</div><div class="fact-v">GVZ Police 842193</div></div>
+            <div class="fact"><div class="fact-k">EGID</div><div class="fact-v">90231425</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="text-[15px] font-semibold ink mb-3">Beteiligte</div>
+          <div class="bg-white rounded-2xl soft-shadow p-4 space-y-3">
+            <div><div class="text-[11px] muted uppercase tracking-wider">Eigentümer</div><div class="text-[14px] ink font-medium mt-1">Family Office Müller AG</div><div class="text-[12px] muted">100% · seit 2003</div></div>
+            <div class="border-t line pt-3"><div class="text-[11px] muted uppercase tracking-wider">Bewirtschaftung</div><div class="text-[14px] ink font-medium mt-1">Reto Wuhrmann</div><div class="text-[12px] muted">seit 01.2024</div></div>
+            <div class="border-t line pt-3"><div class="text-[11px] muted uppercase tracking-wider">Hauswart</div><div class="text-[14px] ink font-medium mt-1">Peter Keller</div><div class="text-[12px] muted">vor Ort · 079 423 12 88</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-[18px] font-semibold ink">Objekte</div>
+        <div class="flex items-center gap-2">
+          <span class="chip" style="background:var(--accent);color:white;border:0;">Alle 24</span>
+          <span class="chip">Wohnungen 18</span><span class="chip">Gewerbe 2</span><span class="chip">Parkplätze 14</span><span class="chip">Keller 4</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow overflow-hidden mb-5" id="obj-table">
+        <div class="grid text-[11px] muted uppercase tracking-wider px-4 py-3" style="grid-template-columns:90px 1.2fr 1.4fr 110px 120px 120px 24px;">
+          <div>Objekt</div><div>Lage</div><div>Mieter</div><div>Fläche</div><div>Mietzins</div><div>Status</div><div></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Parkplätze</div><div class="text-[20px] font-semibold ink mt-1">14 / 14 belegt</div><div class="text-[12px] muted mt-1">CHF 150 / Monat · Tiefgarage</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Keller und Estrich</div><div class="text-[20px] font-semibold ink mt-1">4 Abteile</div><div class="text-[12px] muted mt-1">im Mietzins enthalten</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Gewerbe</div><div class="text-[20px] font-semibold ink mt-1">2 Einheiten</div><div class="text-[12px] muted mt-1">Dr. Weber · Hoffmann Coiffeur</div></div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: OBJEKT ===== -->
+    <section data-view="objekt" class="p-8">
+      <div class="rounded-2xl g-sage soft-shadow p-6 mb-5 relative overflow-hidden">
+        <svg class="absolute right-6 bottom-0 opacity-25" width="180" height="120" viewBox="0 0 180 120" fill="none" stroke="white" stroke-width="1.5"><rect x="30" y="30" width="120" height="80"/><path d="M30 60h120M90 30v80M50 45h15M110 45h15M50 75h15M110 75h15"/></svg>
+        <div class="relative">
+          <div class="text-[12.5px] opacity-80">Seestrasse 12 · 3. Obergeschoss West</div>
+          <h1 class="text-[30px] font-semibold leading-tight tracking-tight mt-1">Wohnung 3.02</h1>
+          <div class="flex items-center gap-2 mt-3">
+            <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;"><span class="dot"></span>belegt seit 01.03.2022</span>
+            <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">4.5 Zimmer · 112 m²</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Mietzins netto</div><div class="text-[24px] font-semibold ink mt-1">CHF 2'370</div><div class="text-[12px] muted mt-1">+ NK CHF 280</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Fläche</div><div class="text-[24px] font-semibold ink mt-1">112 m²</div><div class="text-[12px] muted mt-1">CHF 21.2 / m²</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Belegt seit</div><div class="text-[24px] font-semibold ink mt-1">4.1 Jahre</div><div class="text-[12px] muted mt-1">01.03.2022</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Zahlungsmoral</div><div class="text-[24px] font-semibold ink mt-1">100%</div><div class="text-[12px] muted mt-1">49 von 49 pünktlich</div></div>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow p-5 mb-6">
+        <div class="flex items-center justify-between mb-3"><div class="text-[15px] font-semibold ink">Agents auf diesem Objekt</div><span class="text-[12px] muted">2 aktiv</span></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="agent-item"><div class="agent-ic g-mint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg></div><div><div class="text-[13px] ink font-medium">Verbrauchsdaten 2025</div><div class="text-[11.5px] muted">Wasser, Strom, Heizung eingelesen</div></div><span class="pill pill-ok">aktiv</span></div>
+          <div class="agent-item"><div class="agent-ic g-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg></div><div><div class="text-[13px] ink font-medium">Referenzzins-Senkung</div><div class="text-[11.5px] muted">Anpassung 1.75%→1.50% vorbereitet</div></div><span class="pill pill-warn">HITL</span></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-5 mb-6">
+        <div class="col-span-2">
+          <div class="text-[15px] font-semibold ink mb-3">Objekt-Fakten</div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="fact"><div class="fact-k">Ausrichtung</div><div class="fact-v">West · Seesicht</div></div>
+            <div class="fact"><div class="fact-k">Balkon</div><div class="fact-v">12 m² überdacht</div></div>
+            <div class="fact"><div class="fact-k">Küche</div><div class="fact-v">offen · 2022 renoviert</div></div>
+            <div class="fact"><div class="fact-k">Nasszellen</div><div class="fact-v">1 Bad · 1 Dusche/WC</div></div>
+            <div class="fact"><div class="fact-k">Kellerabteil</div><div class="fact-v">K-3-02 · UG</div></div>
+            <div class="fact"><div class="fact-k">Parkplatz</div><div class="fact-v">TG-12</div></div>
+            <div class="fact"><div class="fact-k">Bodenbelag</div><div class="fact-v">Eichenparkett · Naturstein</div></div>
+            <div class="fact"><div class="fact-k">Einbauten</div><div class="fact-v">Geschirrspüler · Steamer</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="text-[15px] font-semibold ink mb-3">Aktueller Vertrag</div>
+          <div data-go="vertrag" class="bg-white rounded-2xl soft-shadow p-5 cursor-pointer hover:-translate-y-0.5 transition-transform">
+            <div class="flex items-start justify-between">
+              <div><div class="text-[11px] muted uppercase tracking-wider">Mietvertrag</div><div class="text-[15px] font-semibold ink mt-0.5">LG-2022-0418</div></div>
+              <span class="pill pill-ok">aktiv</span>
+            </div>
+            <div class="mt-4 space-y-2 text-[13px]">
+              <div class="flex justify-between"><span class="muted">Mieter</span><span class="ink">Sandra Keller-Brunner</span></div>
+              <div class="flex justify-between"><span class="muted">Beginn</span><span class="ink">01.03.2022</span></div>
+              <div class="flex justify-between"><span class="muted">Kündbar</span><span class="ink">30.06.2026</span></div>
+              <div class="flex justify-between"><span class="muted">Kaution</span><span class="ink">CHF 7'110</span></div>
+            </div>
+            <div class="mt-4 text-[12px] text-[color:var(--accent)]">Vertrag öffnen ›</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-[15px] font-semibold ink mb-3">Vertragshistorie</div>
+      <div class="bg-white rounded-2xl soft-shadow overflow-hidden" id="obj-history"></div>
+    </section>
+
+    <!-- ===== VIEW: VERTRAG ===== -->
+    <section data-view="vertrag" class="p-8">
+      <div class="rounded-2xl g-plum soft-shadow p-6 mb-5 relative overflow-hidden">
+        <svg class="absolute right-8 bottom-0 opacity-25" width="160" height="120" viewBox="0 0 160 120" fill="none" stroke="white" stroke-width="1.5"><rect x="30" y="20" width="90" height="100" rx="4"/><path d="M45 45h60M45 60h60M45 75h40M45 90h50"/></svg>
+        <div class="relative">
+          <div class="text-[12.5px] opacity-80">Seestrasse 12 · Wohnung 3.02</div>
+          <h1 class="text-[30px] font-semibold leading-tight tracking-tight mt-1">Mietvertrag LG-2022-0418</h1>
+          <div class="flex items-center gap-2 mt-3">
+            <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;"><span class="dot"></span>unbefristet · aktiv</span>
+            <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">Skribble QES · 14.02.2022</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Mietzins netto</div><div class="text-[24px] font-semibold ink mt-1">CHF 2'370</div><div class="text-[12px] muted mt-1">+ NK CHF 280 akonto</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Kaution</div><div class="text-[24px] font-semibold ink mt-1">CHF 7'110</div><div class="text-[12px] muted mt-1">SwissCaution</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Nächste Kündbarkeit</div><div class="text-[24px] font-semibold ink mt-1">30.06.2026</div><div class="text-[12px] muted mt-1">Frist 3 Monate · Ende Quartal</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Laufzeit</div><div class="text-[24px] font-semibold ink mt-1">4.1 Jahre</div><div class="text-[12px] muted mt-1">seit 01.03.2022</div></div>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow p-5 mb-6">
+        <div class="flex items-center justify-between mb-3"><div class="text-[15px] font-semibold ink">Agents auf diesem Vertrag</div><span class="text-[12px] muted">3 Signale</span></div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="agent-item"><div class="agent-ic g-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg></div><div><div class="text-[13px] ink font-medium">Referenzzins-Tracker</div><div class="text-[11.5px] muted">Senkung 1.75→1.50% · OR 269d bereit</div></div><span class="pill pill-warn">HITL</span></div>
+          <div class="agent-item"><div class="agent-ic g-mint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div><div><div class="text-[13px] ink font-medium">Zahlungsmonitor Bexio</div><div class="text-[11.5px] muted">49/49 pünktlich · letzte 01.04.2026</div></div><span class="pill pill-ok">ok</span></div>
+          <div class="agent-item"><div class="agent-ic g-plum"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><div class="text-[13px] ink font-medium">Kündigungsfrist-Watcher</div><div class="text-[11.5px] muted">keine Kündigung erfasst</div></div><span class="pill pill-muted">Hintergrund</span></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-5 mb-6">
+        <div class="col-span-2">
+          <div class="text-[15px] font-semibold ink mb-3">Konditionen</div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="fact"><div class="fact-k">Beginn</div><div class="fact-v">01.03.2022</div></div>
+            <div class="fact"><div class="fact-k">Laufzeit</div><div class="fact-v">unbefristet</div></div>
+            <div class="fact"><div class="fact-k">Kündigungsfrist</div><div class="fact-v">3 Monate · Ende Quartal</div></div>
+            <div class="fact"><div class="fact-k">Nächste Kündbarkeit</div><div class="fact-v">30.06.2026</div></div>
+            <div class="fact"><div class="fact-k">Referenzzinssatz</div><div class="fact-v">1.50% · angepasst 05.2026</div></div>
+            <div class="fact"><div class="fact-k">Indexbindung</div><div class="fact-v">Nein</div></div>
+            <div class="fact"><div class="fact-k">Staffelung</div><div class="fact-v">keine</div></div>
+            <div class="fact"><div class="fact-k">Hausordnung</div><div class="fact-v">Version 2022-01 akzeptiert</div></div>
+          </div>
+
+          <div class="text-[15px] font-semibold ink mt-6 mb-3">Anhänge</div>
+          <div class="bg-white rounded-2xl soft-shadow overflow-hidden">
+            <div class="row" style="grid-template-columns:32px 1fr 100px 120px 24px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6A63" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg><div><div class="text-[13px] ink">Mietvertrag Original.pdf</div><div class="text-[11.5px] muted">signiert 14.02.2022</div></div><div class="text-[12px] muted">184 KB</div><div class="text-[12px] muted">Skribble QES</div><div class="muted">›</div></div>
+            <div class="row" style="grid-template-columns:32px 1fr 100px 120px 24px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6A63" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg><div><div class="text-[13px] ink">Nachtrag Namensänderung.pdf</div><div class="text-[11.5px] muted">02.2025 · Agent-generiert</div></div><div class="text-[12px] muted">92 KB</div><div class="text-[12px] muted">Skribble QES</div><div class="muted">›</div></div>
+            <div class="row" style="grid-template-columns:32px 1fr 100px 120px 24px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6A63" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg><div><div class="text-[13px] ink">Mietzinsanpassung 05.2026.pdf</div><div class="text-[11.5px] muted">OR 269d Formular</div></div><div class="text-[12px] muted">76 KB</div><div class="text-[12px] muted">vorbereitet</div><div class="muted">›</div></div>
+            <div class="row" style="grid-template-columns:32px 1fr 100px 120px 24px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6A63" stroke-width="1.8"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg><div><div class="text-[13px] ink">Übergabeprotokoll.pdf</div><div class="text-[11.5px] muted">01.03.2022</div></div><div class="text-[12px] muted">312 KB</div><div class="text-[12px] muted">Original</div><div class="muted">›</div></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-[15px] font-semibold ink mb-3">Mieter</div>
+          <div data-go="mieter" class="bg-white rounded-2xl soft-shadow p-5 cursor-pointer hover:-translate-y-0.5 transition-transform">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full g-rose flex items-center justify-center text-[15px] font-semibold">SK</div>
+              <div><div class="text-[15px] ink font-semibold">Sandra Keller-Brunner</div><div class="text-[12px] muted">Hauptmieterin</div></div>
+            </div>
+            <div class="mt-4 space-y-2 text-[13px]">
+              <div class="flex justify-between"><span class="muted">Geburtsjahr</span><span class="ink">1984</span></div>
+              <div class="flex justify-between"><span class="muted">Haushalt</span><span class="ink">2 Erw. · 1 Kind</span></div>
+              <div class="flex justify-between"><span class="muted">Seit</span><span class="ink">01.03.2022</span></div>
+              <div class="flex justify-between"><span class="muted">Zahlungsmoral</span><span class="ink">100%</span></div>
+            </div>
+            <div class="border-t line mt-4 pt-3">
+              <div class="text-[11px] muted uppercase tracking-wider">Co-Signatar</div>
+              <div class="text-[13px] ink font-medium mt-1">Thomas Brunner</div>
+              <div class="text-[11.5px] muted">seit 02.2025 · Nachtrag Heirat</div>
+            </div>
+            <div class="mt-4 text-[12px] text-[color:var(--accent)]">Mieterprofil öffnen ›</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: MIETER ===== -->
+    <section data-view="mieter" class="p-8">
+      <div class="rounded-2xl g-rose soft-shadow p-6 mb-5 relative overflow-hidden">
+        <div class="relative flex items-center gap-5">
+          <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-[26px] font-semibold">SK</div>
+          <div>
+            <div class="text-[12.5px] opacity-80">Mieterin · seit 01.03.2022</div>
+            <h1 class="text-[30px] font-semibold leading-tight tracking-tight mt-1">Sandra Keller-Brunner</h1>
+            <div class="flex items-center gap-2 mt-3">
+              <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;"><span class="dot"></span>Zahlungsmoral 100%</span>
+              <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">1 aktiver Vertrag</span>
+              <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">DE · CH</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Zahlungen pünktlich</div><div class="text-[24px] font-semibold ink mt-1">49 / 49</div><div class="text-[12px] muted mt-1">0 Mahnungen</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Vorgänge</div><div class="text-[24px] font-semibold ink mt-1">7</div><div class="text-[12px] muted mt-1">in 4.1 Jahren</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">NPS Mieterzufriedenheit</div><div class="text-[24px] font-semibold ink mt-1">+8</div><div class="text-[12px] muted mt-1">Umfrage 03.2026</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Nächste Zahlung</div><div class="text-[24px] font-semibold ink mt-1">CHF 2'650</div><div class="text-[12px] muted mt-1">fällig 01.05.2026</div></div>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow p-5 mb-6">
+        <div class="flex items-center justify-between mb-3"><div class="text-[15px] font-semibold ink">Agents auf diesem Mieter</div><span class="text-[12px] muted">2 aktiv</span></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="agent-item"><div class="agent-ic g-mint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div><div><div class="text-[13px] ink font-medium">Kommunikations-Assistent</div><div class="text-[11.5px] muted">42 Nachrichten · 100% direkt beantwortet</div></div><span class="pill pill-ok">aktiv</span></div>
+          <div class="agent-item"><div class="agent-ic g-sky"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg></div><div><div class="text-[13px] ink font-medium">Zahlungsprognose</div><div class="text-[11.5px] muted">nächste Zahlung 01.05. erwartet</div></div><span class="pill pill-muted">Hintergrund</span></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-5 mb-6">
+        <div class="col-span-2">
+          <div class="text-[15px] font-semibold ink mb-3">Kontakt und Stammdaten</div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="fact"><div class="fact-k">E-Mail</div><div class="fact-v">sandra.keller@bluewin.ch</div></div>
+            <div class="fact"><div class="fact-k">Mobile</div><div class="fact-v">+41 79 412 88 34</div></div>
+            <div class="fact"><div class="fact-k">Korrespondenz</div><div class="fact-v">Deutsch · digital bevorzugt</div></div>
+            <div class="fact"><div class="fact-k">Geburtsjahr</div><div class="fact-v">1984 · Schweiz</div></div>
+            <div class="fact"><div class="fact-k">Beruf</div><div class="fact-v">Projektleiterin · 90%</div></div>
+            <div class="fact"><div class="fact-k">Arbeitgeber</div><div class="fact-v">Swiss Re · seit 2017</div></div>
+            <div class="fact"><div class="fact-k">Betreibungen</div><div class="fact-v">keine · Auskunft 02.2022</div></div>
+            <div class="fact"><div class="fact-k">Haftpflicht</div><div class="fact-v">Zurich · Police 8871-3421</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="text-[15px] font-semibold ink mb-3">Haushalt</div>
+          <div class="bg-white rounded-2xl soft-shadow p-4 space-y-3">
+            <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full g-rose flex items-center justify-center text-[12px] font-semibold">SK</div><div><div class="text-[13.5px] ink font-medium">Sandra Keller-Brunner</div><div class="text-[11.5px] muted">Hauptmieterin · 1984</div></div></div>
+            <div class="flex items-center gap-3 border-t line pt-3"><div class="w-9 h-9 rounded-full g-plum flex items-center justify-center text-[12px] font-semibold">TB</div><div><div class="text-[13.5px] ink font-medium">Thomas Brunner</div><div class="text-[11.5px] muted">Co-Signatar · 1982</div></div></div>
+            <div class="flex items-center gap-3 border-t line pt-3"><div class="w-9 h-9 rounded-full g-sun flex items-center justify-center text-[12px] font-semibold">EB</div><div><div class="text-[13.5px] ink font-medium">Elin Brunner</div><div class="text-[11.5px] muted">Kind · 2020</div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-[15px] font-semibold ink mb-3">Verträge dieser Person</div>
+      <div class="bg-white rounded-2xl soft-shadow overflow-hidden mb-6">
+        <div class="grid text-[11px] muted uppercase tracking-wider px-4 py-3" style="grid-template-columns:140px 1.4fr 1.2fr 120px 110px 24px;"><div>Vertrag</div><div>Objekt</div><div>Zeitraum</div><div>Mietzins</div><div>Status</div><div></div></div>
+        <div data-go="vertrag" class="row" style="grid-template-columns:140px 1.4fr 1.2fr 120px 110px 24px;">
+          <div class="text-[13px] font-medium">LG-2022-0418</div><div class="text-[13px]">Seestrasse 12 · 3.02</div><div class="text-[13px]">seit 01.03.2022</div><div class="text-[13px]">CHF 2'370</div><div><span class="pill pill-ok">aktiv</span></div><div class="muted">›</div>
+        </div>
+      </div>
+
+      <div class="text-[15px] font-semibold ink mb-3">Verlauf</div>
+      <div class="bg-white rounded-2xl soft-shadow p-5 space-y-4">
+        <div class="flex gap-4"><div class="w-2 h-2 rounded-full bg-[color:var(--accent)] mt-2 shrink-0"></div><div class="flex-1"><div class="text-[13px] ink font-medium">Mietzinsanpassung Referenzzinssenkung</div><div class="text-[11.5px] muted">05.04.2026 · durch Agent vorbereitet · wartet auf Versand</div></div><span class="pill pill-warn">offen</span></div>
+        <div class="flex gap-4 border-t line pt-4"><div class="w-2 h-2 rounded-full bg-[#6fae93] mt-2 shrink-0"></div><div class="flex-1"><div class="text-[13px] ink font-medium">Nebenkostenabrechnung 2024 versendet</div><div class="text-[11.5px] muted">18.03.2025 · Guthaben CHF 142 überwiesen</div></div><span class="pill pill-ok">erledigt</span></div>
+        <div class="flex gap-4 border-t line pt-4"><div class="w-2 h-2 rounded-full bg-[#6fae93] mt-2 shrink-0"></div><div class="flex-1"><div class="text-[13px] ink font-medium">Namensänderung nach Heirat</div><div class="text-[11.5px] muted">12.02.2025 · Nachtrag signiert · Co-Signatar hinzugefügt</div></div><span class="pill pill-ok">erledigt</span></div>
+        <div class="flex gap-4 border-t line pt-4"><div class="w-2 h-2 rounded-full bg-[#6fae93] mt-2 shrink-0"></div><div class="flex-1"><div class="text-[13px] ink font-medium">Kleinreparatur Geschirrspüler</div><div class="text-[11.5px] muted">24.09.2023 · V-Zug Service · CHF 148 zu Lasten Eigentümer</div></div><span class="pill pill-ok">erledigt</span></div>
+        <div class="flex gap-4 border-t line pt-4"><div class="w-2 h-2 rounded-full bg-[#b8b6ae] mt-2 shrink-0"></div><div class="flex-1"><div class="text-[13px] ink font-medium">Einzug Wohnung 3.02</div><div class="text-[11.5px] muted">01.03.2022 · Übergabeprotokoll ohne Beanstandungen</div></div><span class="pill pill-muted">Start</span></div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: VERMIETUNG ===== -->
+    <section data-view="vermietung" class="p-8">
+      <div class="mb-6"><div class="text-[13px] muted">8 Objekte aktuell in Vermietung · Ø 42 Tage bis Neuvertrag</div><h1 class="text-[30px] font-semibold ink leading-tight tracking-tight">Vermietung</h1></div>
+
+      <div class="grid grid-cols-5 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Wird frei</div><div class="text-[26px] font-semibold ink mt-1">3</div><div class="text-[12px] muted mt-1">in den nächsten 90 Tagen</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Inseriert</div><div class="text-[26px] font-semibold ink mt-1">2</div><div class="text-[12px] muted mt-1">Homegate, ImmoScout, Flatfox</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Anfragen offen</div><div class="text-[26px] font-semibold ink mt-1">30</div><div class="text-[12px] muted mt-1">Agent hat 18 vorsortiert</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Bewerbungen</div><div class="text-[26px] font-semibold ink mt-1">7</div><div class="text-[12px] muted mt-1">4 mit Bonitätscheck</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Vertrag in Arbeit</div><div class="text-[26px] font-semibold ink mt-1">2</div><div class="text-[12px] muted mt-1">1 wartet auf Signatur</div></div>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow p-5 mb-6">
+        <div class="flex items-center justify-between mb-3"><div class="text-[15px] font-semibold ink">Agents auf Vermietung</div><span class="text-[12px] muted">3 aktiv</span></div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="agent-item"><div class="agent-ic g-sky"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div><div><div class="text-[13px] ink font-medium">Inserate-Publisher</div><div class="text-[11.5px] muted">2 Wohnungen auf 3 Portalen live</div></div><span class="pill pill-ok">aktiv</span></div>
+          <div class="agent-item"><div class="agent-ic g-mint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div><div><div class="text-[13px] ink font-medium">Bewerber-Matching</div><div class="text-[11.5px] muted">18 Anfragen nach Kriterien gerankt</div></div><span class="pill pill-ok">aktiv</span></div>
+          <div class="agent-item"><div class="agent-ic g-plum"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/></svg></div><div><div class="text-[13px] ink font-medium">Vertrags-Generator</div><div class="text-[11.5px] muted">2 Entwürfe bereit für Signatur</div></div><span class="pill pill-warn">HITL</span></div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="chip" style="background:var(--accent);color:white;border:0;">Alle 8</span>
+        <span class="chip">Wohnen 7</span><span class="chip">Gewerbe 1</span>
+        <span class="mx-2 muted text-[12px]">·</span>
+        <span class="chip">Alle Liegenschaften</span>
+        <div class="ml-auto flex bg-[#F5F1E8] rounded-lg p-0.5"><button class="tab active">Pipeline</button><button class="tab">Tabelle</button></div>
+      </div>
+
+      <div class="grid grid-cols-5 gap-3" id="vermietung-kanban"></div>
+    </section>
+
+    <!-- ===== VIEW: VERMIETUNG DETAIL ===== -->
+    <section data-view="vermietung-detail" class="p-8">
+      <div class="mb-6 flex items-start justify-between gap-6">
+        <div>
+          <div class="text-[13px] muted">Vermietung · Inseriert seit 15.04.2026 · 6 Tage online</div>
+          <h1 class="text-[30px] font-semibold ink leading-tight tracking-tight">Rosengasse 14 · Wohnung 1.01</h1>
+          <div class="text-[13px] muted mt-1">4.5 Zimmer · 102 m² · 1. OG · frei ab 01.07.2026</div>
+        </div>
+        <div class="flex gap-2">
+          <button class="chip">Inserat bearbeiten</button>
+          <button class="chip" style="background:var(--accent);color:white;border:0;">Top-Bewerber einladen</button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Sollmiete</div><div class="text-[22px] font-semibold ink mt-1">CHF 2'280</div><div class="text-[12px] muted mt-1">+ NK CHF 240 · brutto 2'520</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Anfragen gesamt</div><div class="text-[22px] font-semibold ink mt-1">12</div><div class="text-[12px] muted mt-1">8 vom Agent qualifiziert</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Bewerbungen</div><div class="text-[22px] font-semibold ink mt-1">5</div><div class="text-[12px] muted mt-1">3 mit Bonitätsauszug</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Portale</div><div class="text-[22px] font-semibold ink mt-1">3</div><div class="text-[12px] muted mt-1">Homegate · ImmoScout · Flatfox</div></div>
+      </div>
+
+      <div class="grid grid-cols-[1.2fr_1.6fr] gap-6">
+        <!-- Inserat -->
+        <div class="bg-white rounded-2xl soft-shadow overflow-hidden">
+          <div class="relative">
+            <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80" alt="Wohnzimmer" class="w-full h-56 object-cover"/>
+            <div class="absolute top-3 right-3 text-[11px] text-white bg-black/40 px-2 py-1 rounded-md backdrop-blur-sm">1 / 8</div>
+            <div class="absolute bottom-3 right-3 text-[11px] text-white bg-black/40 px-2 py-1 rounded-md backdrop-blur-sm flex items-center gap-1">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
+              8 Fotos
+            </div>
+          </div>
+          <div class="grid grid-cols-4 gap-1 p-1">
+            <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&q=80" class="w-full h-16 object-cover rounded" alt="Küche"/>
+            <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=300&q=80" class="w-full h-16 object-cover rounded" alt="Schlafzimmer"/>
+            <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=300&q=80" class="w-full h-16 object-cover rounded" alt="Bad"/>
+            <div class="relative w-full h-16 rounded overflow-hidden"><img src="https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=300&q=80" class="w-full h-full object-cover" alt=""/><div class="absolute inset-0 bg-black/50 flex items-center justify-center text-[12px] text-white font-medium">+5</div></div>
+          </div>
+          <div class="p-5">
+            <div class="text-[11px] muted uppercase tracking-wider mb-1">Inserat</div>
+            <h2 class="text-[17px] ink font-semibold">Lichtdurchflutete 4.5-Zi-Wohnung im Herzen von Zürich</h2>
+            <div class="text-[12.5px] muted mt-2 leading-relaxed">Per 01.07.2026 vermieten wir in der charmanten Rosengasse eine renovierte 4.5-Zimmer-Wohnung. Moderne Küche, zwei Bäder, grosser Süd-Balkon mit Blick ins Grüne. Sehr ruhige Lage, ÖV in 3 Minuten.</div>
+            <div class="grid grid-cols-2 gap-3 mt-4 text-[12.5px]">
+              <div><span class="muted">Zimmer</span><div class="ink font-medium">4.5</div></div>
+              <div><span class="muted">Wohnfläche</span><div class="ink font-medium">102 m²</div></div>
+              <div><span class="muted">Etage</span><div class="ink font-medium">1. OG</div></div>
+              <div><span class="muted">Baujahr / Reno</span><div class="ink font-medium">1968 / 2024</div></div>
+              <div><span class="muted">GEAK</span><div class="ink font-medium">C</div></div>
+              <div><span class="muted">Haustiere</span><div class="ink font-medium">nach Absprache</div></div>
+            </div>
+            <div class="border-t line mt-4 pt-4">
+              <div class="text-[11px] muted uppercase tracking-wider mb-2">Live auf</div>
+              <div class="flex flex-wrap gap-2">
+                <span class="chip">Homegate · 847 Views</span>
+                <span class="chip">ImmoScout · 512 Views</span>
+                <span class="chip">Flatfox · 203 Views</span>
+              </div>
+            </div>
+            <div class="border-t line mt-4 pt-4 text-[11.5px] muted">Publiziert durch <span class="ink">Inserate-Publisher Agent</span> · 15.04.2026 · Texte AI-generiert, durch Bewi freigegeben</div>
+          </div>
+        </div>
+
+        <!-- Bewerbungen -->
+        <div>
+          <div class="bg-white rounded-2xl soft-shadow p-5 mb-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="text-[15px] font-semibold ink">Bewerber-Matching Agent</div>
+              <span class="pill pill-warn">HITL · wartet auf Entscheid</span>
+            </div>
+            <div class="text-[12.5px] muted leading-relaxed">12 Anfragen eingegangen. 8 erfüllen die Mindestkriterien (3-fache Monatsmiete, keine Betreibungen). 5 Bewerbungen vollständig eingereicht und nach Bonität, Einkommensstabilität und Referenzen gerankt. <span class="ink">Empfehlung:</span> Familie Hofmann-Keller als Top-Kandidat.</div>
+          </div>
+
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-[15px] font-semibold ink">Bewerbungen (5)</div>
+            <div class="flex gap-2 text-[11px] muted">sortiert nach Agent-Score</div>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <!-- Bewerber 1 -->
+            <div class="bg-white rounded-2xl soft-shadow p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full g-mint flex items-center justify-center text-white text-[13px] font-medium shrink-0">HK</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2"><div class="text-[14px] ink font-medium">Familie Hofmann-Keller</div><span class="pill pill-ok">Score 94</span><span class="pill pill-ok">Favorit</span></div>
+                  <div class="text-[11.5px] muted">2 Erwachsene · 2 Kinder · eingegangen 18.04.</div>
+                  <div class="grid grid-cols-4 gap-3 mt-3 text-[11.5px]">
+                    <div><span class="muted">Einkommen</span><div class="ink font-medium">CHF 14'200 / Mt.</div></div>
+                    <div><span class="muted">Mietbelastung</span><div class="ink font-medium">18%</div></div>
+                    <div><span class="muted">Betreibungen</span><div class="ink font-medium">keine</div></div>
+                    <div><span class="muted">Referenzen</span><div class="ink font-medium">3 · alle positiv</div></div>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5 mt-3">
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Bonität geprüft</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Lohnausweis</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Betreibungsauszug</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ ID-Check</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Vormieter-Referenz</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1.5 shrink-0">
+                  <button class="chip" style="background:var(--accent);color:white;border:0;font-size:11px;padding:4px 10px;">Zusagen</button>
+                  <button class="chip" style="font-size:11px;padding:4px 10px;">Profil</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bewerber 2 -->
+            <div class="bg-white rounded-2xl soft-shadow p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full g-sky flex items-center justify-center text-white text-[13px] font-medium shrink-0">RM</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2"><div class="text-[14px] ink font-medium">Raphael Meyer & Sarah Bürgi</div><span class="pill pill-ok">Score 87</span></div>
+                  <div class="text-[11.5px] muted">2 Erwachsene · eingegangen 19.04.</div>
+                  <div class="grid grid-cols-4 gap-3 mt-3 text-[11.5px]">
+                    <div><span class="muted">Einkommen</span><div class="ink font-medium">CHF 11'800 / Mt.</div></div>
+                    <div><span class="muted">Mietbelastung</span><div class="ink font-medium">21%</div></div>
+                    <div><span class="muted">Betreibungen</span><div class="ink font-medium">keine</div></div>
+                    <div><span class="muted">Referenzen</span><div class="ink font-medium">2 · positiv</div></div>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5 mt-3">
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Bonität geprüft</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Lohnausweis</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Betreibungsauszug</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ ID-Check</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1.5 shrink-0">
+                  <button class="chip" style="font-size:11px;padding:4px 10px;">Zusagen</button>
+                  <button class="chip" style="font-size:11px;padding:4px 10px;">Profil</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bewerber 3 -->
+            <div class="bg-white rounded-2xl soft-shadow p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full g-plum flex items-center justify-center text-white text-[13px] font-medium shrink-0">AF</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2"><div class="text-[14px] ink font-medium">Anna Fischer</div><span class="pill pill-ok">Score 81</span></div>
+                  <div class="text-[11.5px] muted">1 Erwachsene · 1 Kind · eingegangen 20.04.</div>
+                  <div class="grid grid-cols-4 gap-3 mt-3 text-[11.5px]">
+                    <div><span class="muted">Einkommen</span><div class="ink font-medium">CHF 8'400 / Mt.</div></div>
+                    <div><span class="muted">Mietbelastung</span><div class="ink font-medium">30%</div></div>
+                    <div><span class="muted">Betreibungen</span><div class="ink font-medium">keine</div></div>
+                    <div><span class="muted">Referenzen</span><div class="ink font-medium">2 · positiv</div></div>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5 mt-3">
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Bonität geprüft</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Lohnausweis</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Betreibungsauszug</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1.5 shrink-0">
+                  <button class="chip" style="font-size:11px;padding:4px 10px;">Zusagen</button>
+                  <button class="chip" style="font-size:11px;padding:4px 10px;">Profil</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bewerber 4 -->
+            <div class="bg-white rounded-2xl soft-shadow p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full g-sun flex items-center justify-center text-white text-[13px] font-medium shrink-0">TB</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2"><div class="text-[14px] ink font-medium">Thomas Brunner</div><span class="pill pill-warn">Score 68</span></div>
+                  <div class="text-[11.5px] muted">1 Erwachsener · eingegangen 17.04.</div>
+                  <div class="grid grid-cols-4 gap-3 mt-3 text-[11.5px]">
+                    <div><span class="muted">Einkommen</span><div class="ink font-medium">CHF 7'200 / Mt.</div></div>
+                    <div><span class="muted">Mietbelastung</span><div class="ink font-medium">35%</div></div>
+                    <div><span class="muted">Betreibungen</span><div class="ink font-medium">keine</div></div>
+                    <div><span class="muted">Referenzen</span><div class="ink font-medium">1 · neutral</div></div>
+                  </div>
+                  <div class="flex flex-wrap gap-1.5 mt-3">
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ Bonität geprüft</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">⚠ Mietbelastung &gt;33%</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1.5 shrink-0">
+                  <button class="chip" style="font-size:11px;padding:4px 10px;">Zusagen</button>
+                  <button class="chip" style="font-size:11px;padding:4px 10px;">Absagen</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bewerber 5 -->
+            <div class="bg-white rounded-2xl soft-shadow p-4">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full g-clay flex items-center justify-center text-white text-[13px] font-medium shrink-0">SV</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2"><div class="text-[14px] ink font-medium">Silvio Vitale</div><span class="pill pill-muted">Score —</span><span class="pill pill-warn">Unterlagen fehlen</span></div>
+                  <div class="text-[11.5px] muted">1 Erwachsener · eingegangen 21.04.</div>
+                  <div class="text-[12px] muted mt-2">Agent hat Bewerber um fehlende Dokumente gebeten: <span class="ink">Betreibungsauszug, Lohnausweis 2025</span>. Erinnerung automatisch in 48h.</div>
+                  <div class="flex flex-wrap gap-1.5 mt-3">
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✗ Lohnausweis</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✗ Betreibungsauszug</span>
+                    <span class="chip" style="padding:2px 8px;font-size:10.5px">✓ ID-Check</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-1.5 shrink-0">
+                  <button class="chip" style="font-size:11px;padding:4px 10px;" disabled>Wartet</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Weitere Anfragen (nicht bewertet) -->
+            <div class="bg-[#F5F1E8] rounded-xl p-3 text-[12px] muted flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+              7 weitere Anfragen vom Agent verworfen (Mindestkriterien nicht erfüllt) · <a class="underline cursor-pointer">einsehen</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: AGENTS ===== -->
+    <section data-view="agents" class="p-8">
+      <div class="mb-6"><div class="text-[13px] muted">14 laufende Workflows · heute 23 Tasks generiert</div><h1 class="text-[30px] font-semibold ink leading-tight tracking-tight">Agents</h1></div>
+
+      <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Workflows aktiv</div><div class="text-[28px] font-semibold ink mt-1">14</div><div class="text-[12px] muted mt-1">davon 3 eskaliert</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Tasks offen</div><div class="text-[28px] font-semibold ink mt-1">47</div><div class="text-[12px] muted mt-1">38 bei Externen</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">HITL wartet auf dich</div><div class="text-[28px] font-semibold ink mt-1">3</div><div class="text-[12px] muted mt-1">Entscheidungen heute</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Erledigt heute</div><div class="text-[28px] font-semibold ink mt-1">14</div><div class="text-[12px] muted mt-1">Ø 3.2 Min pro Vorgang</div></div>
+      </div>
+
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="chip" style="background:var(--accent);color:white;border:0;">Alle 14</span>
+        <span class="chip">Eskaliert 3</span><span class="chip">HITL 3</span><span class="chip">Laufend 8</span>
+        <span class="mx-2 muted text-[12px]">·</span>
+        <span class="chip">Mieter-ausgelöst 4</span><span class="chip">Eigentümer-ausgelöst 2</span><span class="chip">System 7</span><span class="chip">Bewi 1</span>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow overflow-hidden" id="workflows-table">
+        <div class="grid text-[11px] muted uppercase tracking-wider px-4 py-3" style="grid-template-columns:44px 1.5fr 1fr 1fr 90px 100px 120px 24px;">
+          <div></div><div>Workflow</div><div>Bezug</div><div>Auslöser</div><div>Tasks</div><div>Seit</div><div>Status</div><div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: WORKFLOW DETAIL ===== -->
+    <section data-view="workflow" class="p-8">
+      <div class="rounded-2xl g-mint soft-shadow p-6 mb-5 relative overflow-hidden">
+        <svg class="absolute right-6 bottom-0 opacity-25" width="180" height="120" viewBox="0 0 180 120" fill="none" stroke="white" stroke-width="1.5"><path d="M30 100c0-30 20-50 50-50s50 20 50 50"/><path d="M80 100V40M60 55c0-10 8-18 20-18M100 55c0-10-8-18-20-18"/></svg>
+        <div class="relative">
+          <div class="flex items-center gap-2">
+            <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">Gartenpflege</span>
+            <span class="chip" style="background:rgba(255,255,255,.2);border:0;color:white;">WF-2026-0471</span>
+          </div>
+          <h1 class="text-[28px] font-semibold leading-tight tracking-tight mt-2">Frühlingsschnitt Seestrasse 12</h1>
+          <div class="text-[12.5px] opacity-85 mt-1">Ausgelöst durch Eigentümer Heinrich Müller · E-Mail vom 21.04.2026 14:32</div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Status</div><div class="text-[20px] font-semibold ink mt-1">Terminiert</div><div class="text-[12px] muted mt-1">Ausführung 28.04.2026 07:30</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Tasks</div><div class="text-[20px] font-semibold ink mt-1">2 generiert</div><div class="text-[12px] muted mt-1">beide terminiert</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Kosten</div><div class="text-[20px] font-semibold ink mt-1">CHF 800</div><div class="text-[12px] muted mt-1">Pauschale · auto-freigegeben</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Dauer bisher</div><div class="text-[20px] font-semibold ink mt-1">19 Std</div><div class="text-[12px] muted mt-1">2 Min aktive Agent-Zeit</div></div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-5 mb-6">
+        <div class="col-span-2">
+          <div class="text-[15px] font-semibold ink mb-3">Generierte Tasks</div>
+          <div class="bg-white rounded-2xl soft-shadow overflow-hidden mb-6">
+            <div class="grid text-[11px] muted uppercase tracking-wider px-4 py-3" style="grid-template-columns:110px 1.6fr 1fr 110px 120px 24px;">
+              <div>Task</div><div>Aktion</div><div>Zuständig</div><div>Fällig</div><div>Status</div><div></div>
+            </div>
+            <div class="row" style="grid-template-columns:110px 1.6fr 1fr 110px 120px 24px;">
+              <div class="text-[13px] font-medium">T-2026-0847</div>
+              <div><div class="text-[13px] ink">Frühlingsschnitt durchführen</div><div class="text-[12px] muted">Hecke, Rasen, Rabatten · ca. 4 Std</div></div>
+              <div class="text-[13px]">Gärtnerei Lüthi</div>
+              <div class="text-[13px]">28.04.2026</div>
+              <div><span class="pill pill-ok">bestätigt</span></div><div class="muted">›</div>
+            </div>
+            <div class="row" style="grid-template-columns:110px 1.6fr 1fr 110px 120px 24px;">
+              <div class="text-[13px] font-medium">T-2026-0848</div>
+              <div><div class="text-[13px] ink">Aushang montieren</div><div class="text-[12px] muted">Mieter informieren · Eingangshalle</div></div>
+              <div class="text-[13px]">Peter Keller</div>
+              <div class="text-[13px]">25.04.2026</div>
+              <div><span class="pill pill-warn">offen</span></div><div class="muted">›</div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-[15px] font-semibold ink">Audit-Log</div>
+            <div class="flex items-center gap-2">
+              <span class="chip">Alle 11</span>
+              <span class="chip">Agent</span>
+              <span class="chip">E-Mail</span>
+              <span class="chip">System</span>
+              <a class="text-[12.5px] muted ml-2">Als JSON exportieren</a>
+            </div>
+          </div>
+          <div class="bg-white rounded-2xl soft-shadow" id="audit-log"></div>
+        </div>
+
+        <div>
+          <div class="text-[15px] font-semibold ink mb-3">Kontext</div>
+          <div class="bg-white rounded-2xl soft-shadow p-4 space-y-3 mb-4">
+            <div><div class="text-[11px] muted uppercase tracking-wider">Liegenschaft</div><a data-go="liegenschaft" class="text-[13.5px] ink font-medium mt-1 block cursor-pointer hover:underline">Seestrasse 12 ›</a></div>
+            <div class="border-t line pt-3"><div class="text-[11px] muted uppercase tracking-wider">Ausgelöst durch</div><div class="text-[13.5px] ink font-medium mt-1">Heinrich Müller</div><div class="text-[11.5px] muted">Eigentümer · Family Office Müller AG</div></div>
+            <div class="border-t line pt-3"><div class="text-[11px] muted uppercase tracking-wider">Agent</div><div class="text-[13.5px] ink font-medium mt-1">Gartenpflege-Agent</div><div class="text-[11.5px] muted">v2.4 · Intent-Classifier → Handwerker-Broker</div></div>
+            <div class="border-t line pt-3"><div class="text-[11px] muted uppercase tracking-wider">Regel</div><div class="text-[13.5px] ink font-medium mt-1">Gartenpflege-Pauschale §4.2</div><div class="text-[11.5px] muted">≤ CHF 800 p.a. · ohne HITL freigegeben</div></div>
+          </div>
+
+          <div class="text-[15px] font-semibold ink mb-3">Beteiligte</div>
+          <div class="bg-white rounded-2xl soft-shadow p-4 space-y-3">
+            <div class="flex items-center gap-3"><div class="w-9 h-9 rounded-full g-sage flex items-center justify-center text-[12px] font-semibold text-white">HM</div><div><div class="text-[13.5px] ink font-medium">Heinrich Müller</div><div class="text-[11.5px] muted">Eigentümer · informiert</div></div></div>
+            <div class="flex items-center gap-3 border-t line pt-3"><div class="w-9 h-9 rounded-full g-mint flex items-center justify-center text-[12px] font-semibold text-white">GL</div><div><div class="text-[13.5px] ink font-medium">Gärtnerei Lüthi</div><div class="text-[11.5px] muted">Handwerker · Termin bestätigt</div></div></div>
+            <div class="flex items-center gap-3 border-t line pt-3"><div class="w-9 h-9 rounded-full g-clay flex items-center justify-center text-[12px] font-semibold text-white">PK</div><div><div class="text-[13.5px] ink font-medium">Peter Keller</div><div class="text-[11.5px] muted">Hauswart · Task T-2026-0848</div></div></div>
+            <div class="flex items-center gap-3 border-t line pt-3"><div class="w-9 h-9 rounded-full g-rose flex items-center justify-center text-[12px] font-semibold text-white">24</div><div><div class="text-[13.5px] ink font-medium">24 Mieter</div><div class="text-[11.5px] muted">via Aushang · am 25.04.</div></div></div>
+          </div>
+
+          <div class="mt-5 bg-white rounded-2xl soft-shadow p-4">
+            <div class="text-[13px] ink font-medium mb-2">Eingreifen</div>
+            <div class="flex flex-col gap-2">
+              <button class="bg-[color:var(--accent)] text-white text-[12.5px] px-3 py-2 rounded-lg">Workflow stoppen</button>
+              <button class="bg-[#F5F1E8] text-[color:var(--ink)] text-[12.5px] px-3 py-2 rounded-lg">Task neu zuweisen</button>
+              <button class="bg-[#F5F1E8] text-[color:var(--ink)] text-[12.5px] px-3 py-2 rounded-lg">Kommentar hinzufügen</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: PERSONEN ===== -->
+    <section data-view="personen" class="p-8">
+      <div class="mb-6"><div class="text-[13px] muted">312 Personen im Mandat</div><h1 class="text-[30px] font-semibold ink leading-tight tracking-tight">Personen</h1></div>
+
+      <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Mieter</div><div class="text-[28px] font-semibold ink mt-1">287</div><div class="text-[12px] muted mt-1">aktiv</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Eigentümer</div><div class="text-[28px] font-semibold ink mt-1">12</div><div class="text-[12px] muted mt-1">Personen und Gesellschaften</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Handwerker</div><div class="text-[28px] font-semibold ink mt-1">8</div><div class="text-[12px] muted mt-1">Stammpartner</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Hauswart</div><div class="text-[28px] font-semibold ink mt-1">5</div><div class="text-[12px] muted mt-1">vor Ort</div></div>
+      </div>
+
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="chip" style="background:var(--accent);color:white;border:0;">Alle 312</span>
+        <span class="chip">Mieter 287</span><span class="chip">Eigentümer 12</span><span class="chip">Handwerker 8</span><span class="chip">Hauswart 5</span>
+        <span class="mx-2 muted text-[12px]">·</span>
+        <span class="chip">Mit offenen Forderungen</span>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow overflow-hidden" id="persons-table">
+        <div class="grid text-[11px] muted uppercase tracking-wider px-4 py-3" style="grid-template-columns:44px 1.4fr 1fr 1.2fr 100px 130px 24px;">
+          <div></div><div>Person</div><div>Rolle</div><div>Verknüpft mit</div><div>Seit</div><div>Status</div><div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: VERTRAEGE ===== -->
+    <section data-view="vertraege" class="p-8">
+      <div class="mb-6"><div class="text-[13px] muted">589 aktive Verträge im Mandat</div><h1 class="text-[30px] font-semibold ink leading-tight tracking-tight">Verträge</h1></div>
+
+      <div class="grid grid-cols-4 gap-3 mb-6">
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Aktive Mietverträge</div><div class="text-[28px] font-semibold ink mt-1">589</div><div class="text-[12px] muted mt-1">davon 12 befristet</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Kündbar in 6 Monaten</div><div class="text-[28px] font-semibold ink mt-1">84</div><div class="text-[12px] muted mt-1">nach nächster Kündbarkeit</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Referenzzins 1.75%</div><div class="text-[28px] font-semibold ink mt-1">127</div><div class="text-[12px] muted mt-1">Senkung möglich</div></div>
+        <div class="bg-white rounded-2xl soft-shadow p-5"><div class="text-[11px] muted uppercase tracking-wider">Kündigungen offen</div><div class="text-[28px] font-semibold ink mt-1">6</div><div class="text-[12px] muted mt-1">4 in Nachvermietung</div></div>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow p-5 mb-6">
+        <div class="flex items-center justify-between mb-3"><div class="text-[15px] font-semibold ink">Agents auf Verträgen</div><span class="text-[12px] muted">4 Signale</span></div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="agent-item"><div class="agent-ic g-sun"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg></div><div><div class="text-[13px] ink font-medium">Referenzzins-Batch bereit</div><div class="text-[11.5px] muted">127 Verträge · Sammelsignatur vorbereitet</div></div><span class="pill pill-warn">HITL</span></div>
+          <div class="agent-item"><div class="agent-ic g-plum"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><div><div class="text-[13px] ink font-medium">Kündigungsfristen-Watcher</div><div class="text-[11.5px] muted">6 Kündigungen registriert · Fristen geprüft</div></div><span class="pill pill-ok">aktiv</span></div>
+          <div class="agent-item"><div class="agent-ic g-mint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div><div><div class="text-[13px] ink font-medium">Zahlungsmonitor Bexio</div><div class="text-[11.5px] muted">585/589 pünktlich · 4 Mahnungen aktiv</div></div><span class="pill pill-ok">aktiv</span></div>
+          <div class="agent-item"><div class="agent-ic g-sky"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M4 4h16v16H4zM4 10h16"/></svg></div><div><div class="text-[13px] ink font-medium">Vertragsarchivierung</div><div class="text-[11.5px] muted">18 neue Dokumente verknüpft</div></div><span class="pill pill-muted">Hintergrund</span></div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="chip" style="background:var(--accent);color:white;border:0;">Alle 589</span>
+        <span class="chip">Aktiv 583</span><span class="chip">Kündigung eingereicht 6</span>
+        <span class="mx-2 muted text-[12px]">·</span>
+        <span class="chip">Wohnen 546</span><span class="chip">Gewerbe 31</span><span class="chip">Parkplatz 12</span>
+      </div>
+
+      <div class="bg-white rounded-2xl soft-shadow overflow-hidden" id="contracts-table">
+        <div class="grid text-[11px] muted uppercase tracking-wider px-4 py-3" style="grid-template-columns:140px 1.4fr 1.4fr 110px 110px 110px 24px;">
+          <div>Vertrag</div><div>Objekt</div><div>Mieter</div><div>Mietzins</div><div>Kündbar</div><div>Status</div><div></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- SEARCH OVERLAY -->
+<div id="search-overlay" class="search-overlay">
+  <div class="search-box">
+    <div class="flex items-center gap-3 px-4 py-3 border-b line">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B6A63" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search-input" class="flex-1 outline-none text-[14px] bg-transparent" placeholder="Liegenschaft, Einheit, Vertrag oder Person suchen"/>
+      <span class="kbd">ESC</span>
+    </div>
+    <div id="search-results" class="max-h-[420px] overflow-y-auto"></div>
+    <div class="px-4 py-2 border-t line flex items-center gap-3 text-[11px] muted">
+      <span class="kbd">↑</span><span class="kbd">↓</span> navigieren
+      <span class="kbd">↵</span> öffnen
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---- Data ----
+  const LGS = [
+    {id:'seestrasse-12', name:'Seestrasse 12', city:'6300 Zug', type:'Wohnen', owner:'Family Office Müller', objekte:24, belegt:'24/24', rendite:'5.1%', baujahr:1978, status:['ok','stabil'], grad:'g-sage'},
+    {id:'bergweg-8', name:'Bergweg 8', city:'8001 Zürich', type:'Wohnen', owner:'Family Office Müller', objekte:18, belegt:'17/18', rendite:'4.6%', baujahr:1962, status:['err','Schaden'], grad:'g-fire'},
+    {id:'gartenweg-5', name:'Gartenweg 5', city:'8400 Winterthur', type:'Wohnen', owner:'Müller Immo AG', objekte:14, belegt:'13/14', rendite:'5.3%', baujahr:1995, status:['warn','Neuvermietung'], grad:'g-plum'},
+    {id:'rosengasse-14', name:'Rosengasse 14', city:'8004 Zürich', type:'Wohnen', owner:'Family Office Müller', objekte:32, belegt:'32/32', rendite:'4.9%', baujahr:1988, status:['ok','stabil'], grad:'g-rose'},
+    {id:'marktgasse-3', name:'Marktgasse 3', city:'3011 Bern', type:'Gewerbe', owner:'Müller Immo AG', objekte:6, belegt:'6/6', rendite:'6.2%', baujahr:2005, status:['ok','stabil'], grad:'g-sky'},
+    {id:'lindenstrasse-22', name:'Lindenstrasse 22', city:'6003 Luzern', type:'Wohnen', owner:'Family Office Müller', objekte:12, belegt:'11/12', rendite:'4.4%', baujahr:1971, status:['warn','Sanierung geplant'], grad:'g-mint'},
+  ];
+  const OBJ = [
+    {id:'3-02', nr:'3.02', lage:'3. OG West', typ:'Wohnung · 4.5 Zi', mieter:'Sandra Keller-Brunner', sub:'Co-Signatur Thomas Brunner', flaeche:'112 m²', miete:"CHF 2'370", status:['ok','belegt']},
+    {id:'3-01', nr:'3.01', lage:'3. OG Ost', typ:'Wohnung · 3.5 Zi', mieter:'Dario Hofer', sub:'seit 05.2019', flaeche:'88 m²', miete:"CHF 1'890", status:['ok','belegt']},
+    {id:'2-02', nr:'2.02', lage:'2. OG West', typ:'Wohnung · 4.5 Zi', mieter:'Anna und Beat Fischer', sub:'seit 09.2015', flaeche:'112 m²', miete:"CHF 2'280", status:['ok','belegt']},
+    {id:'2-01', nr:'2.01', lage:'2. OG Ost', typ:'Wohnung · 3.5 Zi', mieter:'Michaela Krause', sub:'seit 11.2020', flaeche:'88 m²', miete:"CHF 1'950", status:['ok','belegt']},
+    {id:'1-02', nr:'1.02', lage:'1. OG West', typ:'Wohnung · 4.5 Zi', mieter:'Laura Bernet', sub:'seit 03.2018', flaeche:'112 m²', miete:"CHF 2'240", status:['ok','belegt']},
+  ];
+  const OBJ_HIST = [
+    {nr:'LG-2022-0418', mieter:'Sandra Keller-Brunner', zeit:'seit 01.03.2022', miete:"CHF 2'370", status:['ok','aktiv'], sel:true},
+    {nr:'LG-2014-0092', mieter:'Markus und Renate Benz', zeit:'06.2014 – 02.2022', miete:"CHF 2'180", status:['muted','beendet']},
+    {nr:'LG-2003-0011', mieter:'Erika Hugentobler', zeit:'09.2003 – 05.2014', miete:"CHF 1'980", status:['muted','beendet']},
+  ];
+  const PERSONS = [
+    {id:'sandra-keller', name:'Sandra Keller-Brunner', initials:'SK', rolle:'Mieterin', link:'Seestrasse 12 · 3.02', seit:'03.2022', status:['ok','aktiv'], grad:'g-rose'},
+    {id:'dario-hofer', name:'Dario Hofer', initials:'DH', rolle:'Mieter', link:'Seestrasse 12 · 3.01', seit:'05.2019', status:['ok','aktiv'], grad:'g-sky'},
+    {id:'fischer', name:'Anna und Beat Fischer', initials:'AF', rolle:'Mieter (2 Personen)', link:'Seestrasse 12 · 2.02', seit:'09.2015', status:['ok','aktiv'], grad:'g-mint'},
+    {id:'michaela-krause', name:'Michaela Krause', initials:'MK', rolle:'Mieterin', link:'Seestrasse 12 · 2.01', seit:'11.2020', status:['ok','aktiv'], grad:'g-plum'},
+    {id:'marco-benz', name:'Marco Benz', initials:'MB', rolle:'Mieter · Kündigung', link:'Rosengasse 14 · 2.03', seit:'04.2017', status:['warn','kündigt'], grad:'g-sun'},
+    {id:'laura-bernet', name:'Laura Bernet', initials:'LB', rolle:'Mieterin', link:'Seestrasse 12 · 1.02', seit:'03.2018', status:['ok','aktiv'], grad:'g-clay'},
+    {id:'family-office-mueller', name:'Family Office Müller AG', initials:'FO', rolle:'Eigentümer', link:'28 Liegenschaften', seit:'2003', status:['ok','Mandatskunde'], grad:'g-sage'},
+    {id:'mueller-immo', name:'Müller Immo AG', initials:'MI', rolle:'Eigentümer', link:'19 Liegenschaften', seit:'2011', status:['ok','Mandatskunde'], grad:'g-sage'},
+    {id:'peter-keller', name:'Peter Keller', initials:'PK', rolle:'Hauswart', link:'Seestrasse 12', seit:'01.2024', status:['muted','extern'], grad:'g-clay'},
+    {id:'v-zug', name:'V-Zug Service AG', initials:'VZ', rolle:'Handwerker · Haushaltgeräte', link:'Stammpartner', seit:'2019', status:['muted','extern'], grad:'g-plum'},
+  ];
+  const CONTRACTS = [
+    {id:'lg-2022-0418', nr:'LG-2022-0418', obj:'Seestrasse 12 · 3.02', mieter:'Sandra Keller-Brunner', miete:"CHF 2'370", kuendbar:'30.06.2026', status:['ok','aktiv']},
+    {id:'lg-2019-0231', nr:'LG-2019-0231', obj:'Seestrasse 12 · 3.01', mieter:'Dario Hofer', miete:"CHF 1'890", kuendbar:'31.10.2026', status:['ok','aktiv']},
+    {id:'lg-2015-0612', nr:'LG-2015-0612', obj:'Seestrasse 12 · 2.02', mieter:'Anna und Beat Fischer', miete:"CHF 2'280", kuendbar:'30.09.2026', status:['ok','aktiv']},
+    {id:'lg-2020-0887', nr:'LG-2020-0887', obj:'Seestrasse 12 · 2.01', mieter:'Michaela Krause', miete:"CHF 1'950", kuendbar:'30.06.2026', status:['ok','aktiv']},
+    {id:'lg-2017-0341', nr:'LG-2017-0341', obj:'Rosengasse 14 · 2.03', mieter:'Marco Benz', miete:"CHF 2'140", kuendbar:'30.06.2026', status:['warn','Kündigung']},
+    {id:'lg-2018-0512', nr:'LG-2018-0512', obj:'Seestrasse 12 · 1.02', mieter:'Laura Bernet', miete:"CHF 2'240", kuendbar:'31.12.2026', status:['ok','aktiv']},
+    {id:'gv-2020-0044', nr:'GV-2020-0044', obj:'Marktgasse 3 · EG Ost', mieter:'Dr. Weber Zahnarztpraxis', miete:"CHF 6'800", kuendbar:'31.12.2027', status:['ok','aktiv']},
+  ];
+
+  const VERMIETUNG = [
+    // stage: 1 Wird frei · 2 Inseriert · 3 Besichtigung · 4 Bewerbung · 5 Vertrag
+    {id:'vm-1', stage:1, obj:'Rosengasse 14 · 2.03', typ:'4.5 Zi · 98 m²', miete:"CHF 2'140", grad:'g-rose', frei:'30.06.2026', note:'Marco Benz hat gekündigt · Inserat in Vorbereitung', meta:'Kündigung vor 3 Tagen'},
+    {id:'vm-2', stage:1, obj:'Seestrasse 12 · 1.01', typ:'3.5 Zi · 88 m²', miete:"CHF 1'920", grad:'g-sage', frei:'30.09.2026', note:'Mieterwechsel angekündigt · Agent erstellt Inserat am 15.05.', meta:''},
+    {id:'vm-3', stage:1, obj:'Lindenstrasse 22 · DG.03', typ:'2.5 Zi · 62 m²', miete:"CHF 1'480", grad:'g-mint', frei:'31.07.2026', note:'Nach Sanierung frei · Aufwertung geplant', meta:''},
+
+    {id:'vm-4', stage:2, obj:'Rosengasse 14 · 1.01', typ:'4.5 Zi · 102 m²', miete:"CHF 2'280", grad:'g-rose', portals:['Homegate','ImmoScout','Flatfox'], anfragen:12, tage:6, meta:'seit 6 Tagen online'},
+    {id:'vm-5', stage:2, obj:'Bergweg 8 · 3.04', typ:'3.5 Zi · 78 m²', miete:"CHF 1'850", grad:'g-fire', portals:['Homegate','Flatfox'], anfragen:18, tage:11, meta:'seit 11 Tagen online'},
+
+    {id:'vm-6', stage:3, obj:'Rosengasse 14 · 1.01', typ:'4.5 Zi · 102 m²', miete:"CHF 2'280", grad:'g-rose', slots:4, naechste:'24.04. 18:00', meta:'4 Termine diese Woche'},
+    {id:'vm-7', stage:3, obj:'Bergweg 8 · 3.04', typ:'3.5 Zi · 78 m²', miete:"CHF 1'850", grad:'g-fire', slots:6, naechste:'23.04. 17:30', meta:'Sammelbesichtigung'},
+
+    {id:'vm-8', stage:4, obj:'Gartenweg 5 · EG.02', typ:'3.5 Zi · 82 m²', miete:"CHF 1'780", grad:'g-plum', bewerber:'Familie Hofmann-Keller', score:92, bonitaet:true, meta:'Favorit nach Agent-Ranking'},
+    {id:'vm-9', stage:4, obj:'Rosengasse 14 · 1.01', typ:'4.5 Zi · 102 m²', miete:"CHF 2'280", grad:'g-rose', bewerber:'3 Kandidaten', score:null, bonitaet:false, meta:'Bonitätscheck läuft'},
+
+    {id:'vm-10', stage:5, obj:'Gartenweg 5 · EG.02', typ:'3.5 Zi · 82 m²', miete:"CHF 1'780", grad:'g-plum', mieter:'Familie Hofmann-Keller', eintritt:'01.06.2026', sig:'wartet auf Mieter', meta:'Vertrag seit 21.04. bei Skribble'},
+    {id:'vm-11', stage:5, obj:'Marktgasse 3 · 1.OG Süd', typ:'Gewerbe · 145 m²', miete:"CHF 4'200", grad:'g-sky', mieter:'Atelier Weiss GmbH', eintritt:'01.07.2026', sig:'beide signiert', meta:'Übergabe 30.06.'},
+  ];
+
+  const WORKFLOWS = [
+    {id:'wf-2026-0471', name:'Frühlingsschnitt Seestrasse 12', bezug:'Seestrasse 12', ausloeser:'Eigentümer Heinrich Müller', quelle:'eigentümer', tasks:'2 offen', seit:'19 Std', status:['ok','terminiert'], grad:'g-mint', icon:'leaf'},
+    {id:'wf-2026-0468', name:'Wasserschaden Taskforce', bezug:'Bergweg 8 · 2.01', ausloeser:'Mieterin L. Hug', quelle:'mieter', tasks:'4 offen', seit:'1 Tag', status:['err','eskaliert'], grad:'g-fire', icon:'alert'},
+    {id:'wf-2026-0465', name:'Kündigung Marco Benz · Nachvermietung', bezug:'Rosengasse 14 · 2.03', ausloeser:'Mieter Marco Benz', quelle:'mieter', tasks:'6 offen', seit:'3 Tage', status:['warn','HITL'], grad:'g-plum', icon:'doc'},
+    {id:'wf-2026-0460', name:'Referenzzinssenkung Batch', bezug:'127 Verträge', ausloeser:'BWO Meldung 03.2026', quelle:'system', tasks:'127 wartend', seit:'5 Tage', status:['warn','HITL'], grad:'g-sun', icon:'percent'},
+    {id:'wf-2026-0458', name:'NK-Abrechnung 2025', bezug:'12 Liegenschaften', ausloeser:'Jahresplan', quelle:'system', tasks:'3 offen', seit:'2 Wochen', status:['ok','läuft'], grad:'g-mint', icon:'chart'},
+    {id:'wf-2026-0452', name:'Mahnlauf April', bezug:'4 Verträge', ausloeser:'Bexio Zahlungseingang', quelle:'system', tasks:'4 versendet', seit:'Heute', status:['ok','aktiv'], grad:'g-clay', icon:'coin'},
+    {id:'wf-2026-0450', name:'Namensänderung Wohnung 3.02', bezug:'Seestrasse 12 · 3.02', ausloeser:'Mieterin S. Keller', quelle:'mieter', tasks:'0 offen', seit:'vor 12 Min', status:['ok','erledigt'], grad:'g-plum', icon:'doc'},
+    {id:'wf-2026-0447', name:'Inserate Bergweg 8', bezug:'Bergweg 8 · 3.04', ausloeser:'Nachvermietung', quelle:'system', tasks:'18 Anfragen', seit:'1 Woche', status:['ok','aktiv'], grad:'g-sky', icon:'search'},
+  ];
+
+  const AUDIT = [
+    {ts:'21.04.2026 14:32:14', actor:'E-Mail-Empfang', kind:'trigger', grad:'g-sky', title:'E-Mail empfangen von heinrich.mueller@mueller-family.ch', details:[
+      ['Betreff','Frühlingsschnitt wie jedes Jahr bitte'],
+      ['Nachricht','„Lieber Reto, wie jedes Jahr bitte den Frühlingsschnitt organisieren. Danke und Gruss, Heinrich."'],
+      ['Anhänge','keine'],
+    ]},
+    {ts:'21.04.2026 14:32:15', actor:'Intent-Classifier v2.4', kind:'agent', grad:'g-mint', title:'Klassifiziert als „Gartenpflege-Auftrag"', details:[
+      ['Confidence','0.96'],
+      ['Extrahierte Entitäten','Objekt: Seestrasse 12 · Typ: Gartenpflege · Periodizität: jährlich'],
+      ['Workflow gestartet','WF-2026-0471 · Gartenpflege'],
+    ]},
+    {ts:'21.04.2026 14:32:17', actor:'Context-Loader', kind:'agent', grad:'g-mint', title:'Kontext geladen', details:[
+      ['Liegenschaft','Seestrasse 12 (EGID 90231425)'],
+      ['Eigentümer','Family Office Müller AG · Heinrich Müller als Ansprechperson'],
+      ['Regelwerk','§4.2 Gartenpflege-Pauschale · §7.1 Mieter-Informationspflicht'],
+      ['Historie','Frühlingsschnitt 2023, 2024, 2025 · jeweils Gärtnerei Lüthi'],
+    ]},
+    {ts:'21.04.2026 14:32:18', actor:'Budget-Regel §4.2', kind:'system', grad:'g-sage', title:'Budget-Check bestanden · auto-freigegeben', details:[
+      ['Regel','Gartenpflege-Pauschale ≤ CHF 800 p.a.'],
+      ['Veranschlagt','CHF 800 (Pauschalvertrag Lüthi)'],
+      ['Ergebnis','OK · keine HITL-Freigabe nötig'],
+    ]},
+    {ts:'21.04.2026 14:32:21', actor:'Handwerker-Broker', kind:'agent', grad:'g-mint', title:'Stammpartner ausgewählt: Gärtnerei Lüthi', details:[
+      ['Basis','8 vorherige Aufträge · Ø Zufriedenheit 4.8/5 · 100% Termin eingehalten'],
+      ['Alternativen geprüft','Gartenbau Schnyder (zu teuer), Grünwerk AG (nicht Region Zug)'],
+    ]},
+    {ts:'21.04.2026 14:32:24', actor:'Task-Service', kind:'system', grad:'g-sage', title:'Task erstellt: T-2026-0847 · Frühlingsschnitt durchführen', details:[
+      ['Zuständig','Gärtnerei Lüthi'],
+      ['Geschätzte Dauer','4 Stunden'],
+      ['Vorgeschlagene Daten','28.04. / 29.04. / 02.05.'],
+    ]},
+    {ts:'21.04.2026 14:32:38', actor:'E-Mail-Agent', kind:'agent', grad:'g-mint', title:'E-Mail versendet an Gärtnerei Lüthi', details:[
+      ['An','info@gaertnerei-luethi.ch'],
+      ['Betreff','Frühlingsschnitt Seestrasse 12 · Terminvorschläge'],
+      ['Auszug','„Guten Tag, wir bitten um Ausführung des Frühlingsschnitts gemäss Pauschalvertrag. Mögliche Termine: 28.04., 29.04., 02.05. ..."'],
+    ]},
+    {ts:'21.04.2026 14:32:39', actor:'Notification-Service', kind:'system', grad:'g-sage', title:'SMS an Hauswart Peter Keller', details:[
+      ['Nachricht','Frühlingsschnitt Seestrasse 12 organisiert. Aushang folgt.'],
+    ]},
+    {ts:'22.04.2026 09:12:44', actor:'E-Mail-Empfang', kind:'trigger', grad:'g-sky', title:'Antwort von Gärtnerei Lüthi erhalten', details:[
+      ['Inhalt','Termin 28.04.2026 07:30 bestätigt. Dauer ca. 4 Std.'],
+      ['Parse-Ergebnis','Datum: 2026-04-28 07:30 · bestätigt'],
+    ]},
+    {ts:'22.04.2026 09:13:02', actor:'E-Mail-Agent', kind:'agent', grad:'g-mint', title:'Bestätigung an Eigentümer versendet', details:[
+      ['An','heinrich.mueller@mueller-family.ch'],
+      ['Inhalt','Frühlingsschnitt am 28.04. 07:30 durch Gärtnerei Lüthi, CHF 800 wie üblich.'],
+    ]},
+    {ts:'22.04.2026 09:13:10', actor:'Document-Generator', kind:'agent', grad:'g-mint', title:'Aushang generiert · Task T-2026-0848 erstellt', details:[
+      ['Template','Aushang Gartenarbeiten'],
+      ['Ausgabe','aushang-seestrasse12-2026-04-28.pdf (62 KB)'],
+      ['Zuständig','Peter Keller · Fällig 25.04.2026'],
+    ]},
+  ];
+
+  // ---- Render ----
+  const pill = ([k,l]) => `<span class="pill pill-${k}">${l}</span>`;
+  const grads = {
+    'seestrasse-12':'g-sage','bergweg-8':'g-fire','gartenweg-5':'g-plum','rosengasse-14':'g-rose','marktgasse-3':'g-sky','lindenstrasse-22':'g-mint'
+  };
+
+  document.getElementById('lg-table').insertAdjacentHTML('beforeend', LGS.map(l => `
+    <div data-go="liegenschaft" data-id="${l.id}" class="row" style="grid-template-columns:40px 1.5fr 1fr 80px 90px 90px 80px 110px 24px;">
+      <div class="w-7 h-7 rounded-lg ${l.grad} flex items-center justify-center"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 21V10l9-7 9 7v11"/></svg></div>
+      <div><div class="text-[14px] ink font-medium">${l.name}</div><div class="text-[12px] muted">${l.city} · ${l.type}</div></div>
+      <div class="text-[13px]">${l.owner}</div>
+      <div class="text-[13px]">${l.objekte}</div>
+      <div class="text-[13px]">${l.belegt}</div>
+      <div class="text-[13px]">${l.rendite}</div>
+      <div class="text-[13px]">${l.baujahr}</div>
+      <div>${pill(l.status)}</div><div class="muted">›</div>
+    </div>
+  `).join('') + `<div class="px-4 py-3 border-t line text-center text-[12.5px] muted cursor-pointer hover:bg-[#FAF8F4]">41 weitere Liegenschaften anzeigen</div>`);
+
+  document.getElementById('obj-table').insertAdjacentHTML('beforeend', OBJ.map(o => `
+    <div data-go="objekt" data-id="${o.id}" class="row" style="grid-template-columns:90px 1.2fr 1.4fr 110px 120px 120px 24px;">
+      <div class="text-[13px] font-medium">${o.nr}</div>
+      <div><div class="text-[13px] ink">${o.lage}</div><div class="text-[12px] muted">${o.typ}</div></div>
+      <div><div class="text-[13px] ink">${o.mieter}</div><div class="text-[12px] muted">${o.sub}</div></div>
+      <div class="text-[13px]">${o.flaeche}</div>
+      <div class="text-[13px]">${o.miete}</div>
+      <div>${pill(o.status)}</div><div class="muted">›</div>
+    </div>
+  `).join('') + `<div class="px-4 py-3 border-t line text-center text-[12.5px] muted cursor-pointer hover:bg-[#FAF8F4]">13 weitere Wohnungen anzeigen</div>`);
+
+  document.getElementById('obj-history').insertAdjacentHTML('beforeend', `
+    <div class="grid text-[11px] muted uppercase tracking-wider px-4 py-3" style="grid-template-columns:140px 1.4fr 1fr 120px 120px 24px;">
+      <div>Vertrag</div><div>Mieter</div><div>Zeitraum</div><div>Mietzins</div><div>Status</div><div></div>
+    </div>
+  ` + OBJ_HIST.map(v => `
+    <div data-go="vertrag" class="row ${v.sel?'selected':''}" style="grid-template-columns:140px 1.4fr 1fr 120px 120px 24px;">
+      <div class="text-[13px] font-medium">${v.nr}</div>
+      <div class="text-[13px]">${v.mieter}</div>
+      <div class="text-[13px]">${v.zeit}</div>
+      <div class="text-[13px]">${v.miete}</div>
+      <div>${pill(v.status)}</div><div class="muted">›</div>
+    </div>
+  `).join(''));
+
+  document.getElementById('persons-table').insertAdjacentHTML('beforeend', PERSONS.map(p => `
+    <div data-go="mieter" data-id="${p.id}" class="row" style="grid-template-columns:44px 1.4fr 1fr 1.2fr 100px 130px 24px;">
+      <div class="w-9 h-9 rounded-full ${p.grad} flex items-center justify-center text-[12px] font-semibold text-white">${p.initials}</div>
+      <div class="text-[13.5px] ink font-medium">${p.name}</div>
+      <div class="text-[13px]">${p.rolle}</div>
+      <div class="text-[13px] muted">${p.link}</div>
+      <div class="text-[13px] muted">${p.seit}</div>
+      <div>${pill(p.status)}</div><div class="muted">›</div>
+    </div>
+  `).join(''));
+
+  const WF_ICONS = {
+    leaf:'<path d="M7 20c0-8 6-14 14-14 0 8-6 14-14 14zM7 20s2-6 8-10"/>',
+    alert:'<path d="M12 2 2 22h20z"/><path d="M12 10v5M12 18v0"/>',
+    doc:'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/>',
+    percent:'<path d="M5 19 19 5M7 7h.01M17 17h.01"/>',
+    chart:'<path d="M3 3v18h18M7 14l4-4 4 4 5-5"/>',
+    coin:'<circle cx="12" cy="12" r="9"/><path d="M9 9h6M9 15h6"/>',
+    search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  };
+  document.getElementById('workflows-table').insertAdjacentHTML('beforeend', WORKFLOWS.map(w => `
+    <div data-go="workflow" data-id="${w.id}" class="row" style="grid-template-columns:44px 1.5fr 1fr 1fr 90px 100px 120px 24px;">
+      <div class="w-9 h-9 rounded-xl ${w.grad} flex items-center justify-center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">${WF_ICONS[w.icon]}</svg></div>
+      <div><div class="text-[13.5px] ink font-medium">${w.name}</div><div class="text-[11.5px] muted">${w.id.toUpperCase()}</div></div>
+      <div class="text-[13px]">${w.bezug}</div>
+      <div><div class="text-[13px] ink">${w.ausloeser}</div><div class="text-[11.5px] muted capitalize">${w.quelle}</div></div>
+      <div class="text-[13px]">${w.tasks}</div>
+      <div class="text-[13px] muted">${w.seit}</div>
+      <div>${pill(w.status)}</div><div class="muted">›</div>
+    </div>
+  `).join(''));
+
+  const AUDIT_KIND_LABEL = {trigger:'Signal', agent:'Agent', system:'System'};
+  document.getElementById('audit-log').insertAdjacentHTML('beforeend', AUDIT.map((a,i) => `
+    <details class="border-t line first:border-t-0" ${i===0?'open':''}>
+      <summary class="grid items-center gap-4 px-4 py-3 cursor-pointer hover:bg-[#FAF8F4]" style="grid-template-columns:28px 170px 1fr 90px 16px;">
+        <div class="w-7 h-7 rounded-lg ${a.grad} flex items-center justify-center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">${a.kind==='trigger'?'<path d="M4 12h16M12 4l8 8-8 8"/>':a.kind==='agent'?'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3"/>':'<rect x="4" y="4" width="16" height="16" rx="2"/>'}</svg></div>
+        <div class="text-[11.5px] muted font-mono">${a.ts}</div>
+        <div><div class="text-[13px] ink">${a.title}</div><div class="text-[11.5px] muted">${a.actor}</div></div>
+        <div><span class="pill pill-muted">${AUDIT_KIND_LABEL[a.kind]}</span></div>
+        <div class="muted text-[12px]">▾</div>
+      </summary>
+      <div class="px-4 pb-4 pl-[60px]">
+        <div class="bg-[#FAF8F4] rounded-lg border line divide-y divide-[rgba(31,42,34,.06)]">
+          ${a.details.map(([k,v]) => `<div class="grid px-4 py-2.5" style="grid-template-columns:170px 1fr;gap:16px;"><div class="text-[11px] muted uppercase tracking-wider">${k}</div><div class="text-[12.5px] ink">${v}</div></div>`).join('')}
+        </div>
+      </div>
+    </details>
+  `).join(''));
+
+  document.getElementById('contracts-table').insertAdjacentHTML('beforeend', CONTRACTS.map(c => `
+    <div data-go="vertrag" data-id="${c.id}" class="row" style="grid-template-columns:140px 1.4fr 1.4fr 110px 110px 110px 24px;">
+      <div class="text-[13px] font-medium">${c.nr}</div>
+      <div class="text-[13px]">${c.obj}</div>
+      <div class="text-[13px]">${c.mieter}</div>
+      <div class="text-[13px]">${c.miete}</div>
+      <div class="text-[13px]">${c.kuendbar}</div>
+      <div>${pill(c.status)}</div><div class="muted">›</div>
+    </div>
+  `).join(''));
+
+  // ---- Vermietung Kanban ----
+  const STAGES = [
+    {id:1, title:'Wird frei',     sub:'nächste 90 Tage'},
+    {id:2, title:'Inseriert',     sub:'live auf Portalen'},
+    {id:3, title:'Besichtigung',  sub:'Termine diese Woche'},
+    {id:4, title:'Bewerbung',     sub:'Bonität & Ranking'},
+    {id:5, title:'Vertrag',       sub:'Signatur & Übergabe'},
+  ];
+  function vmCardBody(v){
+    if(v.stage===1) return `
+      <div class="text-[11.5px] muted">Frei ab <span class="ink font-medium">${v.frei}</span></div>
+      <div class="text-[11.5px] muted mt-2 leading-relaxed">${v.note}</div>`;
+    if(v.stage===2) return `
+      <div class="flex flex-wrap gap-1 mb-2">${v.portals.map(p=>`<span class="chip" style="padding:2px 8px;font-size:10.5px">${p}</span>`).join('')}</div>
+      <div class="flex items-center justify-between"><div class="text-[11.5px] muted">${v.anfragen} Anfragen</div><div class="text-[11.5px] muted">${v.meta}</div></div>`;
+    if(v.stage===3) return `
+      <div class="text-[11.5px] muted">${v.slots} Termine · nächste</div>
+      <div class="text-[13px] ink font-medium mt-1">${v.naechste}</div>
+      <div class="text-[11.5px] muted mt-1">${v.meta}</div>`;
+    if(v.stage===4) return `
+      <div class="text-[13px] ink font-medium">${v.bewerber}</div>
+      <div class="flex items-center gap-2 mt-2">
+        ${v.score?`<span class="pill pill-ok">Score ${v.score}</span>`:''}
+        ${v.bonitaet?`<span class="pill pill-ok">Bonität ok</span>`:`<span class="pill pill-warn">Bonität läuft</span>`}
+      </div>
+      <div class="text-[11.5px] muted mt-2">${v.meta}</div>`;
+    if(v.stage===5) return `
+      <div class="text-[13px] ink font-medium">${v.mieter}</div>
+      <div class="text-[11.5px] muted mt-1">Eintritt ${v.eintritt}</div>
+      <div class="mt-2">${v.sig==='beide signiert'?'<span class="pill pill-ok">beide signiert</span>':'<span class="pill pill-warn">'+v.sig+'</span>'}</div>
+      <div class="text-[11.5px] muted mt-2">${v.meta}</div>`;
+    return '';
+  }
+  const kanban = document.getElementById('vermietung-kanban');
+  if(kanban){
+    kanban.innerHTML = STAGES.map(s => {
+      const items = VERMIETUNG.filter(v => v.stage===s.id);
+      return `
+        <div class="bg-[#F5F1E8] rounded-2xl p-3">
+          <div class="flex items-center justify-between px-1 mb-3">
+            <div><div class="text-[13px] ink font-semibold">${s.title}</div><div class="text-[11px] muted">${s.sub}</div></div>
+            <span class="text-[11px] muted">${items.length}</span>
+          </div>
+          <div class="flex flex-col gap-2">
+            ${items.map(v => `
+              <div data-go="vermietung-detail" data-id="${v.id}" class="bg-white rounded-xl p-3 soft-shadow cursor-pointer hover:shadow-md transition">
+                <div class="flex items-center gap-2 mb-2">
+                  <div class="w-7 h-7 rounded-lg ${v.grad} flex items-center justify-center shrink-0"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/></svg></div>
+                  <div class="min-w-0"><div class="text-[12.5px] ink font-medium truncate">${v.obj}</div><div class="text-[11px] muted truncate">${v.typ} · ${v.miete}</div></div>
+                </div>
+                ${vmCardBody(v)}
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  // ---- Routing ----
+  let ctx = 'liegenschaften';
+  const TOP_VIEWS = ['start','liegenschaften','personen','vertraege','vermietung','agents'];
+  const CTX_LABEL = {liegenschaften:'Liegenschaften', personen:'Personen', vertraege:'Verträge', vermietung:'Vermietung', agents:'Agents'};
+
+  function crumbFor(view){
+    if(view==='start') return [{label:'Start', view:'start'}];
+    if(view==='liegenschaften') return [{label:'Liegenschaften', view:'liegenschaften'}];
+    if(view==='personen') return [{label:'Personen', view:'personen'}];
+    if(view==='vertraege') return [{label:'Verträge', view:'vertraege'}];
+    if(view==='vermietung') return [{label:'Vermietung', view:'vermietung'}];
+    if(view==='vermietung-detail') return [{label:'Vermietung', view:'vermietung'},{label:'Rosengasse 14 · 1.01', view:'vermietung-detail'}];
+    if(view==='agents') return [{label:'Agents', view:'agents'}];
+    if(view==='workflow') return [{label:'Agents', view:'agents'},{label:'Frühlingsschnitt Seestrasse 12', view:'workflow'}];
+    const base = [{label:CTX_LABEL[ctx], view:ctx}];
+    const LG = {label:'Seestrasse 12', view:'liegenschaft'};
+    const OB = {label:'Wohnung 3.02', view:'objekt'};
+    const VT = {label:'LG-2022-0418', view:'vertrag'};
+    const MT = {label:'Sandra Keller-Brunner', view:'mieter'};
+    if(ctx==='liegenschaften'){
+      if(view==='liegenschaft') return [...base, LG];
+      if(view==='objekt')       return [...base, LG, OB];
+      if(view==='vertrag')      return [...base, LG, OB, VT];
+      if(view==='mieter')       return [...base, LG, OB, VT, MT];
+    }
+    if(ctx==='personen'){
+      if(view==='mieter')       return [...base, MT];
+      if(view==='vertrag')      return [...base, MT, VT];
+      if(view==='objekt')       return [...base, MT, VT, OB];
+      if(view==='liegenschaft') return [...base, MT, VT, OB, LG];
+    }
+    if(ctx==='vertraege'){
+      if(view==='vertrag')      return [...base, VT];
+      if(view==='mieter')       return [...base, VT, MT];
+      if(view==='objekt')       return [...base, VT, OB];
+      if(view==='liegenschaft') return [...base, VT, OB, LG];
+    }
+    return base;
+  }
+
+  function showView(name){
+    if(TOP_VIEWS.includes(name) && name!=='start') ctx = name;
+    document.querySelectorAll('[data-view]').forEach(el => el.classList.toggle('active', el.dataset.view === name));
+    document.querySelectorAll('.nav-a[data-nav]').forEach(a => {
+      const active = a.dataset.nav === name || (!TOP_VIEWS.includes(name) && a.dataset.nav === ctx);
+      a.classList.toggle('active', active);
+    });
+    const path = crumbFor(name);
+    document.getElementById('crumb').innerHTML = path.map((p,i)=>{
+      const last = i === path.length-1;
+      return (i>0?'<span class="sep">›</span>':'') + (last ? `<span class="ink font-medium">${p.label}</span>` : `<a data-nav="${p.view}">${p.label}</a>`);
+    }).join('');
+    window.scrollTo({top:0, behavior:'instant'});
+    if(location.hash.replace('#','') !== name) location.hash = name;
+  }
+
+  document.addEventListener('click', (e) => {
+    const nav = e.target.closest('[data-nav]');
+    if(nav && nav.dataset.nav){ showView(nav.dataset.nav); return; }
+    const go = e.target.closest('[data-go]');
+    if(go){ showView(go.dataset.go); return; }
+  });
+
+  // ---- Search ----
+  const overlay = document.getElementById('search-overlay');
+  const input = document.getElementById('search-input');
+  const results = document.getElementById('search-results');
+  const trigger = document.getElementById('search-trigger');
+
+  const searchItems = [
+    ...LGS.map(l => ({label:l.name, sub:`${l.city} · ${l.type} · ${l.objekte} Objekte`, kind:'Liegenschaft', grad:l.grad, view:'liegenschaft'})),
+    ...OBJ.map(o => ({label:`Seestrasse 12 · ${o.nr}`, sub:`${o.typ} · ${o.mieter}`, kind:'Einheit', grad:'g-sage', view:'objekt'})),
+    ...CONTRACTS.map(c => ({label:c.nr, sub:`${c.obj} · ${c.mieter}`, kind:'Vertrag', grad:'g-plum', view:'vertrag'})),
+    ...PERSONS.map(p => ({label:p.name, sub:`${p.rolle} · ${p.link}`, kind:'Person', grad:p.grad, view:p.rolle.includes('Eigentümer')||p.rolle.includes('Hauswart')||p.rolle.includes('Handwerker')?'personen':'mieter'})),
+    ...WORKFLOWS.map(w => ({label:w.name, sub:`${w.bezug} · ${w.ausloeser}`, kind:'Workflow', grad:w.grad, view:'workflow'})),
+  ];
+
+  let focusIdx = 0;
+  function renderResults(q){
+    const term = q.trim().toLowerCase();
+    const hits = term ? searchItems.filter(i => (i.label+' '+i.sub+' '+i.kind).toLowerCase().includes(term)) : searchItems.slice(0,8);
+    focusIdx = 0;
+    results.innerHTML = hits.length ? hits.map((h,i) => `
+      <div class="search-hit ${i===0?'focus':''}" data-view="${h.view}">
+        <div class="w-7 h-7 rounded-lg ${h.grad} flex items-center justify-center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">${h.kind==='Liegenschaft'?'<path d="M3 21V10l9-7 9 7v11"/>':h.kind==='Einheit'?'<rect x="4" y="4" width="16" height="16" rx="2"/>':h.kind==='Vertrag'?'<path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6"/>':h.kind==='Workflow'?'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3"/>':'<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/>'}</svg></div>
+        <div><div class="text-[13.5px] ink font-medium">${h.label}</div><div class="text-[11.5px] muted">${h.sub}</div></div>
+        <div class="text-[11px] muted uppercase tracking-wider">${h.kind}</div>
+      </div>
+    `).join('') : `<div class="px-5 py-10 text-center text-[13px] muted">Keine Treffer für „${q}"</div>`;
+  }
+  function openSearch(){ overlay.classList.add('open'); input.value=''; renderResults(''); setTimeout(()=>input.focus(),0); }
+  function closeSearch(){ overlay.classList.remove('open'); }
+
+  trigger.addEventListener('click', openSearch);
+  document.addEventListener('keydown', (e) => {
+    if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); openSearch(); return; }
+    if(!overlay.classList.contains('open')) return;
+    if(e.key==='Escape') closeSearch();
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      e.preventDefault();
+      const hits = [...results.querySelectorAll('.search-hit')];
+      if(!hits.length) return;
+      hits[focusIdx]?.classList.remove('focus');
+      focusIdx = (focusIdx + (e.key==='ArrowDown'?1:-1) + hits.length) % hits.length;
+      hits[focusIdx].classList.add('focus');
+      hits[focusIdx].scrollIntoView({block:'nearest'});
+    }
+    if(e.key==='Enter'){
+      const cur = results.querySelector('.search-hit.focus');
+      if(cur){ showView(cur.dataset.view); closeSearch(); }
+    }
+  });
+  input.addEventListener('input', e => renderResults(e.target.value));
+  results.addEventListener('click', e => {
+    const hit = e.target.closest('.search-hit');
+    if(hit){ showView(hit.dataset.view); closeSearch(); }
+  });
+  overlay.addEventListener('click', e => { if(e.target===overlay) closeSearch(); });
+
+  // ---- Init ----
+  const VALID = ['start','liegenschaften','liegenschaft','objekt','vertrag','mieter','personen','vertraege','vermietung','vermietung-detail','agents','workflow'];
+  const initial = (location.hash || '#start').replace('#','');
+  showView(VALID.includes(initial) ? initial : 'start');
+</script>
+</body>
+</html>
