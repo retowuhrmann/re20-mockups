@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prozesslandkarte · REC Space Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root {
+  --bg-base:          #060b1a;
+  --bg-radial-center: #0a1128;
+  --bg-radial-edge:   #03060f;
+  --color-vision:     #08ccab;
+  --color-gold:       #f59e0b;
+  --color-cyan:       #0ea5e9;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#e2e8f0;background:var(--bg-base);background-image:radial-gradient(circle at 50% 30%,var(--bg-radial-center) 0%,var(--bg-radial-edge) 100%);min-height:100vh}
+h1,h2,h3,h4{color:#f8fafc;font-weight:700}
+.text-gradient{background:linear-gradient(130deg,#4a8fff 20%,#a855f7 55%,#f59e0b 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.glow-text{text-shadow:0 0 30px rgba(255,255,255,0.3)}
+.code-badge{background:rgba(99,156,255,.10);border:1px solid rgba(99,156,255,.20);color:#93c5fd;padding:.2rem .7rem;border-radius:9999px;font-family:'JetBrains Mono',monospace;font-size:.8rem;display:inline-block}
+
+/* HEADER */
+#hd{padding:36px 64px 28px;border-bottom:1px solid rgba(8,204,171,.12);position:relative;overflow:hidden}
+#hd::before{content:'';position:absolute;top:-80px;left:30%;width:400px;height:200px;background:radial-gradient(ellipse,rgba(8,204,171,.08) 0%,transparent 70%);pointer-events:none}
+.hd-tag{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--color-vision);background:rgba(8,204,171,.10);padding:4px 12px;border-radius:9999px;border:1px solid rgba(8,204,171,.22);font-family:'JetBrains Mono',monospace}
+.hd-dot{width:6px;height:6px;border-radius:50%;background:var(--color-vision);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* STATS */
+#stats{display:flex;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(6,11,26,.7)}
+.stat{flex:1;padding:18px 24px;text-align:center;border-right:1px solid rgba(255,255,255,.06)}
+.stat:last-child{border-right:none}
+.stat-n{font-size:28px;font-weight:800;line-height:1;font-family:'JetBrains Mono',monospace}
+.stat-l{font-size:10px;color:#64748b;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;margin-top:5px}
+
+/* FILTER */
+#filter{padding:14px 64px;display:flex;gap:8px;align-items:center;background:rgba(6,11,26,.5);border-bottom:1px solid rgba(255,255,255,.05);flex-wrap:wrap;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+.flabel{font-size:10px;color:#475569;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-right:4px;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.fb{padding:5px 13px;border-radius:9999px;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.10);cursor:pointer;transition:all .15s;background:rgba(255,255,255,.04);color:#94a3b8;display:flex;align-items:center;gap:5px;user-select:none}
+.fb:hover{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.18);color:#e2e8f0}
+.fb.active{color:#fff;border-color:transparent}
+.fd{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* CONTENT */
+#content{padding:40px 64px 80px;max-width:1500px;margin:0 auto}
+
+/* CATEGORY */
+.cat-section{margin-bottom:52px}
+.cat-header{display:flex;align-items:center;gap:14px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.06)}
+.cat-count{font-size:10px;padding:2px 9px;border-radius:9999px;background:rgba(255,255,255,.07);color:#64748b;font-weight:700;font-family:'JetBrains Mono',monospace}
+.cat-auto{margin-left:auto;font-size:11px;color:#475569;font-weight:500;font-family:'JetBrains Mono',monospace}
+
+/* GRID */
+.pGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px}
+
+/* CARD */
+.pCard{background:rgba(10,15,30,.65);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:22px;transition:border-color .2s,box-shadow .2s,transform .15s;display:flex;flex-direction:column;gap:14px;position:relative;overflow:hidden}
+.pCard::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac);border-radius:2px 2px 0 0;opacity:.9}
+.pCard.clickable{cursor:pointer}
+.pCard.clickable:hover{box-shadow:0 8px 32px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.12);transform:translateY(-2px);border-color:rgba(255,255,255,.18)}
+.pCard.doc-card{border-color:rgba(8,204,171,.25);box-shadow:0 0 24px rgba(8,204,171,.08),inset 0 0 20px rgba(8,204,171,.03)}
+.pCard.doc-card:hover{border-color:rgba(8,204,171,.5);box-shadow:0 8px 32px rgba(0,0,0,.6),0 0 32px rgba(8,204,171,.15)}
+.pCard.fhide{display:none}
+
+.ct{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.ci{width:38px;height:38px;flex-shrink:0;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+.sb{font-size:9px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;padding:3px 9px;border-radius:9999px;flex-shrink:0;white-space:nowrap;font-family:'JetBrains Mono',monospace}
+.sb-doc{background:rgba(8,204,171,.15);color:#08ccab;border:1px solid rgba(8,204,171,.3)}
+.sb-dev{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25)}
+.sb-plan{background:rgba(255,255,255,.05);color:#475569;border:1px solid rgba(255,255,255,.08)}
+.sb-mvp{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.35)}
+.sb-sub{background:rgba(14,165,233,.12);color:#0ea5e9;border:1px solid rgba(14,165,233,.3)}
+
+.cn{font-size:14px;font-weight:700;color:#f1f5f9;line-height:1.35}
+.cd{font-size:12px;color:#64748b;line-height:1.6;flex:1}
+
+.abar{display:flex;align-items:center;gap:8px}
+.abar-track{height:2px;border-radius:2px;background:rgba(255,255,255,.08);flex:1;overflow:hidden}
+.abar-fill{height:100%;border-radius:2px;background:var(--ac)}
+.abar-pct{font-size:10px;color:#475569;font-weight:700;width:30px;text-align:right;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+
+.cf{display:flex;justify-content:space-between;align-items:center;margin-top:2px}
+.ab{font-size:10px;font-weight:700;letter-spacing:.4px;padding:3px 10px;border-radius:9999px;background:rgba(var(--ac-rgb),.12);color:var(--ac);border:1px solid rgba(var(--ac-rgb),.2)}
+.vl{font-size:11px;font-weight:700;color:var(--ac);text-decoration:none;display:flex;align-items:center;gap:4px;opacity:0;transition:opacity .15s}
+.pCard:hover .vl{opacity:1}
+.cat-section.fhide{display:none}
+
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.10);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.20)}
+</style>
+</head>
+<body>
+
+<header id="hd">
+  <div class="flex justify-between items-start">
+    <div>
+      <div class="hd-tag"><span class="hd-dot"></span>REC Space Model · BOS</div>
+      <h1 class="text-4xl font-bold mt-1 mb-2 text-gradient glow-text">Prozesslandkarte</h1>
+      <p class="text-sm" style="color:#64748b">Business Operating System · KI-gestützte Prozessautomatisierung · Immobilienwirtschaft CH</p>
+    </div>
+    <div class="text-right">
+      <div class="code-badge">v1.0 · 2026</div>
+      <p class="text-xs mt-2" id="hd-meta" style="color:#334155"></p>
+    </div>
+  </div>
+</header>
+
+<div id="stats">
+  <div class="stat"><div class="stat-n" id="s-total" style="color:#f8fafc"></div><div class="stat-l">Prozesse gesamt</div></div>
+  <div class="stat"><div class="stat-n" id="s-doc"   style="color:var(--color-vision)"></div><div class="stat-l">Dokumentiert</div></div>
+  <div class="stat"><div class="stat-n" id="s-dev"   style="color:var(--color-gold)"></div><div class="stat-l">In Entwicklung</div></div>
+  <div class="stat"><div class="stat-n" id="s-plan"  style="color:#334155"></div><div class="stat-l">Geplant</div></div>
+  <div class="stat"><div class="stat-n" id="s-mvp"   style="color:#f59e0b"></div><div class="stat-l">MVP</div></div>
+  <div class="stat"><div class="stat-n" id="s-auto"  style="color:var(--color-cyan)"></div><div class="stat-l">Ø Automation</div></div>
+</div>
+
+<div id="filter">
+  <span class="flabel">filter</span>
+  <button class="fb active" data-f="all" onclick="setFilter('all',this)">Alle</button>
+  <button class="fb" data-f="mvp" onclick="setFilter('mvp',this)"><span class="fd" style="background:#f59e0b"></span>MVP</button>
+</div>
+
+<div id="content"></div>
+
+<script>
+// ─────────────────────────────────────────────────────────
+//  KATEGORIEN  (hier neue Kategorien hinzufügen)
+// ─────────────────────────────────────────────────────────
+const CATEGORIES = [
+  { id:'mieter',          label:'Mieter-Prozesse',          code:'mieter',                color:'#a855f7', rgb:'168,85,247'  },
+  { id:'eigentuemer',     label:'Eigentümer-Prozesse',      code:'eigentuemer',           color:'#3b82f6', rgb:'59,130,246'  },
+  { id:'bewirtschaftung', label:'Bewirtschaftungs-Prozesse',code:'bewirtschaftung',       color:'#f97316', rgb:'249,115,22'  },
+  { id:'lieferant',       label:'Lieferanten-Prozesse',     code:'lieferant',             color:'#0ea5e9', rgb:'14,165,233'  },
+  { id:'onboarding',      label:'On- & Offboarding Factory',code:'onboarding_factory',    color:'#f43f5e', rgb:'244,63,94'   },
+];
+
+// ─────────────────────────────────────────────────────────
+//  PROZESSE  (hier neue Prozesse hinzufügen oder anpassen)
+//
+//  Felder:
+//    category    → ID aus CATEGORIES
+//    icon        → Emoji
+//    name        → Anzeigename
+//    desc        → Kurzbeschreibung
+//    status      → 'doc' | 'dev' | 'plan'
+//    automation  → 0–100 (%)
+//    link        → optional, öffnet Detailseite
+//    actor       → Badge-Text (optional, default = category.label)
+//    mvp         → true | false  (MVP-relevant)
+// ─────────────────────────────────────────────────────────
+const PROCESSES = [
+
+  // ── Mieter ──────────────────────────────────────────────
+  {
+    category: 'mieter', icon: '🪧', status: 'doc', automation: 95, mvp: true,
+    name: 'Namensschilder bestellen',
+    desc: 'Mieter bestellt Namensschilder für Klingel, Briefkasten oder Tür. Vollautomatische Abwicklung via Agent Swarms — kein manueller Eingriff bei Standardfällen.',
+    link: 'NamensschilderBestellen.html',
+  },
+  {
+    category: 'mieter', icon: '🔧', status: 'doc', automation: 80, mvp: true,
+    name: 'Schaden melden',
+    desc: 'Mieter meldet Schäden oder Mängel. KI klassifiziert, erkennt Duplikate und leitet via HITL oder Sofortbeauftragung an den Provider weiter — mit SLA-basierter Eskalation.',
+    link: 'SchadenMelden.html',
+  },
+  {
+    category: 'mieter', icon: '🔑', status: 'doc', automation: 75, mvp: true,
+    name: 'Zusatzobjekte mieten',
+    desc: 'Mieter oder Interessent beantragt Parkplatz, Lagerraum oder Gartenanteil. Verfügbarkeit und Owner-Policy prüfen, Warteliste bei Nichtverf&uuml;gbarkeit, Vertrag digital unterzeichnen, Zustellung SLA-gebunden.',
+    link: 'ZusatzobjekteMieten.html',
+  },
+  {
+    category: 'mieter', icon: '🚪', status: 'doc', automation: 55, mvp: true,
+    name: 'Kündigen',
+    desc: 'Mieter kündigt Mietverhältnis. Fristen automatisch prüfen, Übergabetermin koordinieren, Nachmietersuche und Instandstellung über Bewirtschaftung anstoßen.',
+    link: 'Kuendigen.html',
+  },
+  {
+    category: 'mieter', icon: '💬', status: 'doc', automation: 70, mvp: true,
+    name: 'Anfragen',
+    desc: 'Universeller Chat-Eingang und Triage-Layer. AI beantwortet Informationsanfragen direkt (Kat. A), routet Prozessabsichten (Kat. B) oder eskaliert an Bewirtschaftung (Kat. C).',
+    link: 'Anfragen.html',
+  },
+  {
+    category: 'mieter', icon: '📢', status: 'doc', automation: 50, mvp: true,
+    name: 'Reklamationen',
+    desc: 'Kategorie-Clustering, Governance-Hinweis (Hausordnung), Pattern-Erkennung bei Wiederholung. HITL wenn Mietpartei unklar oder Repeat-Threshold erreicht. Abmahnung bis Kündigung möglich.',
+    link: 'Reklamationen.html',
+  },
+  {
+    category: 'mieter', icon: '👤', status: 'doc', automation: 95, mvp: true,
+    name: 'Stammdaten ändern',
+    desc: 'Mieter aktualisiert Kontaktdaten, Kommunikationspräferenzen, Notfallkontakt oder Korrespondenzadresse. E-Mail-Änderungen mit Verifikationslink und Sicherheitsbenachrichtigung. 95% automatisiert, kein HITL.',
+    link: 'Stammdaten.html',
+  },
+  {
+    category: 'mieter', icon: '📑', status: 'plan', automation: 60,
+    name: 'Vertragsänderung beantragen',
+    desc: 'Mieter beantragt Änderung von Fläche, Nutzung oder Laufzeit. Prüfung gegen Owner-Policy, Eigentümer-Genehmigung einholen, Vertragsanpassung und BOS-Aktualisierung.',
+  },
+  {
+    category: 'mieter', icon: '🤝', status: 'plan', automation: 65,
+    name: 'Untermiete beantragen',
+    desc: 'Mieter beantragt Untervermietung. Richtlinienprüfung via Owner-Policy, Eigentümergenehmigung einholen, Vertragsanpassung und Untermieterdaten im BOS erfassen.',
+  },
+  {
+    category: 'mieter', icon: '⏰', status: 'plan', automation: 78,
+    name: 'Optionen ausüben',
+    desc: 'Mieter übt vertraglich vereinbarte Optionen aus (z. B. Verlängerungs- oder Kaufoption). Automatische Prüfung der Bedingungen, Fristen und Gültigkeitsstatus im BOS.',
+  },
+  {
+    category: 'mieter', icon: '💳', status: 'plan', automation: 55,
+    name: 'Ratenzahlung beantragen',
+    desc: 'Mieter beantragt Ratenzahlung für ausstehende Beträge. Bonitätsprüfung, Prüfung gegen Owner-Policy-Limite, Zahlungsplan erstellen und im BOS verankern.',
+  },
+
+  // ── Eigentümer ───────────────────────────────────────────
+  {
+    category: 'eigentuemer', icon: '📊', status: 'doc', automation: 95, mvp: true,
+    name: 'Portfolio-Report',
+    desc: 'KPI-Refresh (event-basiert + täglich), monatlicher PDF-Report und jährlicher Jahresabschluss. Fünf KPIs: Portfoliowert, Nettorendite, Cashflow, Mieteinnahmen, Leerstandsquote. 95% automatisiert, kein HITL.',
+    link: 'PortfolioReport.html',
+  },
+  {
+    category: 'eigentuemer', icon: '💰', status: 'doc', automation: 50, mvp: true,
+    name: 'Budgetgenehmigung',
+    desc: 'Agent generiert drei Szenarien (Pessimistisch/Basis/Optimistisch) auf Basis von BOS-Daten und externen Indexdaten. Bewirtschaftung reicht ein, Eigentümer wählt Szenario und genehmigt via Portal oder persönlich.',
+    link: 'Budgetgenehmigung.html',
+  },
+  {
+    category: 'eigentuemer', icon: '📈', status: 'doc', automation: 40, mvp: true,
+    name: 'Investitionsentscheid',
+    desc: 'Trigger: Schaden melden (Sub-Prozess), Eigentümer oder Bewirtschaftung direkt. Bewirtschaftung holt 3 Anbieter-Offerten ein, Agent vergleicht systematisch und empfiehlt. Eigentümer entscheidet via Portal.',
+    link: 'Investitionsentscheid.html',
+  },
+  {
+    category: 'eigentuemer', icon: '🌱', status: 'plan', automation: 85, mvp: true,
+    name: 'ESG-Reporting',
+    desc: 'Automatisches Erstellen von GRESB- und CRREM-konformen Berichten aus Verbrauchsdaten und Asset-Informationen direkt aus dem BOS.',
+  },
+  {
+    category: 'eigentuemer', icon: '⚡', status: 'plan', automation: 88,
+    name: 'Verbrauchsanalyse',
+    desc: 'Energieverbrauch je Space und Asset kontinuierlich analysieren, Anomalien erkennen, Optimierungspotenziale mit Benchmark-Daten aufzeigen.',
+  },
+
+  // ── Bewirtschaftung · Vermietungszyklus ─────────────────
+  {
+    category: 'bewirtschaftung', icon: '📣', status: 'doc', automation: 75, mvp: true,
+    name: 'Inserat & Vermarktung', link: 'InseratVermarktung.html',
+    desc: 'Folgeprozess Kündigung. Objekt aufbereiten, Inserat generieren, Interessenten qualifizieren, Besichtigungen koordinieren. Erstvermietung als Variante (Flag) integriert.',
+  },
+  {
+    category: 'bewirtschaftung', icon: '📋', status: 'doc', automation: 65, mvp: true,
+    name: 'Mietvertrag & Einzug', link: 'MietvertragEinzug.html',
+    desc: 'Amtliches Formular aus BOS generieren, digitale Unterzeichnung aller Mietparteien, Sicherheitsleistung, Übergabe via Sorglosfee, 10-tägige Mängelfrist.',
+  },
+  {
+    category: 'bewirtschaftung', icon: '🔐', status: 'doc', automation: 70, mvp: true,
+    name: 'Schlussabrechnung & Sicherheitsleistung',
+    desc: 'Folgeprozess Kündigung. Schlussabrechnung erstellen, Sorglosfee-Mängel verrechnen, Sicherheitsleistung prüfen und auflösen.',
+    link: 'Schlussabrechnung.html',
+  },
+
+  // ── Bewirtschaftung · Laufend ────────────────────────────
+  {
+    category: 'bewirtschaftung', icon: '🧾', status: 'doc', automation: 60, mvp: true,
+    name: 'Nebenkostenabrechnung',
+    desc: 'Jährliche NK-Abrechnung automatisch erstellen: Verbrauchsdaten, Schlüsselverteilung, Abstimmung mit Kreditoren, digitaler Versand an Mieter.',
+    link: 'Nebenkostenabrechnung.html',
+  },
+  {
+    category: 'bewirtschaftung', icon: '📈', status: 'doc', automation: 70, mvp: true,
+    name: 'Mietzinsanpassung',
+    desc: 'Mietzinsanpassungen auf Basis Referenzzinssatz-Änderung oder Indexklausel. Agent berechnet zulässige Anpassung, erstellt Mitteilung, versendet fristgerecht.',
+    link: 'Mietzinsanpassung.html',
+  },
+  {
+    category: 'bewirtschaftung', icon: '📬', status: 'doc', automation: 80, mvp: true,
+    name: 'Posteingang-Scanning',
+    desc: 'Physische Post automatisch scannen, per OCR und KI kategorisieren, im DMS ablegen und priorisierten Task erstellen. Kein Notification-Kanal — maximale Transparenz über Dashboard.',
+    link: 'PosteingangScanning.html',
+  },
+  {
+    category: 'bewirtschaftung', icon: '⚠️', status: 'doc', automation: 65, mvp: true,
+    name: 'Mahnwesen',
+    desc: 'Zahlungsverzug erkennen, Zahlungserinnerung und Mahnung 1 automatisch versenden, Mahnung 2 / OR Art. 257d-Androhung mit Bewi-Review, Betreibungsbegehren oder Kündigung auslösen.',
+    link: 'Mahnwesen.html',
+  },
+  {
+    category: 'bewirtschaftung', icon: '📮', status: 'doc', automation: 50, mvp: true,
+    name: 'Kündigung durch Bewirtschaftung',
+    desc: 'Kündigung seitens Vermieter. Drei Auslöser: Zahlungsverzug (VSZV nach Mahnwesen), Vertragsverletzung (nach Abmahnung), Eigenbedarf/Ordentlich (Eigentümer-Entscheid). Fristen und Formvorschriften je Auslöser.',
+    link: 'KuendigungBewirtschaftung.html',
+  },
+
+  {
+    category: 'bewirtschaftung', icon: '🔧', status: 'doc', automation: 75, mvp: true,
+    name: 'Serviceverträge',
+    link: 'Servicevertraege.html',
+    desc: 'Serviceverträge je Liegenschaft verwalten. Policy definiert notwendige Vertragsarten. Agent überwacht Laufzeiten, fehlende Rechnungseingänge und Anomalien und alarmiert proaktiv via Task.',
+  },
+
+  // ── Bewirtschaftung · Finanzen ───────────────────────────
+  {
+    category: 'bewirtschaftung', icon: '💳', status: 'doc', automation: 90, mvp: true,
+    name: 'Debitoren',
+    desc: 'Monatliche Bruttomietzins-Rechnungen via Finanzsystem-API generieren und versenden, Zahlungseingänge empfangen und abgleichen, Sonderpositionen als Einzelrechnungen, Mahnwesen triggern.',
+    link: 'Debitoren.html',
+  },
+  {
+    category: 'bewirtschaftung', icon: '🗂️', status: 'doc', automation: 70, mvp: true,
+    name: 'Kreditoren',
+    desc: 'Eingangsrechnungen automatisch kontieren und plausibilisieren (Schaden-Prozess, Service-Verträge, Historik), NK-Relevanz klassifizieren, betragsgestaffelte Freigabe, Zahlung via Finanzsystem-API.',
+    link: 'Kreditoren.html',
+  },
+
+  // ── Lieferant ────────────────────────────────────────────
+  {
+    category: 'lieferant', icon: '📦', status: 'doc', automation: 85, mvp: true,
+    name: 'Auftragsabwicklung',
+    link: 'Auftragsabwicklung.html',
+    desc: 'Aufträge an externe Lieferanten oder die Sorglosfee übermitteln, Ausführung überwachen, Abschluss via Kreditoren-Prozess (extern) oder Direktbuchung (Sorglosfee).',
+  },
+  {
+    category: 'lieferant', icon: '⭐', status: 'doc', automation: 85, mvp: true,
+    name: 'Lieferantenbewertung',
+    link: 'Lieferantenbewertung.html',
+    desc: 'Agent prüft laufend im Hintergrund Bewertungen je Lieferant und eskaliert bei erkannten Mustern an Bewirtschaftung. Mieter bewertet freiwillig nach jedem Auftrag.',
+  },
+
+  {
+    category: 'bewirtschaftung', icon: '🛡️', status: 'plan', automation: 71,
+    name: 'Versicherungsfall',
+    desc: 'Schaden erfassen und klassifizieren, Versicherung via API benachrichtigen, Dokumentation aus dem BOS zusammenstellen und tracken.',
+  },
+
+  // ── On- & Offboarding Factory ────────────────────────────
+  {
+    category: 'onboarding', icon: '🏛️', status: 'doc', automation: 35, mvp: true,
+    name: 'Mandat-Onboarding', link: 'MandatOnboarding.html',
+    desc: 'Herzstück des BOS. 6 Phasen, 5 Gates: Vertrag & Vollmachten → Finanzielles Setup & Policies → Vorverwalter-Übergabe & Delta-Prüfung → Data Factory → Objektbesichtigung & Zustandsaufnahme → Go-Live.',
+  },
+  {
+    category: 'onboarding', icon: '🏢', status: 'plan', automation: 70, mvp: true,
+    name: 'Objekt-Onboarding',
+    desc: 'Datenerhebung je Liegenschaft aus AV-Online, Geodaten, Grundrissen und Dokumenten. Vollständigkeitsprüfung aller Pflichtfelder für abhängige Prozesse (Debitoren, Kreditoren, NK-Abrechnung, Serviceverträge).',
+  },
+  {
+    category: 'onboarding', icon: '👤', status: 'plan', automation: 70, mvp: true,
+    name: 'Mieter-Onboarding', link: 'MieterOnboarding.html',
+    desc: 'Maximale Portal-Registrierungsrate (Ziel ≥ 99%) via Multi-Channel-Strategie: Magic Link → SMS → Physischer Brief → HITL. Portal ist der einzige Kanal für NK-Abrechnung und Schadensmeldungen — starker Nutzungsanreiz.',
+  },
+  {
+    category: 'onboarding', icon: '🔧', status: 'plan', automation: 65, mvp: true,
+    name: 'Lieferanten-Onboarding',
+    desc: 'Bestehende Lieferanten und Serviceverträge aus Vorverwalter-Unterlagen strukturieren, Lieferantenprofile anlegen und mit Servicevertrags-Prozess verknüpfen.',
+  },
+  {
+    category: 'onboarding', icon: '🚪', status: 'plan', automation: 40,
+    name: 'Mandat-Offboarding',
+    desc: 'Geordnete Übergabe bei Mandatsende: Abschluss offener Prozesse, Datenexport für Nachfolger-Verwalter, Kommunikation an Mieter und Lieferanten, Konten-Abschluss.',
+  },
+
+];
+
+// ─────────────────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────────────────
+const STATUS_LABEL = { doc:'Dokumentiert', dev:'In Entwicklung', plan:'Geplant' };
+const STATUS_CLS   = { doc:'sb-doc', dev:'sb-dev', plan:'sb-plan' };
+
+function avgAuto(list) {
+  return Math.round(list.reduce((s,p) => s + p.automation, 0) / list.length);
+}
+
+function buildCard(p, cat) {
+  const isDoc  = p.status === 'doc';
+  const actor  = p.actor || cat.label;
+  const linked = !!p.link;
+
+  return `
+  <div class="pCard${linked ? ' clickable' : ''}${isDoc ? ' doc-card' : ''}"
+       style="--ac:${isDoc ? '#08ccab' : cat.color};--ac-rgb:${isDoc ? '8,204,171' : cat.rgb}"
+       data-mvp="${p.mvp ? 'true' : 'false'}"
+       ${linked ? `onclick="location.href='${p.link}'"` : ''}>
+    <div class="ct">
+      <div class="ci">${p.icon}</div>
+      <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end">
+        ${p.sub  ? '<span class="sb sb-sub">Subprocess</span>' : ''}
+        ${p.mvp ? '<span class="sb sb-mvp">MVP</span>' : ''}
+        <span class="sb ${STATUS_CLS[p.status]}">${STATUS_LABEL[p.status]}</span>
+      </div>
+    </div>
+    <div class="cn">${p.name}</div>
+    <div class="cd">${p.desc}</div>
+    <div class="abar">
+      <div class="abar-track"><div class="abar-fill" style="width:${p.automation}%"></div></div>
+      <span class="abar-pct">${p.automation} %</span>
+    </div>
+    <div class="cf">
+      <span class="ab">${actor}</span>
+      ${linked ? `<a class="vl" href="${p.link}">Prozess ansehen →</a>` : ''}
+    </div>
+  </div>`;
+}
+
+function render() {
+  // Stats
+  const doc  = PROCESSES.filter(p => p.status === 'doc').length;
+  const dev  = PROCESSES.filter(p => p.status === 'dev').length;
+  const plan = PROCESSES.filter(p => p.status === 'plan').length;
+  const mvp  = PROCESSES.filter(p => p.mvp).length;
+  const auto = avgAuto(PROCESSES);
+  document.getElementById('s-total').textContent = PROCESSES.length;
+  document.getElementById('s-doc').textContent   = doc;
+  document.getElementById('s-dev').textContent   = dev;
+  document.getElementById('s-plan').textContent  = plan;
+  document.getElementById('s-mvp').textContent   = mvp;
+  document.getElementById('s-auto').textContent  = auto + ' %';
+  document.getElementById('hd-meta').textContent = `${PROCESSES.length} Prozesse · ${CATEGORIES.length} Akteure`;
+
+  // Filter buttons
+  const filterEl = document.getElementById('filter');
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'fb';
+    btn.dataset.f = cat.id;
+    btn.onclick = () => setFilter(cat.id, btn);
+    btn.innerHTML = `<span class="fd" style="background:${cat.color}"></span>${cat.label.replace(/-Prozesse|Prozesse/,'').trim()}`;
+    filterEl.appendChild(btn);
+  });
+
+  // Sections
+  const content = document.getElementById('content');
+  CATEGORIES.forEach(cat => {
+    const procs = PROCESSES.filter(p => p.category === cat.id);
+    if (!procs.length) return;
+    const avg = avgAuto(procs);
+    const section = document.createElement('div');
+    section.className = 'cat-section';
+    section.dataset.cat = cat.id;
+    section.innerHTML = `
+      <div class="cat-header">
+        <span class="code-badge"># ${cat.code}</span>
+        <h3 class="text-sm font-bold tracking-widest uppercase" style="color:var(--color-vision);letter-spacing:2px">${cat.label}</h3>
+        <span class="cat-count">${procs.length}</span>
+        <span class="cat-auto">Ø ${avg} % automatisiert</span>
+      </div>
+      <div class="pGrid">${procs.map(p => buildCard(p, cat)).join('')}</div>`;
+    content.appendChild(section);
+  });
+}
+
+// ─────────────────────────────────────────────────────────
+//  FILTER
+// ─────────────────────────────────────────────────────────
+function setFilter(f, btn) {
+  document.querySelectorAll('.fb').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = b.style.borderColor = b.style.color = '';
+  });
+  btn.classList.add('active');
+  const cat = CATEGORIES.find(c => c.id === f);
+  if (f === 'mvp') {
+    btn.style.background  = 'rgba(245,158,11,0.18)';
+    btn.style.borderColor = 'rgba(245,158,11,0.5)';
+    btn.style.color       = '#f59e0b';
+  } else if (cat) {
+    btn.style.background   = cat.color + '22';
+    btn.style.borderColor  = cat.color + '66';
+    btn.style.color        = '#fff';
+  } else {
+    btn.style.background  = 'rgba(255,255,255,0.12)';
+    btn.style.borderColor = 'rgba(255,255,255,0.25)';
+    btn.style.color       = '#fff';
+  }
+  // reset card-level fhide first
+  document.querySelectorAll('.pCard').forEach(c => c.classList.remove('fhide'));
+
+  if (f === 'mvp') {
+    document.querySelectorAll('.pCard').forEach(c => {
+      if (c.dataset.mvp !== 'true') c.classList.add('fhide');
+    });
+    document.querySelectorAll('.cat-section').forEach(sec => {
+      const hasVisible = sec.querySelectorAll('.pCard:not(.fhide)').length > 0;
+      sec.classList.toggle('fhide', !hasVisible);
+    });
+  } else {
+    document.querySelectorAll('.cat-section').forEach(sec => {
+      sec.classList.toggle('fhide', f !== 'all' && sec.dataset.cat !== f);
+    });
+  }
+}
+
+render();
+lucide.createIcons();
+</script>
+</body>
+</html>

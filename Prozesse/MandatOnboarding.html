@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prozess · REC Space Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--bg-base:#060b1a;--bg-radial-center:#0a1128;--bg-radial-edge:#03060f;--color-vision:#08ccab;--color-gold:#f59e0b;--color-cyan:#0ea5e9}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#e2e8f0;background:var(--bg-base);background-image:radial-gradient(circle at 50% 20%,var(--bg-radial-center) 0%,var(--bg-radial-edge) 100%);min-height:100vh}
+h1,h2,h3,h4{color:#f8fafc;font-weight:700}
+.mono{font-family:'JetBrains Mono',monospace}
+.text-gradient{background:linear-gradient(130deg,#f43f5e 20%,#f97316 55%,#f59e0b 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.glow{text-shadow:0 0 30px rgba(255,255,255,.25)}
+.code-badge{background:rgba(99,156,255,.10);border:1px solid rgba(99,156,255,.20);color:#93c5fd;padding:.18rem .65rem;border-radius:9999px;font-family:'JetBrains Mono',monospace;font-size:.78rem;display:inline-block}
+#topbar{padding:18px 56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(6,11,26,.7);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.back-link{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#64748b;text-decoration:none;transition:color .15s}
+.back-link:hover{color:var(--color-vision)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:11px;color:#334155;font-family:'JetBrains Mono',monospace}
+.breadcrumb span{color:#475569}
+.bc-active{color:var(--color-vision) !important}
+#hero{padding:32px 56px 24px;border-bottom:1px solid rgba(255,255,255,.05);position:relative;overflow:hidden}
+#hero::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:300px;background:radial-gradient(ellipse,rgba(244,63,94,.06) 0%,transparent 60%);pointer-events:none}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--color-vision);background:rgba(8,204,171,.10);padding:4px 12px;border-radius:9999px;border:1px solid rgba(8,204,171,.22);font-family:'JetBrains Mono',monospace}
+.hd-dot{width:6px;height:6px;border-radius:50%;background:var(--color-vision);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.sb{font-size:9px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;padding:3px 10px;border-radius:9999px;white-space:nowrap;font-family:'JetBrains Mono',monospace}
+.sb-doc{background:rgba(8,204,171,.15);color:#08ccab;border:1px solid rgba(8,204,171,.3)}
+.sb-plan{background:rgba(255,255,255,.05);color:#475569;border:1px solid rgba(255,255,255,.08)}
+.sb-mvp{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.35)}
+#tab-nav{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(6,11,26,.5);backdrop-filter:blur(10px);padding:0 56px;position:sticky;top:60px;z-index:90}
+.tab-btn{padding:14px 24px;font-size:13px;font-weight:600;color:#475569;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:7px;font-family:'Segoe UI',sans-serif}
+.tab-btn:hover{color:#94a3b8}
+.tab-btn.active{color:var(--color-vision);border-bottom-color:var(--color-vision)}
+.tab-btn i{width:15px;height:15px}
+.tab-panel{display:none;padding:40px 56px 80px}
+.tab-panel.active{display:block}
+#svg-wrapper{border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:0 0 0 1px rgba(8,204,171,.08), 0 24px 64px rgba(0,0,0,.6)}
+#svg-container{width:100%;min-height:560px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+#svg-placeholder{text-align:center;padding:60px 40px}
+.svg-hint{font-family:'JetBrains Mono',monospace;font-size:12px;color:#334155;margin-top:20px;line-height:2;text-align:left;display:inline-block}
+.svg-hint span{color:var(--color-vision)}
+.section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--color-vision);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+.prose{font-size:13px;color:#94a3b8;line-height:1.8;margin-bottom:28px}
+.actor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:32px}
+.actor-card{background:rgba(10,15,30,.65);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px;position:relative;overflow:hidden}
+.actor-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac)}
+.actor-name{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:2px}
+.actor-role{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ac);margin-bottom:10px;font-family:'JetBrains Mono',monospace}
+.actor-resp{font-size:11px;color:#64748b;line-height:1.6}
+/* Gate-Chain */
+.gate-chain{display:flex;flex-direction:column;gap:0;margin-bottom:32px}
+.gate-row{display:flex;align-items:stretch;gap:0}
+.gate-card{flex:1;background:rgba(10,15,30,.55);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
+.gate-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:rgba(var(--gc-rgb),.8)}
+.gate-label{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(var(--gc-rgb),1);margin-bottom:4px}
+.gate-title{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:4px}
+.gate-desc{font-size:11px;color:#64748b;line-height:1.5}
+.gate-blocker{font-size:10px;font-weight:700;color:#f43f5e;font-family:'JetBrains Mono',monospace;margin-top:8px;display:flex;align-items:center;gap:4px}
+.gate-arrow{display:flex;align-items:center;justify-content:center;padding:0 4px;color:#1e293b;font-size:18px;flex-shrink:0;align-self:center}
+/* Phase */
+.phases-grid{display:flex;flex-direction:column;gap:20px;margin-bottom:32px}
+.phase-card{background:rgba(10,15,30,.5);border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden}
+.phase-header{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.02)}
+.phase-num{min-width:32px;height:26px;padding:0 8px;border-radius:6px;background:rgba(var(--pc-rgb),.2);border:1px solid rgba(var(--pc-rgb),.4);color:var(--pc);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.phase-title{font-size:13px;font-weight:700;color:#f1f5f9}
+.phase-par{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#475569;font-family:'JetBrains Mono',monospace;margin-left:auto;border:1px solid rgba(255,255,255,.08);padding:2px 8px;border-radius:9999px}
+.phase-body{padding:16px 20px}
+.step-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.step-item{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:#94a3b8;line-height:1.6}
+.step-n{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#475569;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'JetBrains Mono',monospace}
+.step-main{font-weight:600;color:#cbd5e1}
+.step-branches{margin-top:6px;padding-left:4px;display:flex;flex-direction:column;gap:4px}
+.branch{font-size:11px;display:flex;gap:6px;align-items:flex-start}
+.branch-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.branch-yes{background:#10b981}
+.branch-no{background:#f43f5e}
+.branch-alt{background:#f59e0b}
+.branch-text{color:#64748b}
+.branch-condition{font-weight:600;color:#94a3b8}
+/* Attr */
+.attr-section{margin-bottom:32px}
+.attr-section-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.attr-section-num{width:24px;height:24px;border-radius:6px;background:rgba(var(--asc-rgb),.2);border:1px solid rgba(var(--asc-rgb),.35);color:var(--asc);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.attr-section-title{font-size:13px;font-weight:700;color:#f1f5f9}
+.attr-section-sub{font-size:10px;color:#475569;font-family:'JetBrains Mono',monospace}
+table{width:100%;border-collapse:collapse;background:rgba(10,15,30,.55);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+thead th{padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#475569;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;font-family:'JetBrains Mono',monospace}
+tbody td{padding:9px 14px;font-size:12px;color:#94a3b8;border-bottom:1px solid rgba(255,255,255,.04)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+.td-attr{font-family:'JetBrains Mono',monospace;font-size:11px;color:#93c5fd}
+.td-type{font-family:'JetBrains Mono',monospace;font-size:11px;color:#64748b}
+.req-yes{color:#10b981;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.req-no{color:#334155;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.enum-section{margin-bottom:28px}
+.enum-title{font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:8px}
+.enum-block{background:rgba(10,15,30,.7);border:1px solid rgba(99,156,255,.15);border-radius:8px;padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#93c5fd;line-height:2}
+.enum-val{display:inline-block;background:rgba(99,156,255,.08);border:1px solid rgba(99,156,255,.15);border-radius:4px;padding:1px 7px;margin:2px 3px;color:#93c5fd}
+.val-table table{margin-top:0}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.10);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.20)}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="breadcrumb">
+    <a href="prozesslandkarte.html" class="back-link">
+      <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
+      Prozesslandkarte
+    </a>
+    <span style="color:#1e293b">/</span>
+    <span id="bc-cat"></span>
+    <span style="color:#1e293b">/</span>
+    <span id="bc-name" class="bc-active"></span>
+  </div>
+  <div class="code-badge" id="topbar-version"></div>
+</div>
+
+<div id="hero">
+  <div id="hero-tag" class="hero-tag"><span class="hd-dot"></span></div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:4px">
+    <div>
+      <h1 id="hero-title" class="text-3xl font-bold text-gradient glow" style="margin-bottom:8px"></h1>
+      <p id="hero-desc" class="text-sm" style="color:#64748b;max-width:680px;line-height:1.7"></p>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <div style="display:flex;gap:7px;align-items:center" id="hero-badges"></div>
+      <div style="display:flex;gap:16px;align-items:center" id="hero-meta"></div>
+    </div>
+  </div>
+</div>
+
+<nav id="tab-nav">
+  <button class="tab-btn active" onclick="showTab('prozess',this)">
+    <i data-lucide="git-branch"></i> Prozess
+  </button>
+  <button class="tab-btn" onclick="showTab('doku',this)">
+    <i data-lucide="file-text"></i> Dokumentation
+  </button>
+  <button class="tab-btn" onclick="showTab('attr',this)">
+    <i data-lucide="database"></i> Attributkatalog
+  </button>
+</nav>
+
+<div class="tab-panel active" id="tab-prozess">
+  <div id="svg-wrapper">
+  <div id="svg-container">
+    <div id="svg-placeholder">
+      <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <i data-lucide="git-fork" style="width:28px;height:28px;color:#334155"></i>
+      </div>
+      <p style="font-size:14px;font-weight:700;color:#475569;margin-bottom:6px">BPMN-Diagramm</p>
+      <p style="font-size:12px;color:#334155;margin-bottom:20px">SVG-Export hier einfügen</p>
+      <div class="svg-hint">diagramSrc: <span>'bpmn_MandatOnboarding.svg'</span></div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-doku">
+  <div style="max-width:900px">
+    <div class="section-title">Prozessübersicht</div>
+    <p class="prose" id="doc-overview"></p>
+    <div class="section-title">Abhängigkeitskette</div>
+    <div class="gate-chain" id="doc-gates"></div>
+    <div class="section-title">Beteiligte Akteure</div>
+    <div class="actor-grid" id="doc-actors"></div>
+    <div class="section-title">Prozessablauf</div>
+    <div class="phases-grid" id="doc-phases"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-attr">
+  <div style="max-width:1100px">
+    <div id="attr-sections"></div>
+    <div class="section-title" style="margin-top:40px">Enum-Definitionen</div>
+    <div id="attr-enums"></div>
+    <div class="section-title" style="margin-top:32px">Validierungsregeln</div>
+    <div class="val-table" id="attr-validations"></div>
+  </div>
+</div>
+
+<script>
+const PROCESS_DATA = {
+
+  name:          'Mandat-Onboarding',
+  nameEn:        'Mandate Onboarding',
+  category:      'On- & Offboarding Factory',
+  categoryColor: '#f43f5e',
+  categoryRgb:   '244,63,94',
+  status:        'plan',
+  mvp:           true,
+  automation:    35,
+  version:       '1.0',
+  backLink:      'prozesslandkarte.html',
+
+  diagramSrc:    'bpmn_MandatOnboarding.svg',
+  diagramInline: null,
+
+  overview: 'Mandat-Onboarding ist das Herzstück des BOS und orchestriert den vollständigen Mandatsstart über 6 Phasen und 5 Gates. Nach Vertragsunterzeichnung erhält der Eigentümer sofort einen Magic Link ins Portal — er wird geführt und sieht den Onboarding-Fortschritt live. Die Delta-Prüfung in Phase 3 stellt sicher, dass die Data Factory mit dem aktuellen Stand arbeitet, nicht mit dem Erstakten-Snapshot. Nach der Vollständigkeitsprüfung folgt die physische Objektbesichtigung (Tag X/Y, Voranmeldung, Fotos und Notizen — kein operativer Trigger). Die Befunde werden in einem strukturierten Bericht aufbereitet und in der Abschluss-Besprechung mit dem Eigentümer reviewed ("uns ist aufgefallen, dass ..."). Danach: Provider-Reset — bestehende Leistungen kündigen, neue organisieren. Besonderheit: Eine Mieterin oder ein Mieter des Hauses kann sich im Portal direkt als Sorglosfee bewerben (Mietvertrag-Nachtrag: Mietzinsreduktion gegen Hauswart-Pflichten). Erst nach abgeschlossenem Provider-Reset erfolgt der Go-Live.',
+
+  gates: [
+    {
+      label: 'Gate 1',
+      title: 'Vertrag & Vollmachten',
+      desc: 'Mandatsvertrag unterzeichnet, Vollmacht erteilt, Datenschutz-Einwilligung vorhanden.',
+      blocker: 'Ohne Vollmacht: keine Kontozugriffe, keine Rechtshandlungen, kein Prozessstart',
+      color: '#f43f5e', rgb: '244,63,94',
+    },
+    {
+      label: 'Gate 2',
+      title: 'Finanzielles Setup & Policies',
+      desc: 'Kontenplan erstellt, Bankzugriff eingerichtet, fiduziäres Konto eröffnet, alle Policies durch Eigentümer freigegeben.',
+      blocker: 'Ohne Kontenplan: kein Kreditoren-, kein Debitoren-, keine NK-Abrechnung',
+      color: '#f97316', rgb: '249,115,22',
+    },
+    {
+      label: 'Gate 3',
+      title: 'Vorverwalter-Übergabe',
+      desc: 'Akten vollständig übernommen und digitalisiert. Snapshot T0 gesetzt als Basis für die Delta-Prüfung kurz vor Go-Live.',
+      blocker: 'Ohne Übergabe: Data Factory hat keine Datengrundlage — Mieter-, Objekt- und Lieferantendaten fehlen',
+      color: '#f59e0b', rgb: '245,158,11',
+    },
+    {
+      label: 'Gate 4',
+      title: 'Vollständigkeitsprüfung (digital + physisch)',
+      desc: 'Alle Pflichtfelder je Objekt, Mieter und Lieferant befüllt. Objektbesichtigung aller Liegenschaften abgeschlossen (Gemeinschaftsbereiche vollständig, Wohnungen soweit zugänglich). Kombinierter Vollständigkeits-Score ≥ policy_min_vollstaendigkeit.',
+      blocker: 'Ohne Besichtigung und bestandene Prüfung: kein Go-Live — physischer Zustand unbekannt, Investitionsplanung unmöglich',
+      color: '#10b981', rgb: '16,185,129',
+    },
+    {
+      label: 'Gate 5',
+      title: 'Besprechung, Provider-Reset & Go-Live',
+      desc: 'Abschluss-Besprechung abgehalten. Provider-Reset abgeschlossen: alle Kündigungen versendet, neue Leistungen organisiert. Go-Live durch Eigentümer und Bewirtschaftung freigegeben.',
+      blocker: 'Kein Go-Live ohne Besprechung und abgeschlossenen Provider-Reset — operative Prozesse dürfen nicht mit falschen Leistungserbringern starten',
+      color: '#08ccab', rgb: '8,204,171',
+    },
+  ],
+
+  actors: [
+    { name:'Agent Swarms',   role:'Datenverarbeitung · Vollständigkeitsprüfung', color:'#4a8fff', rgb:'74,143,255', responsibilities:'Daten aus strukturierten und unstrukturierten Quellen verarbeiten (AV-Online, Geodaten, Dokumente); Sub-Prozesse Objekt-, Mieter-, Lieferanten-Onboarding orchestrieren; Vollständigkeitsprüfung aller Pflichtfelder durchführen' },
+    { name:'Bewirtschaftung',role:'Koordination · Vorverwalter · Go-Live',       color:'#0ea5e9', rgb:'14,165,233', responsibilities:'Gesamtprozess koordinieren; Kontakt mit Vorverwalter für Übergabe; analoge Unterlagen digitalisieren und hochladen; Go-Live-Kommunikation an Mieter und Lieferanten auslösen' },
+    { name:'Eigentümer',     role:'Vertrag · Vollmacht · Policy-Definition',     color:'#10b981', rgb:'16,185,129', responsibilities:'Mandatsvertrag unterzeichnen; Vollmacht erteilen; Bankkontozugriff gewähren; alle Policies (Mahnwesen, Kreditoren, Investition, Reporting) definieren und freigeben' },
+    { name:'Finanzsystem',   role:'Kontenplan · Bankzugriff',                    color:'#f97316', rgb:'249,115,22', responsibilities:'Fiduziäres Mieteinnahmenkonto eröffnen; Kontenplan je Liegenschaft anlegen; Bankzugriff-Schnittstelle einrichten; MWST-Status konfigurieren' },
+  ],
+
+  phases: [
+    {
+      num:'1', title:'Phase 1: Vertrag & Vollmachten',
+      color:'#f43f5e', rgb:'244,63,94', parallel: false,
+      steps:[
+        { n:1, main:'Mandatsvertrag aufsetzen', desc:'Bewirtschaftung erstellt Mandatsvertrag mit Leistungsumfang, Honorar, Laufzeit und Kündigungsfristen. Agent generiert Vertragsentwurf aus Objekt-Grunddaten und Eigentümer-Profil.' },
+        { n:2, main:'Vertrag und Vollmacht unterzeichnen', desc:'Eigentümer unterzeichnet Mandatsvertrag und Vollmacht (Zeichnungsberechtigung für Bewirtschaftung). Datenschutz-Einwilligung nach DSG wird gleichzeitig eingeholt. Dokumente im BOS archiviert.', branches:[
+          { type:'yes', condition:'Unterzeichnet', result:'Gate 1 erfüllt; Portal-Einladung wird sofort ausgelöst' },
+          { type:'no',  condition:'Verhandlung',   result:'Prozess bleibt in Status VERHANDLUNG; kein Weitergang' },
+        ]},
+        { n:3, main:'Eigentümer Portal-Onboarding', desc:'Agent sendet sofort einen Magic Link per E-Mail an den Eigentümer — kein Passwort nötig. Im Portal wird er durch einen Guided Wizard geführt:', branches:[
+          { type:'alt', condition:'Schritt 1 — Profil', result:'Name, Sprache, Kommunikationspräferenzen bestätigen' },
+          { type:'alt', condition:'Schritt 2 — Dokumente', result:'Vollmacht, DSG-Einwilligung und weitere Unterlagen direkt im Portal hochladen' },
+          { type:'alt', condition:'Schritt 3 — Policies', result:'Operative Policies Schritt für Schritt definieren und freigeben (Mahnwesen, NK, Reporting, ...)' },
+          { type:'alt', condition:'Schritt 4 — Onboarding-Dashboard', result:'Live-Ansicht des Gate-Status: was ist erledigt, was fehlt noch, voraussichtlicher Go-Live-Termin' },
+        ]},
+      ],
+    },
+    {
+      num:'2', title:'Phase 2: Finanzielles Setup & Policy-Definition',
+      color:'#f97316', rgb:'249,115,22', parallel: true,
+      steps:[
+        { n:1, main:'Finanzielles Setup', desc:'Finanzsystem richtet fiduziäres Mieteinnahmenkonto ein (OR Art. 400 — getrennte Vermögen). Kontenplan je Liegenschaft wird erstellt. Bankvollmacht und API-Zugriff für Zahlungsverkehr konfiguriert. MWST-Option geprüft und gesetzt.' },
+        { n:2, main:'Policy-Definition durch Eigentümer', desc:'Eigentümer legt alle operativen Policies fest, die für nachgelagerte Prozesse zwingend nötig sind:', branches:[
+          { type:'alt', condition:'Mahnwesen-Policy',     result:'Zahlungsfristen, Toleranzen, Eskalationsstufen' },
+          { type:'alt', condition:'Kreditoren-Policy',    result:'Konfidenz-Schwellwert, Freigabelimiten' },
+          { type:'alt', condition:'Investitions-Policy',  result:'Betragschwellen je Massnahmentyp' },
+          { type:'alt', condition:'Servicevertrags-Policy',result:'Pflichtvertragsarten je Liegenschaft' },
+          { type:'alt', condition:'Reporting-Policy',     result:'Frequenz, Empfänger, KPI-Auswahl' },
+        ]},
+        { n:3, main:'Gate 2 prüfen', desc:'Kontenplan erstellt UND alle Policies durch Eigentümer freigegeben → Phase 3 startet. Fehlt ein Element, bleibt der Prozess in Phase 2.', branches:[
+          { type:'yes', condition:'Vollständig', result:'Gate 2 erfüllt; Vorverwalter-Übergabe kann beginnen' },
+          { type:'no',  condition:'Offen',       result:'Bewirtschaftung mahnt Eigentümer oder Finanzsystem nach' },
+        ]},
+      ],
+    },
+    {
+      num:'3', title:'Phase 3: Vorverwalter-Übergabe',
+      color:'#f59e0b', rgb:'245,158,11', parallel: false,
+      steps:[
+        { n:1, main:'Übergabetermin koordinieren', desc:'Bewirtschaftung koordiniert Übergabetermin mit dem Vorverwalter. Übergabe-Checkliste wird vorbereitet: Mietverträge, Zahlungshistorie, offene Forderungen, laufende Kreditoren-Rechnungen, Serviceverträge, Schlüssel, Pläne, Korrespondenz.' },
+        { n:2, main:'Unterlagen übernehmen und digitalisieren', desc:'Physische Akten werden gescannt und im BOS hochgeladen. Digitale Daten vom Vorverwalter-System werden via Export oder API übernommen. Agent klassifiziert und strukturiert eingehende Dokumente automatisch. Zeitstempel T0 wird gesetzt (delta_referenzdatum) — Basis für die Delta-Prüfung kurz vor Go-Live.' },
+        { n:3, main:'Übergabe-Vollständigkeit prüfen', desc:'Bewirtschaftung bestätigt Übergabe als vollständig.', branches:[
+          { type:'yes', condition:'Vollständig', result:'Gate 3 erfüllt; Data Factory startet' },
+          { type:'no',  condition:'Lücken',      result:'Bewirtschaftung fordert fehlende Unterlagen beim Vorverwalter nach' },
+        ]},
+      ],
+    },
+    {
+      num:'4', title:'Phase 4: Data Factory',
+      color:'#4a8fff', rgb:'74,143,255', parallel: false,
+      steps:[
+        { n:1, main:'Objekt-Onboarding (Sub-Prozess)', desc:'Agent startet Objekt-Onboarding je Liegenschaft: AV-Online-Abfrage, Geodaten, Grundrisse, Gebäudedaten aus BFS und kantonalen Registern. Strukturierte Datenquellen werden automatisch verarbeitet; unstrukturierte Dokumente (Pläne, Fotos) durch KI extrahiert.' },
+        { n:2, main:'Mieter-Onboarding (Sub-Prozess)', desc:'Agent übernimmt alle bestehenden Mietverhältnisse aus den Vorverwalter-Unterlagen: Mieterdaten, Mietverträge, aktuelle Mietzinsen, Zahlungshistorie, Korrespondenz. Je Mieter wird ein vollständiger Datensatz im BOS angelegt.' },
+        { n:3, main:'Lieferanten-Onboarding (Sub-Prozess)', desc:'Agent erfasst alle bestehenden Lieferanten und Serviceverträge aus den übernommenen Unterlagen. Lieferantenprofile werden angelegt, Serviceverträge mit dem Servicevertrags-Prozess verknüpft.' },
+        { n:4, main:'Externe Datenquellen anreichern', desc:'Agent reichert Objektdaten mit externen Quellen an: Geodaten (Swisstopo), AV-Online (amtliche Vermessung), kantonale Grundbuchdaten, Energieausweise (GEAK), Lärmbelastungskataster.' },
+      ],
+    },
+    {
+      num:'5', title:'Phase 5: Vollständigkeitsprüfung & Objektbesichtigung',
+      color:'#10b981', rgb:'16,185,129', parallel: false,
+      steps:[
+        { n:1, main:'Pflichtfelder-Validierung', desc:'Agent prüft je Objekt, Mieter und Lieferant ob alle Pflichtfelder für die abhängigen operativen Prozesse vorhanden sind:', branches:[
+          { type:'alt', condition:'Debitoren / Mahnwesen', result:'IBAN Mieter, Mietbeginn, Bruttomietzins, Zahlungskanal' },
+          { type:'alt', condition:'Kreditoren',            result:'Lieferant-ID, Bankverbindung, UID/MWST-Nr.' },
+          { type:'alt', condition:'NK-Abrechnung',         result:'Nutzfläche je Einheit, NK-Schlüssel, Heizperiode' },
+          { type:'alt', condition:'Serviceverträge',       result:'Vertragsart, Laufzeit, Periodenbetrag, NK-Relevanz' },
+        ]},
+        { n:2, main:'Vollständigkeits-Score bewerten', desc:'Agent berechnet vollstaendigkeit_score (0–1) aus den vorliegenden Daten. Offene Positionen werden als Liste ausgegeben.', branches:[
+          { type:'yes', condition:'Score ≥ Schwellwert', result:'Besichtigung starten' },
+          { type:'no',  condition:'Kritische Lücken',    result:'Bewirtschaftung ergänzt fehlende Pflichtdaten; Agent re-validiert' },
+        ]},
+        { n:3, main:'Voranmeldung Besichtigung', desc:'Bewirtschaftung meldet sich für Tag X (Gemeinschaftsbereiche & Haustechnik) und Tag Y (Wohnungen, 24h-Ankündigung gem. OR Art. 257h) an. Termine werden koordiniert und Mieter via Portal/Brief informiert.' },
+        { n:4, main:'Besichtigung durchführen', desc:'Bewirtschaftung geht vor Ort durch alle Bereiche und erfasst Fotos sowie Zustandsnotizen per App je Objekt-ID und Raum-ID. Umfang: Eingang, Treppenhaus, Briefkästen, Türklingeln, Keller, Heizraum, Wasser, Elektro, Fassade und alle zugänglichen Einheiten.', branches:[
+          { type:'yes', condition:'Zugang gewährt', result:'Fotos und Zustandsnotizen je Bereich erfassen' },
+          { type:'no',  condition:'Zugang verweigert', result:'Vermerk im REC: "Besichtigung verweigert [Datum]" — kein weiterer Handlungsbedarf in dieser Phase' },
+        ]},
+        { n:5, main:'Besichtigungsbericht zusammenstellen', desc:'Agent aggregiert alle Fotos und Notizen in einen strukturierten Onboarding-Bericht je Liegenschaft. Kein operativer Trigger in dieser Phase — Befunde fliessen erst nach der Eigentümer-Besprechung in Massnahmen.' },
+      ],
+    },
+    {
+      num:'6', title:'Phase 6: Besprechung, Provider-Reset & Go-Live',
+      color:'#08ccab', rgb:'8,204,171', parallel: false,
+      steps:[
+        { n:1, main:'Delta-Prüfung: T0-Snapshot vs. aktueller Stand', desc:'Agent vergleicht automatisch den T0-Snapshot (Erstakten aus Vorverwalter-Übergabe) mit dem aktuellen Stand kurz vor Mandatsbeginn. Typische Deltas nach 3–6 Monaten:', branches:[
+          { type:'alt', condition:'Mieterwechsel',       result:'Kündigungen, Neueinzüge, Leerstände seit T0' },
+          { type:'alt', condition:'Mietzinsänderungen',  result:'Indexanpassungen, Vertragsänderungen' },
+          { type:'alt', condition:'Lieferanten-Delta',   result:'Neue oder gekündigte Serviceverträge' },
+          { type:'alt', condition:'Objekt-Delta',        result:'Bauliche Änderungen, neue Einheiten' },
+        ]},
+        { n:2, main:'Delta-Positionen klären', desc:'Bewirtschaftung reviewed jeden Delta-Eintrag: bestätigen, überschreiben oder zurückweisen. Alle Änderungen werden im BOS nachgeführt. Erst wenn delta_positionen_offen = 0: weiter mit Onboarding-Bericht.', branches:[
+          { type:'yes', condition:'Delta cleared',           result:'BOS ist auf aktuellem Stand; weiter mit Bericht' },
+          { type:'no',  condition:'Offene Delta-Positionen', result:'Bewirtschaftung klärt mit Vorverwalter oder Eigentümer' },
+        ]},
+        { n:3, main:'Strukturierten Onboarding-Bericht erstellen', desc:'Agent bereitet vollständigen Abschlussbericht vor: Datenvollständigkeit je Liegenschaft, Besichtigungs-Befunde (Fotos, Zustandsübersicht), Delta-Zusammenfassung, Übersicht bestehender Leistungen und Empfehlungen für Provider-Anpassungen. Bericht wird dem Eigentümer vorab im Portal bereitgestellt.' },
+        { n:4, main:'Abschluss-Besprechung mit Eigentümer', desc:'Bewirtschaftung trifft sich mit dem Eigentümer (Meeting oder Call). Review des Berichts: "Lieber Herr X, uns ist aufgefallen, dass ..." — Befunde, Delta-Änderungen, Empfehlungen, Entscheide zu Provider-Anpassungen. Eigentümer entscheidet welche Leistungen zu kündigen und welche neu zu organisieren sind.' },
+        { n:5, main:'Provider-Reset: Kündigungen bestehender Leistungen', desc:'Bewirtschaftung kündigt alle vom Vorverwalter übernommenen Leistungen, die nicht weitergeführt werden sollen (z.B. Hauswartung, Reinigung, Gartenpflege). Agent prüft Kündigungsfristen je Vertrag, generiert Kündigungsschreiben und trackt Bestätigungen.', branches:[
+          { type:'alt', condition:'Vertrag mit Kündigungsfrist', result:'Agent berechnet frühestmögliches Kündigungsdatum; Schreiben wird generiert und via Post/E-Mail versendet' },
+          { type:'alt', condition:'Vertrag bereits abgelaufen', result:'Kein Handlungsbedarf; Lieferant wird als INAKTIV markiert' },
+          { type:'alt', condition:'Vertrag soll weitergeführt werden', result:'Lieferant bleibt aktiv; Ansprechpartner wird auf neue Bewirtschaftung umgestellt' },
+        ]},
+        { n:6, main:'Provider-Reset: Neue Leistungen organisieren', desc:'Bewirtschaftung organisiert Ersatz- oder Neuleistungen gemäss Eigentümer-Entscheid. Neue Leistungserbringer werden als Lieferanten im BOS angelegt und via Servicevertrags-Prozess formalisiert.', branches:[
+          { type:'alt', condition:'Externe Lieferanten', result:'Angebote einholen; Auftrag via Auftragsabwicklung; Lieferanten-Onboarding starten' },
+          { type:'alt', condition:'Sorglosfee (extern)', result:'Sorglosfee-Task anlegen; Auftragsabwicklung übernimmt Koordination und Abrechnung' },
+          { type:'alt', condition:'Sorglosfee aus Mieterschaft', result:'Ausschreibung im Mieter-Portal: Bewohner können sich als Sorglosfee bewerben. Bewirtschaftung wählt Kandidat/in → Mietvertrag-Nachtrag (Mietzinsreduktion gegen definierte Hauswart-Pflichten) → im BOS als Lieferant/Sorglosfee registriert' },
+        ]},
+        { n:7, main:'Go-Live freigeben & Kommunikation', desc:'Eigentümer und Bewirtschaftung bestätigen Go-Live. Agent sendet automatisch: Begrüssungsschreiben an alle Mieter (neuer Verwalter, neue Zahlungsverbindung), Benachrichtigung an alle Lieferanten (neuer Ansprechpartner). Alle operativen Prozesse sind ab diesem Zeitpunkt aktiv.' },
+      ],
+    },
+  ],
+
+  attributes:[
+    {
+      n:1, section:'Mandat-Identifikation', sectionEn:'Mandate Identity',
+      color:'#f43f5e', rgb:'244,63,94',
+      fields:[
+        { attr:'mandat_id',            type:'String/UUID', req:true,  desc:'Eindeutige ID je Mandat' },
+        { attr:'eigentuemer_id',       type:'String/UUID', req:true,  desc:'Referenz auf Eigentümer-Datensatz im BOS' },
+        { attr:'status',               type:'Enum',        req:true,  desc:'Aktueller Onboarding-Status' },
+        { attr:'created_at',           type:'DateTime',    req:true,  desc:'Zeitpunkt der Mandat-Erstellung' },
+        { attr:'go_live_at',           type:'DateTime',    req:false, desc:'Zeitpunkt des Go-Live; null bis Phase 5 abgeschlossen' },
+      ],
+    },
+    {
+      n:2, section:'Vertrag & Vollmachten', sectionEn:'Contract & Powers of Attorney',
+      color:'#f43f5e', rgb:'244,63,94',
+      fields:[
+        { attr:'mandatsvertrag_doc_ref',        type:'String',   req:true,  desc:'BOS-Dokument-Referenz des unterzeichneten Mandatsvertrags' },
+        { attr:'mandatsvertrag_unterzeichnet_at',type:'DateTime', req:true,  desc:'Datum der Vertragsunterzeichnung — Gate 1 Trigger' },
+        { attr:'vollmacht_doc_ref',             type:'String',   req:true,  desc:'BOS-Referenz der Vollmachtsurkunde' },
+        { attr:'vollmacht_erteilt_at',          type:'DateTime', req:true,  desc:'Datum der Vollmachtserteilung' },
+        { attr:'datenschutz_einwilligung_at',   type:'DateTime', req:true,  desc:'Datum der DSG-Einwilligung' },
+      ],
+    },
+    {
+      n:3, section:'Finanzielles Setup', sectionEn:'Financial Setup',
+      color:'#f97316', rgb:'249,115,22',
+      fields:[
+        { attr:'finanzsystem_mandant_id',  type:'String',      req:true,  desc:'Mandant-ID im externen Finanzsystem' },
+        { attr:'kontenplan_erstellt_at',   type:'DateTime',    req:true,  desc:'Zeitpunkt der Kontenplan-Erstellung' },
+        { attr:'bankkonto_vollmacht_at',   type:'DateTime',    req:true,  desc:'Zeitpunkt der Bankzugriff-Einrichtung' },
+        { attr:'fiduziäres_konto_nr',      type:'String',      req:true,  desc:'IBAN des fiduziären Mieteinnahmenkontos (OR Art. 400)' },
+        { attr:'mwst_optiert',             type:'Boolean',     req:true,  desc:'true wenn Eigentümer für MWST optiert hat' },
+      ],
+    },
+    {
+      n:4, section:'Policy-Definition', sectionEn:'Policy Configuration',
+      color:'#f59e0b', rgb:'245,158,11',
+      fields:[
+        { attr:'policy_mahnwesen_ok',       type:'Boolean',  req:true, desc:'true wenn Mahnwesen-Policy durch Eigentümer freigegeben' },
+        { attr:'policy_kreditoren_ok',      type:'Boolean',  req:true, desc:'true wenn Kreditoren-Policy freigegeben' },
+        { attr:'policy_investition_ok',     type:'Boolean',  req:true, desc:'true wenn Investitions-Policy freigegeben' },
+        { attr:'policy_servicevertraege_ok',type:'Boolean',  req:true, desc:'true wenn Servicevertrags-Policy (Pflichtvertragsarten) freigegeben' },
+        { attr:'policy_reporting_ok',       type:'Boolean',  req:true, desc:'true wenn Reporting-Policy freigegeben' },
+        { attr:'policies_freigegeben_at',   type:'DateTime', req:false,desc:'Zeitpunkt der letzten Policy-Freigabe; Gate 2 komplett wenn alle flags true' },
+      ],
+    },
+    {
+      n:5, section:'Vorverwalter-Übergabe', sectionEn:'Predecessor Handover',
+      color:'#f59e0b', rgb:'245,158,11',
+      fields:[
+        { attr:'vorverwalter_name',          type:'String',   req:false, desc:'Name des abgebenden Verwaltungsunternehmens' },
+        { attr:'uebergabe_termin_at',        type:'DateTime', req:false, desc:'Vereinbarter Übergabetermin' },
+        { attr:'uebergabe_abgeschlossen_at', type:'DateTime', req:false, desc:'Zeitpunkt der bestätigten vollständigen Übergabe — Gate 3 Trigger' },
+        { attr:'uebergabe_vollstaendig',     type:'Boolean',  req:true,  desc:'true wenn Bewirtschaftung Vollständigkeit der Übergabe bestätigt hat' },
+        { attr:'uebergabe_anmerkungen',      type:'Text',     req:false, desc:'Offene Punkte, Lücken oder Besonderheiten der Übergabe' },
+      ],
+    },
+    {
+      n:6, section:'Data Factory', sectionEn:'Data Factory',
+      color:'#4a8fff', rgb:'74,143,255',
+      fields:[
+        { attr:'objekt_onboarding_ids',     type:'Array[UUID]', req:false, desc:'IDs der gestarteten Objekt-Onboarding-Prozesse' },
+        { attr:'mieter_onboarding_ids',     type:'Array[UUID]', req:false, desc:'IDs der gestarteten Mieter-Onboarding-Prozesse' },
+        { attr:'lieferanten_onboarding_ids',type:'Array[UUID]', req:false, desc:'IDs der gestarteten Lieferanten-Onboarding-Prozesse' },
+        { attr:'factory_gestartet_at',      type:'DateTime',    req:false, desc:'Zeitpunkt des Factory-Starts' },
+        { attr:'factory_abgeschlossen_at',  type:'DateTime',    req:false, desc:'Zeitpunkt wenn alle Sub-Prozesse abgeschlossen sind' },
+      ],
+    },
+    {
+      n:7, section:'Objektbesichtigung', sectionEn:'Property Inspection',
+      color:'#10b981', rgb:'16,185,129',
+      fields:[
+        { attr:'besichtigung_termin_x_at',           type:'DateTime', req:false, desc:'Angemeldeter Termin Tag X — Gemeinschaftsbereiche und Haustechnik' },
+        { attr:'besichtigung_termin_y_at',           type:'DateTime', req:false, desc:'Angemeldeter Termin Tag Y — Wohnungsbesichtigungen (24h gem. OR Art. 257h)' },
+        { attr:'besichtigung_einheiten_total',       type:'Integer',  req:false, desc:'Anzahl zu besichtigender Wohnungseinheiten' },
+        { attr:'besichtigung_einheiten_besucht',     type:'Integer',  req:false, desc:'Anzahl erfolgreich besichtigter Einheiten' },
+        { attr:'besichtigung_einheiten_verweigert',  type:'Integer',  req:false, desc:'Anzahl Einheiten mit verweigertem Zugang; je Einheit im REC vermerkt' },
+        { attr:'besichtigung_fotos_total',           type:'Integer',  req:false, desc:'Anzahl aufgenommener Fotos; je Objekt-ID / Raum-ID im Knowledge Graph verknüpft' },
+        { attr:'besichtigung_abgeschlossen_at',      type:'DateTime', req:false, desc:'Zeitpunkt der Besichtigungs-Abschluss — Gate 4 Trigger' },
+        { attr:'besichtigung_bericht_ref',           type:'String',   req:false, desc:'BOS-Referenz des aggregierten Besichtigungsberichts' },
+      ],
+    },
+    {
+      n:8, section:'Besprechung & Provider-Reset', sectionEn:'Owner Review & Provider Reset',
+      color:'#08ccab', rgb:'8,204,171',
+      fields:[
+        { attr:'vollstaendigkeit_score',            type:'Decimal 0–1', req:false, desc:'Anteil befüllter Pflichtfelder; Gate 4 relevant' },
+        { attr:'offene_pflichtfelder',              type:'Integer',     req:false, desc:'Anzahl noch fehlender Pflichtfelder' },
+        { attr:'besprechung_bericht_ref',           type:'String',      req:false, desc:'BOS-Referenz des finalen Onboarding-Berichts' },
+        { attr:'besprechung_termin_at',             type:'DateTime',    req:false, desc:'Vereinbarter Termin der Abschluss-Besprechung' },
+        { attr:'besprechung_abgeschlossen_at',      type:'DateTime',    req:false, desc:'Zeitpunkt der abgehaltenen Besprechung' },
+        { attr:'besprechung_anmerkungen',           type:'Text',        req:false, desc:'Kommentare und Provider-Entscheide des Eigentümers' },
+        { attr:'provider_reset_kuendigungen_total', type:'Integer',     req:false, desc:'Anzahl zu kündigender Leistungsverträge' },
+        { attr:'provider_reset_kuendigungen_sent',  type:'Integer',     req:false, desc:'Anzahl versendeter Kündigungsschreiben' },
+        { attr:'provider_reset_neu_total',          type:'Integer',     req:false, desc:'Anzahl neu zu organisierender Leistungen' },
+        { attr:'provider_reset_neu_abgeschlossen',  type:'Integer',     req:false, desc:'Anzahl abgeschlossener Neuorganisationen (Lieferant im BOS angelegt)' },
+        { attr:'sorglosfee_ausschreibung_at',       type:'DateTime',    req:false, desc:'Zeitpunkt der Sorglosfee-Ausschreibung im Mieter-Portal (falls Bewerbung aus Mieterschaft)' },
+        { attr:'sorglosfee_mieter_id',              type:'String/UUID', req:false, desc:'Mieter-ID des gewählten Sorglosfee-Kandidaten; null wenn externe Lösung' },
+        { attr:'provider_reset_abgeschlossen_at',   type:'DateTime',    req:false, desc:'Zeitpunkt des abgeschlossenen Provider-Resets — Gate 5 Trigger' },
+        { attr:'go_live_freigegeben_at',            type:'DateTime',    req:false, desc:'Zeitpunkt der Go-Live-Freigabe durch Eigentümer und Bewirtschaftung' },
+        { attr:'kommunikation_mieter_at',           type:'DateTime',    req:false, desc:'Zeitpunkt des Begrüssungsschreibens an alle Mieter' },
+        { attr:'kommunikation_lieferanten_at',      type:'DateTime',    req:false, desc:'Zeitpunkt der Benachrichtigung an alle Lieferanten' },
+        { attr:'policy_min_vollstaendigkeit',       type:'Decimal 0–1', req:true,  desc:'Minimaler Score für Go-Live-Freigabe (Standard: 0.90)' },
+      ],
+    },
+    {
+      n:8, section:'Eigentümer Portal-Onboarding', sectionEn:'Owner Portal Onboarding',
+      color:'#f43f5e', rgb:'244,63,94',
+      fields:[
+        { attr:'portal_einladung_at',             type:'DateTime', req:false, desc:'Zeitpunkt des versendeten Magic Links an den Eigentümer' },
+        { attr:'portal_wizard_schritt',           type:'Integer',  req:false, desc:'Aktueller Wizard-Schritt (1–4); 4 = vollständig abgeschlossen' },
+        { attr:'portal_wizard_abgeschlossen_at',  type:'DateTime', req:false, desc:'Zeitpunkt der vollständigen Wizard-Abschluss (alle 4 Schritte)' },
+        { attr:'portal_dokumente_hochgeladen',    type:'Boolean',  req:false, desc:'true wenn Eigentümer alle Dokumente im Portal hochgeladen hat' },
+        { attr:'portal_einladung_reminder_count', type:'Integer',  req:false, desc:'Anzahl gesendeter Reminder (max. 3, danach HITL-Eskalation an Bewirtschaftung)' },
+        { attr:'portal_login_at',                 type:'DateTime', req:false, desc:'Zeitpunkt des ersten Portal-Logins via Magic Link' },
+      ],
+    },
+    {
+      n:9, section:'Delta-Management', sectionEn:'Delta Management',
+      color:'#f59e0b', rgb:'245,158,11',
+      fields:[
+        { attr:'delta_referenzdatum',        type:'DateTime', req:false, desc:'T0: Zeitstempel der Erstakten-Erhebung beim Vorverwalter (Snapshot-Basis)' },
+        { attr:'delta_bericht_erstellt_at',  type:'DateTime', req:false, desc:'Zeitpunkt der automatischen Delta-Analyse durch den Agent' },
+        { attr:'delta_positionen_total',     type:'Integer',  req:false, desc:'Gesamtanzahl erkannter Delta-Positionen zwischen T0 und aktuellem Stand' },
+        { attr:'delta_positionen_offen',     type:'Integer',  req:false, desc:'Noch nicht geklärte Delta-Positionen; Gate 3 benötigt Wert = 0' },
+        { attr:'delta_clearance_at',         type:'DateTime', req:false, desc:'Zeitpunkt der vollständigen Delta-Clearance durch Bewirtschaftung — Gate 3 Trigger' },
+        { attr:'delta_anmerkungen',          type:'Text',     req:false, desc:'Freitext-Notizen zu wesentlichen Delta-Positionen oder Klärungen' },
+      ],
+    },
+  ],
+
+  enums:[
+    { name:'Status', values:['VERHANDLUNG','VERTRAG_UNTERZEICHNET','PORTAL_ONBOARDING','SETUP_AKTIV','UEBERGABE','DELTA_PRUEFUNG','DATA_FACTORY','BESICHTIGUNG','VOLLSTAENDIGKEITSPRUEFUNG','BESPRECHUNG','PROVIDER_RESET','GO_LIVE','ABGEBROCHEN'] },
+    { name:'WizardSchritt', values:['1_PROFIL','2_DOKUMENTE','3_POLICIES','4_DASHBOARD','ABGESCHLOSSEN'] },
+    { name:'DeltaPositionStatus', values:['OFFEN','BESTAETIGT','UEBERSCHRIEBEN','ZURUECKGEWIESEN'] },
+    { name:'SorglosfeeQuelle', values:['MIETERSCHAFT','EXTERN'] },
+  ],
+
+  validations:[
+    { attr:'Gate 1 — Start Phase 2', rule:'mandatsvertrag_unterzeichnet_at IS NOT NULL AND vollmacht_erteilt_at IS NOT NULL AND datenschutz_einwilligung_at IS NOT NULL' },
+    { attr:'Gate 2 — Start Phase 3', rule:'kontenplan_erstellt_at IS NOT NULL AND bankkonto_vollmacht_at IS NOT NULL AND policy_mahnwesen_ok AND policy_kreditoren_ok AND policy_investition_ok AND policy_servicevertraege_ok AND policy_reporting_ok' },
+    { attr:'Gate 3 — Start Phase 4', rule:'uebergabe_vollstaendig = true AND uebergabe_abgeschlossen_at IS NOT NULL' },
+    { attr:'Gate 4 — Start Phase 6', rule:'vollstaendigkeit_score ≥ policy_min_vollstaendigkeit AND factory_abgeschlossen_at IS NOT NULL AND besichtigung_abgeschlossen_at IS NOT NULL' },
+    { attr:'Gate 5 — Go-Live',       rule:'delta_clearance_at IS NOT NULL AND besprechung_abgeschlossen_at IS NOT NULL AND provider_reset_abgeschlossen_at IS NOT NULL AND go_live_freigegeben_at IS NOT NULL' },
+    { attr:'fiduziäres_konto_nr',    rule:'Muss gültiges CH-IBAN-Format sein; Konto muss auf Treuhandkonto-Typ im Finanzsystem gesetzt sein (OR Art. 400)' },
+    { attr:'portal_einladung_at',    rule:'Wird automatisch gesetzt sobald mandatsvertrag_unterzeichnet_at IS NOT NULL; Reminder nach 48h, 7d, 14d; nach 3 Remindern → HITL Bewirtschaftung' },
+    { attr:'delta_positionen_offen', rule:'Muss = 0 sein für Gate 5 (nicht Gate 3); Delta-Analyse läuft parallel zu Phase 4 und 5; Klärung durch Bewirtschaftung kurz vor Mandatsbeginn' },
+    { attr:'besichtigung_abgeschlossen_at', rule:'Gesetzt wenn (besichtigung_einheiten_besucht + besichtigung_einheiten_verweigert) = besichtigung_einheiten_total' },
+    { attr:'provider_reset_abgeschlossen_at', rule:'Gesetzt wenn provider_reset_kuendigungen_sent = provider_reset_kuendigungen_total AND provider_reset_neu_abgeschlossen = provider_reset_neu_total' },
+    { attr:'sorglosfee_mieter_id',   rule:'Nur setzen wenn Mietvertrag-Nachtrag (Mietzinsreduktion gegen Hauswart-Pflichten) unterzeichnet und Mieter als Lieferant/SORGLOSFEE im BOS registriert' },
+  ],
+};
+
+const P = PROCESS_DATA;
+const STATUS_LABEL = { doc:'Dokumentiert', dev:'In Entwicklung', plan:'Geplant' };
+const STATUS_CLS   = { doc:'sb-doc', dev:'sb-dev', plan:'sb-plan' };
+
+function renderHero() {
+  document.title = `${P.name} · REC Space Model`;
+  document.getElementById('bc-cat').textContent  = P.category;
+  document.getElementById('bc-name').textContent = P.name;
+  document.getElementById('topbar-version').textContent = `v${P.version}`;
+  const tag = document.getElementById('hero-tag');
+  tag.innerHTML = `<span class="hd-dot"></span>${P.category}`;
+  tag.style.color      = P.categoryColor;
+  tag.style.background = `rgba(${P.categoryRgb},.10)`;
+  tag.style.border     = `1px solid rgba(${P.categoryRgb},.22)`;
+  document.getElementById('hero-title').textContent = P.name;
+  document.getElementById('hero-desc').textContent  = P.overview;
+  document.getElementById('hero-badges').innerHTML = `
+    ${P.mvp ? '<span class="sb sb-mvp">MVP</span>' : ''}
+    <span class="sb ${STATUS_CLS[P.status]}">${STATUS_LABEL[P.status]}</span>`;
+  document.getElementById('hero-meta').innerHTML = `
+    <span style="font-size:11px;color:#334155;font-family:'JetBrains Mono',monospace">
+      <span style="color:var(--color-cyan);font-weight:700">${P.automation} %</span> automatisiert
+    </span>
+    <span style="font-size:11px;color:#334155;font-family:'JetBrains Mono',monospace">
+      ${P.actors.length} Akteure
+    </span>`;
+}
+
+function renderDiagram() {
+  const container = document.getElementById('svg-container');
+  if (P.diagramInline) { container.innerHTML = P.diagramInline; }
+  else if (P.diagramSrc) {
+    container.innerHTML = `<img src="${P.diagramSrc}" alt="BPMN Prozessdiagramm" style="width:100%;height:100%;object-fit:contain;padding:20px">`;
+  }
+}
+
+function renderBranches(branches) {
+  return `<div class="step-branches">${branches.map(b => `
+    <div class="branch">
+      <div class="branch-dot branch-${b.type}"></div>
+      <div class="branch-text"><span class="branch-condition">${b.condition}:</span> ${b.result}</div>
+    </div>`).join('')}</div>`;
+}
+
+function renderDoku() {
+  document.getElementById('doc-overview').textContent = P.overview;
+
+  document.getElementById('doc-gates').innerHTML = P.gates.map((g, i) => `
+    <div class="gate-row">
+      <div class="gate-card" style="--gc:${g.color};--gc-rgb:${g.rgb}">
+        <div class="gate-label">${g.label}</div>
+        <div class="gate-title">${g.title}</div>
+        <div class="gate-desc">${g.desc}</div>
+        <div class="gate-blocker"><span style="color:#f43f5e;font-size:12px">⬛</span> ${g.blocker}</div>
+      </div>
+    </div>
+    ${i < P.gates.length - 1 ? '<div style="display:flex;align-items:center;padding:4px 0 4px 18px"><div style="width:2px;height:24px;background:rgba(255,255,255,.06)"></div></div>' : ''}`).join('');
+
+  document.getElementById('doc-actors').innerHTML = P.actors.map(a => `
+    <div class="actor-card" style="--ac:${a.color}">
+      <div class="actor-name">${a.name}</div>
+      <div class="actor-role">${a.role}</div>
+      <div class="actor-resp">${a.responsibilities}</div>
+    </div>`).join('');
+
+  document.getElementById('doc-phases').innerHTML = P.phases.map(ph => `
+    <div class="phase-card">
+      <div class="phase-header" style="--pc:${ph.color};--pc-rgb:${ph.rgb}">
+        <div class="phase-num" style="--pc:${ph.color};--pc-rgb:${ph.rgb}">${ph.num}</div>
+        <div class="phase-title">${ph.title}</div>
+        ${ph.parallel ? '<span class="phase-par">Parallel</span>' : ''}
+      </div>
+      <div class="phase-body">
+        <ul class="step-list">
+          ${ph.steps.map(s => `
+          <li class="step-item">
+            <div class="step-n">${s.n}</div>
+            <div>
+              <span class="step-main">${s.main}</span>
+              ${s.desc ? ` — ${s.desc}` : ''}
+              ${s.branches ? renderBranches(s.branches) : ''}
+            </div>
+          </li>`).join('')}
+        </ul>
+      </div>
+    </div>`).join('');
+}
+
+function renderAttr() {
+  document.getElementById('attr-sections').innerHTML = P.attributes.map(sec => `
+    <div class="attr-section">
+      <div class="attr-section-header">
+        <div class="attr-section-num" style="--asc:${sec.color};--asc-rgb:${sec.rgb}">${sec.n}</div>
+        <div>
+          <div class="attr-section-title">${sec.section}</div>
+          <div class="attr-section-sub">${sec.sectionEn}</div>
+        </div>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Attribut</th><th>Typ</th><th>Pflicht</th><th>Beschreibung</th>
+        </tr></thead>
+        <tbody>
+          ${sec.fields.map(f => `
+          <tr>
+            <td class="td-attr">${f.attr}</td>
+            <td class="td-type">${f.type}</td>
+            <td>${f.req ? '<span class="req-yes">JA</span>' : '<span class="req-no">—</span>'}</td>
+            <td>${f.desc}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`).join('');
+
+  document.getElementById('attr-enums').innerHTML = P.enums.map(e => `
+    <div class="enum-section">
+      <div class="enum-title">${e.name}</div>
+      <div class="enum-block">${e.values.map(v => `<span class="enum-val">${v}</span>`).join(' ')}</div>
+    </div>`).join('');
+
+  document.getElementById('attr-validations').innerHTML = `
+    <table>
+      <thead><tr><th>Attribut / Regel</th><th>Validierung</th></tr></thead>
+      <tbody>
+        ${P.validations.map(v => `
+        <tr>
+          <td class="td-attr">${v.attr}</td>
+          <td>${v.rule}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+renderHero();
+renderDiagram();
+renderDoku();
+renderAttr();
+lucide.createIcons();
+</script>
+</body>
+</html>

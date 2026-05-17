@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prozess · REC Space Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--bg-base:#060b1a;--bg-radial-center:#0a1128;--bg-radial-edge:#03060f;--color-vision:#08ccab;--color-gold:#f59e0b;--color-cyan:#0ea5e9}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:#e2e8f0;background:var(--bg-base);background-image:radial-gradient(circle at 50% 20%,var(--bg-radial-center) 0%,var(--bg-radial-edge) 100%);min-height:100vh}
+h1,h2,h3,h4{color:#f8fafc;font-weight:700}
+.mono{font-family:'JetBrains Mono',monospace}
+.text-gradient{background:linear-gradient(130deg,#4a8fff 20%,#08ccab 55%,#10b981 90%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.glow{text-shadow:0 0 30px rgba(255,255,255,.25)}
+.code-badge{background:rgba(99,156,255,.10);border:1px solid rgba(99,156,255,.20);color:#93c5fd;padding:.18rem .65rem;border-radius:9999px;font-family:'JetBrains Mono',monospace;font-size:.78rem;display:inline-block}
+#topbar{padding:18px 56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(6,11,26,.7);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.back-link{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#64748b;text-decoration:none;transition:color .15s}
+.back-link:hover{color:var(--color-vision)}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:11px;color:#334155;font-family:'JetBrains Mono',monospace}
+.breadcrumb span{color:#475569}
+.bc-active{color:var(--color-vision) !important}
+#hero{padding:32px 56px 24px;border-bottom:1px solid rgba(255,255,255,.05);position:relative;overflow:hidden}
+#hero::before{content:'';position:absolute;top:-100px;right:-100px;width:500px;height:300px;background:radial-gradient(ellipse,rgba(74,143,255,.06) 0%,transparent 60%);pointer-events:none}
+.hero-tag{display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--color-vision);background:rgba(8,204,171,.10);padding:4px 12px;border-radius:9999px;border:1px solid rgba(8,204,171,.22);font-family:'JetBrains Mono',monospace}
+.hd-dot{width:6px;height:6px;border-radius:50%;background:var(--color-vision);animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.sb{font-size:9px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;padding:3px 10px;border-radius:9999px;white-space:nowrap;font-family:'JetBrains Mono',monospace}
+.sb-doc{background:rgba(8,204,171,.15);color:#08ccab;border:1px solid rgba(8,204,171,.3)}
+.sb-plan{background:rgba(255,255,255,.05);color:#475569;border:1px solid rgba(255,255,255,.08)}
+.sb-mvp{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.35)}
+#tab-nav{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.06);background:rgba(6,11,26,.5);backdrop-filter:blur(10px);padding:0 56px;position:sticky;top:60px;z-index:90}
+.tab-btn{padding:14px 24px;font-size:13px;font-weight:600;color:#475569;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:7px;font-family:'Segoe UI',sans-serif}
+.tab-btn:hover{color:#94a3b8}
+.tab-btn.active{color:var(--color-vision);border-bottom-color:var(--color-vision)}
+.tab-btn i{width:15px;height:15px}
+.tab-panel{display:none;padding:40px 56px 80px}
+.tab-panel.active{display:block}
+#svg-wrapper{border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:0 0 0 1px rgba(8,204,171,.08), 0 24px 64px rgba(0,0,0,.6)}
+#svg-container{width:100%;min-height:560px;background:transparent;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+#svg-placeholder{text-align:center;padding:60px 40px}
+.svg-hint{font-family:'JetBrains Mono',monospace;font-size:12px;color:#334155;margin-top:20px;line-height:2;text-align:left;display:inline-block}
+.svg-hint span{color:var(--color-vision)}
+.section-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--color-vision);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
+.prose{font-size:13px;color:#94a3b8;line-height:1.8;margin-bottom:28px}
+.actor-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:32px}
+.actor-card{background:rgba(10,15,30,.65);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px;position:relative;overflow:hidden}
+.actor-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac)}
+.actor-name{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:2px}
+.actor-role{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ac);margin-bottom:10px;font-family:'JetBrains Mono',monospace}
+.actor-resp{font-size:11px;color:#64748b;line-height:1.6}
+.ext-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:32px}
+.ext-card{background:rgba(10,15,30,.65);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:18px;position:relative;overflow:hidden;display:flex;gap:14px;align-items:flex-start}
+.ext-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:rgba(var(--ec-rgb),.7)}
+.ext-icon{width:36px;height:36px;border-radius:8px;background:rgba(var(--ec-rgb),.12);border:1px solid rgba(var(--ec-rgb),.22);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.ext-name{font-size:12px;font-weight:700;color:#f1f5f9;margin-bottom:3px}
+.ext-tag{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ec);font-family:'JetBrains Mono',monospace;margin-bottom:6px}
+.ext-desc{font-size:11px;color:#64748b;line-height:1.6}
+.kat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:32px}
+.kat-card{background:rgba(10,15,30,.5);border:1px solid rgba(255,255,255,.06);border-radius:10px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
+.kat-icon{width:32px;height:32px;border-radius:7px;background:rgba(var(--kc-rgb),.12);border:1px solid rgba(var(--kc-rgb),.22);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.kat-code{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--kc);letter-spacing:.5px;margin-bottom:2px}
+.kat-name{font-size:12px;font-weight:700;color:#f1f5f9;margin-bottom:3px}
+.kat-desc{font-size:11px;color:#64748b;line-height:1.5}
+.kat-prio{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:2px 7px;border-radius:9999px;margin-top:6px;font-family:'JetBrains Mono',monospace}
+.prio-hoch{background:rgba(244,63,94,.12);color:#f43f5e;border:1px solid rgba(244,63,94,.25)}
+.prio-mittel{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25)}
+.prio-niedrig{background:rgba(100,116,139,.12);color:#64748b;border:1px solid rgba(100,116,139,.25)}
+.phases-grid{display:flex;flex-direction:column;gap:20px;margin-bottom:32px}
+.phase-card{background:rgba(10,15,30,.5);border:1px solid rgba(255,255,255,.06);border-radius:12px;overflow:hidden}
+.phase-header{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.02)}
+.phase-num{min-width:32px;height:26px;padding:0 8px;border-radius:6px;background:rgba(var(--pc-rgb),.2);border:1px solid rgba(var(--pc-rgb),.4);color:var(--pc);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.phase-title{font-size:13px;font-weight:700;color:#f1f5f9}
+.phase-body{padding:16px 20px}
+.step-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+.step-item{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:#94a3b8;line-height:1.6}
+.step-n{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);color:#475569;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:'JetBrains Mono',monospace}
+.step-main{font-weight:600;color:#cbd5e1}
+.step-branches{margin-top:6px;padding-left:4px;display:flex;flex-direction:column;gap:4px}
+.branch{font-size:11px;display:flex;gap:6px;align-items:flex-start}
+.branch-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.branch-yes{background:#10b981}
+.branch-no{background:#f43f5e}
+.branch-alt{background:#f59e0b}
+.branch-text{color:#64748b}
+.branch-condition{font-weight:600;color:#94a3b8}
+.attr-section{margin-bottom:32px}
+.attr-section-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.attr-section-num{width:24px;height:24px;border-radius:6px;background:rgba(var(--asc-rgb),.2);border:1px solid rgba(var(--asc-rgb),.35);color:var(--asc);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.attr-section-title{font-size:13px;font-weight:700;color:#f1f5f9}
+.attr-section-sub{font-size:10px;color:#475569;font-family:'JetBrains Mono',monospace}
+table{width:100%;border-collapse:collapse;background:rgba(10,15,30,.55);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+thead th{padding:10px 14px;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#475569;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;font-family:'JetBrains Mono',monospace}
+tbody td{padding:9px 14px;font-size:12px;color:#94a3b8;border-bottom:1px solid rgba(255,255,255,.04)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.02)}
+.td-attr{font-family:'JetBrains Mono',monospace;font-size:11px;color:#93c5fd}
+.td-type{font-family:'JetBrains Mono',monospace;font-size:11px;color:#64748b}
+.req-yes{color:#10b981;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.req-no{color:#334155;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.enum-section{margin-bottom:28px}
+.enum-title{font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:8px}
+.enum-block{background:rgba(10,15,30,.7);border:1px solid rgba(99,156,255,.15);border-radius:8px;padding:14px 18px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#93c5fd;line-height:2}
+.enum-val{display:inline-block;background:rgba(99,156,255,.08);border:1px solid rgba(99,156,255,.15);border-radius:4px;padding:1px 7px;margin:2px 3px;color:#93c5fd}
+.val-table table{margin-top:0}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.10);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.20)}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="breadcrumb">
+    <a href="prozesslandkarte.html" class="back-link">
+      <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
+      Prozesslandkarte
+    </a>
+    <span style="color:#1e293b">/</span>
+    <span id="bc-cat"></span>
+    <span style="color:#1e293b">/</span>
+    <span id="bc-name" class="bc-active"></span>
+  </div>
+  <div class="code-badge" id="topbar-version"></div>
+</div>
+
+<div id="hero">
+  <div id="hero-tag" class="hero-tag"><span class="hd-dot"></span></div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-top:4px">
+    <div>
+      <h1 id="hero-title" class="text-3xl font-bold text-gradient glow" style="margin-bottom:8px"></h1>
+      <p id="hero-desc" class="text-sm" style="color:#64748b;max-width:680px;line-height:1.7"></p>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+      <div style="display:flex;gap:7px;align-items:center" id="hero-badges"></div>
+      <div style="display:flex;gap:16px;align-items:center" id="hero-meta"></div>
+    </div>
+  </div>
+</div>
+
+<nav id="tab-nav">
+  <button class="tab-btn active" onclick="showTab('prozess',this)">
+    <i data-lucide="git-branch"></i> Prozess
+  </button>
+  <button class="tab-btn" onclick="showTab('doku',this)">
+    <i data-lucide="file-text"></i> Dokumentation
+  </button>
+  <button class="tab-btn" onclick="showTab('attr',this)">
+    <i data-lucide="database"></i> Attributkatalog
+  </button>
+</nav>
+
+<div class="tab-panel active" id="tab-prozess">
+  <div id="svg-wrapper">
+  <div id="svg-container">
+    <div id="svg-placeholder">
+      <div style="width:64px;height:64px;border-radius:16px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <i data-lucide="git-fork" style="width:28px;height:28px;color:#334155"></i>
+      </div>
+      <p style="font-size:14px;font-weight:700;color:#475569;margin-bottom:6px">BPMN-Diagramm</p>
+      <p style="font-size:12px;color:#334155;margin-bottom:20px">SVG-Export hier einfügen</p>
+      <div class="svg-hint">diagramSrc: <span>'bpmn_PosteingangScanning.svg'</span></div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-doku">
+  <div style="max-width:900px">
+    <div class="section-title">Prozessübersicht</div>
+    <p class="prose" id="doc-overview"></p>
+    <div class="section-title">Dokumentkategorien & Task-Prioritäten</div>
+    <div class="kat-grid" id="doc-kategorien"></div>
+    <div class="section-title">Beteiligte Akteure</div>
+    <div class="actor-grid" id="doc-actors"></div>
+    <div class="section-title">Prozessablauf</div>
+    <div class="phases-grid" id="doc-phases"></div>
+  </div>
+</div>
+
+<div class="tab-panel" id="tab-attr">
+  <div style="max-width:1100px">
+    <div id="attr-sections"></div>
+    <div class="section-title" style="margin-top:40px">Enum-Definitionen</div>
+    <div id="attr-enums"></div>
+    <div class="section-title" style="margin-top:32px">Validierungsregeln</div>
+    <div class="val-table" id="attr-validations"></div>
+  </div>
+</div>
+
+<script>
+const PROCESS_DATA = {
+
+  name:          'Posteingang-Scanning',
+  nameEn:        'Incoming Mail Processing',
+  category:      'Bewirtschaftung',
+  categoryColor: '#0ea5e9',
+  categoryRgb:   '14,165,233',
+  status:        'doc',
+  mvp:           true,
+  automation:    80,
+  version:       '1.0',
+  backLink:      'prozesslandkarte.html',
+
+  diagramSrc:    'bpmn_PosteingangScanning.svg',
+  diagramInline: null,
+
+  overview: 'Jedes physisch eingehende Dokument wird erfasst, durch KI kategorisiert und im DMS/BOS abgelegt. Agent extrahiert Metadaten (Absender, Datum, Fristen, Vertragsbezug) und löst je nach Kategorie automatisch den passenden Folgeprozess aus: Einsprachen werden in den laufenden Prozess eingespeist, Kündigungen und Mängelmeldungen eröffnen einen neuen Prozess. Bei Behördenpost, allgemeinen Anfragen oder unklarer Zuordnung wird ein priorisierter Task eröffnet. Kreditoren sind explizit ausgenommen. Bewirtschaftung arbeitet ausschliesslich über das Task-System — keine Push-Benachrichtigungen, volle Transparenz über Status-Dashboard.',
+
+  kategorien: [
+    { code:'KUENDIGUNG',                icon:'🔔', color:'#f43f5e', rgb:'244,63,94',    name:'Kündigung',                    prio:'HOCH',    prioCls:'prio-hoch',    desc:'Mieterkündigung oder Sonderkündigung. Löst Kündigungsprozess aus. Fristerkennung kritisch.' },
+    { code:'EINSPRACHE_MIETZINS',        icon:'📈', color:'#f43f5e', rgb:'244,63,94',    name:'Einsprache Mietzinsanpassung',  prio:'HOCH',    prioCls:'prio-hoch',    desc:'Einsprache gegen Mietzinserhöhung. Verknüpft mit offenem Mietzinsanpassungs-Prozess.' },
+    { code:'EINSPRACHE_NK',              icon:'🧾', color:'#f43f5e', rgb:'244,63,94',    name:'Einsprache NK-Abrechnung',     prio:'HOCH',    prioCls:'prio-hoch',    desc:'Einsprache gegen Nebenkostenabrechnung. Verknüpft mit offenem NK-Prozess.' },
+    { code:'EINSPRACHE_SCHLUSS',         icon:'🏠', color:'#f43f5e', rgb:'244,63,94',    name:'Einsprache Schlussabrechnung', prio:'HOCH',    prioCls:'prio-hoch',    desc:'Einsprache gegen Schlussabrechnung nach Auszug. Verknüpft mit offenem Schlussabrechnungs-Prozess.' },
+    { code:'SCHLICHTUNGSENTSCHEID',      icon:'⚖️', color:'#f43f5e', rgb:'244,63,94',    name:'Schlichtungsentscheid',        prio:'HOCH',    prioCls:'prio-hoch',    desc:'Entscheid der Schlichtungsbehörde. Verknüpft mit jeweiligem offenem Verfahren. Sofort handeln.' },
+    { code:'BEHOERDENPOST',              icon:'🏛️', color:'#f59e0b', rgb:'245,158,11',   name:'Behördenpost',                 prio:'HOCH',    prioCls:'prio-hoch',    desc:'Post von Betreibungsamt, Gerichten, Behörden. Fristen können rechtlich bindend sein.' },
+    { code:'MAENGELMELDUNG',             icon:'🔧', color:'#f59e0b', rgb:'245,158,11',   name:'Mängelmeldung',                prio:'MITTEL',  prioCls:'prio-mittel',  desc:'Schriftliche Mängelmeldung. Löst Mängelmanagement-Prozess aus.' },
+    { code:'ANFRAGE_ALLGEMEIN',          icon:'✉️', color:'#64748b', rgb:'100,116,139',  name:'Allgemeine Anfrage',           prio:'NIEDRIG', prioCls:'prio-niedrig', desc:'Allgemeine Korrespondenz ohne dringenden Handlungsbedarf. Manuell bearbeiten.' },
+    { code:'UNBEKANNT',                  icon:'❓', color:'#a855f7', rgb:'168,85,247',   name:'Unbekannt / unklar',           prio:'MITTEL',  prioCls:'prio-mittel',  desc:'Konfidenz unter Schwellwert. Task zur manuellen Klassifikation und Weiterleitung.' },
+  ],
+
+  actors: [
+    { name:'Agent Swarms',    role:'Erfassung · Klassifikation · Ablage · Prozess-Trigger', color:'#4a8fff', rgb:'74,143,255', responsibilities:'KI-Klassifikation mit Konfidenz-Score, Metadaten-Extraktion (Absender, Datum, Fristen, Vertragsbezug), Zuordnung zu Mietvertrag/Liegenschaft, DMS-Ablage, Folgeprozess triggern oder Task eröffnen' },
+    { name:'Bewirtschaftung', role:'Task-Bearbeitung',                                      color:'#0ea5e9', rgb:'14,165,233', responsibilities:'Ausschliesslich über Task-System: UNBEKANNT-Tasks manuell klassifizieren und weiterleiten, handlungsrelevante Tasks bearbeiten (Behördenpost, Anfragen), Korrekturen bei Fehlzuordnungen' },
+  ],
+
+  phases: [
+    {
+      num:'1', title:'Phase 1: Eingang & Erfassung',
+      color:'#4a8fff', rgb:'74,143,255',
+      steps:[
+        { n:1, main:'Dokument erfassen', desc:'Tägliche Verarbeitung aller physisch eingegangenen Dokumente. Jedes Dokument wird einzeln erfasst: eingang_at (physisches Eingangsdatum), kanal=POST, scan_ref im DMS registriert.' },
+      ],
+    },
+    {
+      num:'2', title:'Phase 2: Inhaltsextraktion & Klassifikation',
+      color:'#08ccab', rgb:'8,204,171',
+      steps:[
+        { n:1, main:'Metadaten extrahieren', desc:'Agent extrahiert aus dem Dokument strukturierte Felder:', branches:[
+          { type:'alt', condition:'Absender', result:'Name, Adresse, PLZ/Ort' },
+          { type:'alt', condition:'Dokumentdatum', result:'Datum auf dem Schreiben — nicht Eingangsdatum' },
+          { type:'alt', condition:'Frist', result:'Erkannte Reaktionsfristen oder rechtlich relevante Datumsangaben → frist_erkannt' },
+          { type:'alt', condition:'Vertragsbezug', result:'Wohnungsadresse, Mieternummer, Vertragsnummer wenn vorhanden' },
+        ]},
+        { n:2, main:'KI-Klassifikation', desc:'KI klassifiziert Dokumentkategorie und liefert klassifikations_konfidenz (0.0–1.0).', branches:[
+          { type:'yes', condition:'≥ Schwellwert (Standard 0.85)', result:'Auto-Klassifikation übernommen, klassifikation_methode = AUTO' },
+          { type:'no',  condition:'< Schwellwert', result:'Kategorie = UNBEKANNT — Task zur manuellen Klassifikation; kein Folgeprozess blockiert' },
+        ]},
+        { n:3, main:'Vertrags-Zuordnung', desc:'Agent sucht passenden Mietvertrag anhand Adresse, Mietername oder Vertragsnummer. Fehlende Zuordnung blockiert nicht — Task enthält alle verfügbaren Metadaten.' },
+      ],
+    },
+    {
+      num:'3', title:'Phase 3: Ablage',
+      color:'#10b981', rgb:'16,185,129',
+      steps:[
+        { n:1, main:'DMS/BOS-Ablage', desc:'Dokument wird mit vollständigem Metadaten-Set abgelegt: Kategorie, Absender, Dokumentdatum, mietvertrag_id (falls bekannt), wohnung_id, liegenschaft_id, klassifikations_konfidenz. doc_ref wird generiert.' },
+        { n:2, main:'Audit-Trail', desc:'Jeder Verarbeitungsschritt wird mit Timestamp protokolliert. Vollständig einsehbar im Status-Dashboard.' },
+      ],
+    },
+    {
+      num:'4', title:'Phase 4: Folgeprozess-Trigger oder Task-Eröffnung',
+      color:'#a855f7', rgb:'168,85,247',
+      steps:[
+        { n:1, main:'Prozess-Mapping prüfen', desc:'Agent prüft ob Kategorie einem definierten Folgeprozess zugeordnet werden kann UND mietvertrag_id bekannt ist.', branches:[
+          { type:'yes', condition:'Mapping vorhanden + Mietvertrag bekannt', result:'Folgeprozess direkt triggern (siehe unten)' },
+          { type:'no',  condition:'Kein Mapping oder Mietvertrag unbekannt', result:'Neuen Task eröffnen mit allen Metadaten und frist_erkannt' },
+        ]},
+        { n:2, main:'Folgeprozess triggern', desc:'Je Kategorie wird der passende Prozess bedient:', branches:[
+          { type:'alt', condition:'EINSPRACHE_NK / MIETZINS / SCHLUSS', result:'Bestehenden laufenden Prozess bedienen — Einsprache-Schritt öffnen und Dokument verknüpfen' },
+          { type:'alt', condition:'SCHLICHTUNGSENTSCHEID', result:'Bestehendes offenes Verfahren suchen und Entscheid einspeisenm' },
+          { type:'alt', condition:'KUENDIGUNG', result:'Neuen Kündigungsprozess eröffnen mit vorausgefüllten Metadaten' },
+          { type:'alt', condition:'MAENGELMELDUNG', result:'Neuen Mängelmanagement-Prozess eröffnen' },
+        ]},
+        { n:3, main:'Task eröffnen (kein Prozess-Mapping)', desc:'Bei BEHOERDENPOST, ANFRAGE_ALLGEMEIN oder UNBEKANNT wird ein priorisierter Task mit Priorität, doc_ref-Link, Metadaten und frist_erkannt eröffnet. Kein automatischer Folgeprozess — Bewi entscheidet über nächsten Schritt.' },
+      ],
+    },
+  ],
+
+  attributes:[
+    {
+      n:1, section:'Prozess-Identifikation', sectionEn:'Process Identity',
+      color:'#4a8fff', rgb:'74,143,255',
+      fields:[
+        { attr:'posteingang_id', type:'String/UUID', req:true,  desc:'Eindeutige ID je Posteingang-Vorgang' },
+        { attr:'eingang_at',     type:'DateTime',    req:true,  desc:'Physisches Eingangsdatum des Dokuments (nicht Verarbeitungsdatum)' },
+        { attr:'kanal',          type:'Enum',        req:true,  desc:'Eingangskanal — initial immer POST' },
+        { attr:'scan_ref',       type:'String',      req:true,  desc:'Scan-Datei-Referenz im DMS' },
+        { attr:'doc_ref',        type:'String',      req:false, desc:'DMS/BOS-Dokument-Referenz nach vollständiger Ablage mit Metadaten' },
+        { attr:'status',         type:'Enum',        req:true,  desc:'Aktueller Verarbeitungsstatus' },
+      ],
+    },
+    {
+      n:2, section:'Klassifikation & Metadaten', sectionEn:'Classification & Metadata',
+      color:'#08ccab', rgb:'8,204,171',
+      fields:[
+        { attr:'kategorie',                 type:'Enum',    req:false, desc:'Erkannter Dokumenttyp — UNBEKANNT wenn Konfidenz unter Schwellwert' },
+        { attr:'klassifikations_konfidenz', type:'Decimal', req:false, desc:'KI-Konfidenz-Score für Kategorie 0.0–1.0' },
+        { attr:'klassifikation_methode',    type:'Enum',    req:false, desc:'AUTO (über Schwellwert), AUTO_UNSICHER (unter Schwellwert), MANUELL (durch Bewi korrigiert)' },
+        { attr:'absender_name',             type:'String',  req:false, desc:'Extrahierter Absendername' },
+        { attr:'absender_adresse',          type:'String',  req:false, desc:'Extrahierte Absenderadresse' },
+        { attr:'dokument_datum',            type:'Date',    req:false, desc:'Datum auf dem Schreiben — nicht Eingangsdatum' },
+        { attr:'betreff',                   type:'String',  req:false, desc:'Extrahierter Betreff oder Thema' },
+        { attr:'frist_erkannt',             type:'Date',    req:false, desc:'Erkannte Reaktionsfrist aus dem Dokumentinhalt — Hinweis im Task; keine automatische Überwachung' },
+      ],
+    },
+    {
+      n:3, section:'Verknüpfung & Folgeprozess', sectionEn:'Linking & Follow-up',
+      color:'#10b981', rgb:'16,185,129',
+      fields:[
+        { attr:'mietvertrag_id',   type:'String/UUID', req:false, desc:'Zugeordneter Mietvertrag — null wenn keine Zuordnung möglich' },
+        { attr:'liegenschaft_id',  type:'String/UUID', req:false, desc:'Zugeordnete Liegenschaft' },
+        { attr:'wohnung_id',       type:'String/UUID', req:false, desc:'Zugeordnete Wohnungseinheit' },
+        { attr:'folgeprozess_typ', type:'String',      req:false, desc:'Art des getriggerten Prozesses (z.B. KUENDIGUNG, EINSPRACHE_NK)' },
+        { attr:'folgeprozess_id',  type:'String/UUID', req:false, desc:'ID des bedientes oder neu eröffneten Folgeprozesses' },
+        { attr:'task_id',          type:'String/UUID', req:false, desc:'ID des eröffneten Tasks — gesetzt wenn kein direkter Prozess-Trigger möglich' },
+        { attr:'task_prioritaet',  type:'Enum',        req:false, desc:'Priorität: HOCH, MITTEL oder NIEDRIG — je Kategorie vordefiniert' },
+      ],
+    },
+    {
+      n:4, section:'Policies & Konfiguration', sectionEn:'Policies & Configuration',
+      color:'#a855f7', rgb:'168,85,247',
+      fields:[
+        { attr:'policy_konfidenz_schwellwert', type:'Decimal', req:true, desc:'Mindest-KI-Konfidenz für Auto-Klassifikation (Standard: 0.85); darunter → UNBEKANNT + Task' },
+      ],
+    },
+  ],
+
+  enums:[
+    { name:'Status',                 values:['EINGANG','KLASSIFIZIERT','ABGELEGT','PROZESS_GETRIGGERT','TASK_EROEFFNET','ABGESCHLOSSEN'] },
+    { name:'Kategorie',              values:['KUENDIGUNG','EINSPRACHE_MIETZINS','EINSPRACHE_NK','EINSPRACHE_SCHLUSS','SCHLICHTUNGSENTSCHEID','BEHOERDENPOST','MAENGELMELDUNG','ANFRAGE_ALLGEMEIN','UNBEKANNT'] },
+    { name:'KlassifikationsMethode', values:['AUTO','AUTO_UNSICHER','MANUELL'] },
+    { name:'TaskPrioritaet',         values:['HOCH','MITTEL','NIEDRIG'] },
+  ],
+
+  validations:[
+    { attr:'kategorie = UNBEKANNT',          rule:'Wenn klassifikations_konfidenz < policy_konfidenz_schwellwert; immer Task MITTEL eröffnen' },
+    { attr:'folgeprozess_id vs task_id',     rule:'Entweder folgeprozess_id (Prozess getriggert) ODER task_id (Task eröffnet) — nie beides; fehlende mietvertrag_id → immer Task, nie Prozess-Trigger' },
+    { attr:'frist_erkannt',                  rule:'Hinweisfeld im Task — keine automatische Fristüberwachung durch System; Bewi verantwortlich' },
+    { attr:'KREDITOREN explizit exkludiert', rule:'Als Kreditor-Rechnung erkannte Dokumente werden nicht verarbeitet — Weiterleitung an separaten Kreditoren-Prozess' },
+    { attr:'task_prioritaet',                rule:'HOCH: KUENDIGUNG, EINSPRACHE_*, SCHLICHTUNGSENTSCHEID, BEHOERDENPOST; MITTEL: MAENGELMELDUNG, UNBEKANNT; NIEDRIG: ANFRAGE_ALLGEMEIN' },
+  ],
+};
+
+const P = PROCESS_DATA;
+const STATUS_LABEL = { doc:'Dokumentiert', dev:'In Entwicklung', plan:'Geplant' };
+const STATUS_CLS   = { doc:'sb-doc', dev:'sb-dev', plan:'sb-plan' };
+
+function renderHero() {
+  document.title = `${P.name} · REC Space Model`;
+  document.getElementById('bc-cat').textContent  = P.category;
+  document.getElementById('bc-name').textContent = P.name;
+  document.getElementById('topbar-version').textContent = `v${P.version}`;
+  const tag = document.getElementById('hero-tag');
+  tag.innerHTML = `<span class="hd-dot"></span>${P.category}`;
+  tag.style.color      = P.categoryColor;
+  tag.style.background = `rgba(${P.categoryRgb},.10)`;
+  tag.style.border     = `1px solid rgba(${P.categoryRgb},.22)`;
+  document.getElementById('hero-title').textContent = P.name;
+  document.getElementById('hero-desc').textContent  = P.overview;
+  document.getElementById('hero-badges').innerHTML = `
+    ${P.mvp ? '<span class="sb sb-mvp">MVP</span>' : ''}
+    <span class="sb ${STATUS_CLS[P.status]}">${STATUS_LABEL[P.status]}</span>`;
+  document.getElementById('hero-meta').innerHTML = `
+    <span style="font-size:11px;color:#334155;font-family:'JetBrains Mono',monospace">
+      <span style="color:var(--color-cyan);font-weight:700">${P.automation} %</span> automatisiert
+    </span>
+    <span style="font-size:11px;color:#334155;font-family:'JetBrains Mono',monospace">
+      ${P.actors.length} Akteure
+    </span>`;
+}
+
+function renderDiagram() {
+  const container = document.getElementById('svg-container');
+  if (P.diagramInline) { container.innerHTML = P.diagramInline; }
+  else if (P.diagramSrc) {
+    container.innerHTML = `<img src="${P.diagramSrc}" alt="BPMN Prozessdiagramm" style="width:100%;height:100%;object-fit:contain;padding:20px">`;
+  }
+}
+
+function renderBranches(branches) {
+  return `<div class="step-branches">${branches.map(b => `
+    <div class="branch">
+      <div class="branch-dot branch-${b.type}"></div>
+      <div class="branch-text"><span class="branch-condition">${b.condition}:</span> ${b.result}</div>
+    </div>`).join('')}</div>`;
+}
+
+function renderDoku() {
+  document.getElementById('doc-overview').textContent = P.overview;
+
+  document.getElementById('doc-kategorien').innerHTML = P.kategorien.map(k => `
+    <div class="kat-card" style="--kc:${k.color};--kc-rgb:${k.rgb}">
+      <div class="kat-icon">${k.icon}</div>
+      <div>
+        <div class="kat-code">${k.code}</div>
+        <div class="kat-name">${k.name}</div>
+        <div class="kat-desc">${k.desc}</div>
+        <span class="kat-prio ${k.prioCls}">${k.prio}</span>
+      </div>
+    </div>`).join('');
+
+  document.getElementById('doc-actors').innerHTML = P.actors.map(a => `
+    <div class="actor-card" style="--ac:${a.color}">
+      <div class="actor-name">${a.name}</div>
+      <div class="actor-role">${a.role}</div>
+      <div class="actor-resp">${a.responsibilities}</div>
+    </div>`).join('');
+
+  document.getElementById('doc-phases').innerHTML = P.phases.map(ph => `
+    <div class="phase-card">
+      <div class="phase-header" style="--pc:${ph.color};--pc-rgb:${ph.rgb}">
+        <div class="phase-num" style="--pc:${ph.color};--pc-rgb:${ph.rgb}">${ph.num}</div>
+        <div class="phase-title">${ph.title}</div>
+      </div>
+      <div class="phase-body">
+        <ul class="step-list">
+          ${ph.steps.map(s => `
+          <li class="step-item">
+            <div class="step-n">${s.n}</div>
+            <div>
+              <span class="step-main">${s.main}</span>
+              ${s.desc ? ` — ${s.desc}` : ''}
+              ${s.branches ? renderBranches(s.branches) : ''}
+            </div>
+          </li>`).join('')}
+        </ul>
+      </div>
+    </div>`).join('');
+}
+
+function renderAttr() {
+  document.getElementById('attr-sections').innerHTML = P.attributes.map(sec => `
+    <div class="attr-section">
+      <div class="attr-section-header">
+        <div class="attr-section-num" style="--asc:${sec.color};--asc-rgb:${sec.rgb}">${sec.n}</div>
+        <div>
+          <div class="attr-section-title">${sec.section}</div>
+          <div class="attr-section-sub">${sec.sectionEn}</div>
+        </div>
+      </div>
+      <table>
+        <thead><tr>
+          <th>Attribut</th><th>Typ</th><th>Pflicht</th><th>Beschreibung</th>
+        </tr></thead>
+        <tbody>
+          ${sec.fields.map(f => `
+          <tr>
+            <td class="td-attr">${f.attr}</td>
+            <td class="td-type">${f.type}</td>
+            <td>${f.req ? '<span class="req-yes">JA</span>' : '<span class="req-no">—</span>'}</td>
+            <td>${f.desc}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`).join('');
+
+  document.getElementById('attr-enums').innerHTML = P.enums.map(e => `
+    <div class="enum-section">
+      <div class="enum-title">${e.name}</div>
+      <div class="enum-block">${e.values.map(v => `<span class="enum-val">${v}</span>`).join(' ')}</div>
+    </div>`).join('');
+
+  document.getElementById('attr-validations').innerHTML = `
+    <table>
+      <thead><tr><th>Attribut / Regel</th><th>Validierung</th></tr></thead>
+      <tbody>
+        ${P.validations.map(v => `
+        <tr>
+          <td class="td-attr">${v.attr}</td>
+          <td>${v.rule}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+renderHero();
+renderDiagram();
+renderDoku();
+renderAttr();
+lucide.createIcons();
+</script>
+</body>
+</html>
