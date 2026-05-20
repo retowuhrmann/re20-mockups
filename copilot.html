@@ -1,0 +1,2136 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Copilot: Training</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Devicon CDN -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+    <!-- Google Fonts: JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Background Gradient Colors (Dark Mode Default) */
+            --bg-base: #060b1a;
+            --bg-radial-center: #0a1128;
+            --bg-radial-edge: #03060f;
+
+            /* Signal Colors */
+            --color-cyan: #0ea5e9;
+            /* Frontend / Cloud */
+            --color-emerald: #10b981;
+            /* Database / Success / Secure */
+            --color-purple: #8b5cf6;
+            /* Infrastructure / API / Terraform */
+            --color-pink: #f43f5e;
+            /* Pipelines / Logic / Git Main */
+            --color-gold: #f59e0b;
+            /* Highlights / Jobs */
+
+            /* Brand Accent */
+            --color-vision: #08ccab;
+            /* vision& Teal/Cyan */
+
+            /* Typography */
+            --text-main: #ffffff;
+            --text-normal: #e2e8f0;
+            --text-subtle: rgba(200, 215, 235, 0.7);
+        }
+
+        /* --- LIGHT MODE OVERRIDES --- */
+        [data-theme="light"] {
+            --bg-base: #f8fafc;
+            --bg-radial-center: #ffffff;
+            --bg-radial-edge: #e2e8f0;
+            --text-main: #0f172a;
+            --text-normal: #334155;
+            --text-subtle: #475569;
+        }
+
+        [data-theme="light"] .glass {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: rgba(8, 204, 171, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), inset 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+
+        [data-theme="light"] .glass-interactive:hover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1), inset 0 0 30px rgba(8, 204, 171, 0.15);
+        }
+
+        /* Invert utility classes for Light Mode */
+        [data-theme="light"] .text-white {
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .text-slate-200,
+        [data-theme="light"] .text-slate-300,
+        [data-theme="light"] .text-slate-400 {
+            color: #475569 !important;
+        }
+
+        [data-theme="light"] .text-slate-500 {
+            color: #64748b !important;
+        }
+
+        [data-theme="light"] .bg-slate-900,
+        [data-theme="light"] .bg-slate-900\/50,
+        [data-theme="light"] .bg-slate-900\/80,
+        [data-theme="light"] .bg-slate-900\/90 {
+            background-color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        [data-theme="light"] .bg-slate-800,
+        [data-theme="light"] .bg-slate-800\/90,
+        [data-theme="light"] .bg-slate-700\/50,
+        [data-theme="light"] .bg-slate-700\/80 {
+            background-color: #f1f5f9 !important;
+            color: #0f172a !important;
+        }
+
+        [data-theme="light"] .border-slate-600,
+        [data-theme="light"] .border-slate-700,
+        [data-theme="light"] .border-slate-800 {
+            border-color: #cbd5e1 !important;
+        }
+
+        [data-theme="light"] .terminal-bg {
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        [data-theme="light"] .timeline-dot-lg {
+            border-color: #f8fafc !important;
+        }
+
+        [data-theme="light"] nav {
+            background: rgba(255, 255, 255, 0.8) !important;
+            border-right: 1px solid rgba(8, 204, 171, 0.2) !important;
+        }
+
+        /* --------------------------- */
+
+        /* Base Body */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            color: var(--text-normal);
+            background: var(--bg-base);
+            background-image: radial-gradient(circle at 50% 50%, var(--bg-radial-center) 0%, var(--bg-radial-edge) 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            transition: background 0.3s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .glass {
+            background: rgba(10, 15, 30, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--color-vision);
+            border-radius: 16px;
+            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(99, 156, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .glass-interactive {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .glass-interactive:hover {
+            border-color: rgba(99, 156, 255, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(99, 156, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .text-gradient {
+            background: linear-gradient(130deg, #4a8fff 20%, #a855f7 55%, #08ccab 90%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-gradient {
+            background: linear-gradient(90deg, #3b82f6, #a855f7);
+        }
+
+        .glow-text {
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(130deg, rgba(74, 143, 255, 0.2), rgba(168, 85, 247, 0.2));
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(130deg, rgba(74, 143, 255, 0.4), rgba(168, 85, 247, 0.4));
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+
+        [data-theme="light"] .btn-primary {
+            color: #ffffff !important;
+            background: linear-gradient(130deg, var(--color-cyan), var(--color-purple));
+        }
+
+        .code-badge {
+            background: rgba(99, 156, 255, 0.1);
+            border: 1px solid rgba(99, 156, 255, 0.2);
+            color: #93c5fd;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            display: inline-block;
+        }
+
+        [data-theme="light"] .code-badge {
+            background: rgba(8, 204, 171, 0.15);
+            border-color: rgba(8, 204, 171, 0.4);
+            color: #0d9488;
+        }
+
+        .slide {
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            padding: 3rem;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(100, 116, 139, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin: 6px 0;
+        }
+
+        .nav-dot.active {
+            background: var(--color-vision);
+            box-shadow: 0 0 10px var(--color-vision);
+            transform: scale(1.5);
+        }
+
+        .terminal-bg {
+            background: #0a0a0a;
+            transition: all 0.3s ease;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(100, 116, 139, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(8, 204, 171, 0.3);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(8, 204, 171, 0.6);
+        }
+
+        /* Timeline Styles */
+        .timeline-dot-lg {
+            position: absolute;
+            left: -32px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 4px solid var(--bg-base);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-line-lg {
+            position: absolute;
+            left: -24px;
+            top: 20px;
+            bottom: -40px;
+            width: 4px;
+            background: rgba(8, 204, 171, 0.2);
+        }
+
+        .timeline-item-lg:last-child .timeline-line-lg {
+            display: none;
+        }
+
+        /* LANGUAGE TOGGLE LOGIC */
+        html[lang="de"] .lang-en {
+            display: none !important;
+        }
+
+        html[lang="en"] .lang-de {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar Navigation -->
+    <nav
+        class="w-[80px] h-screen flex flex-col items-center py-6 border-r border-[rgba(8,204,171,0.15)] bg-[rgba(3,6,15,0.6)] z-50 flex-shrink-0 transition-colors duration-300">
+        <!-- Brand Logo -->
+        <div
+            class="flex items-center justify-center w-10 h-10 rounded-xl border border-[var(--color-vision)] bg-[rgba(8,204,171,0.05)] shadow-[0_0_15px_rgba(8,204,171,0.2)] mb-8">
+            <span class="text-xl font-bold text-[var(--color-vision)] font-mono">&amp;</span>
+        </div>
+
+        <!-- Navigation Indicators (15 Slides) -->
+        <div class="flex flex-col items-center flex-1 w-full" id="nav-dots-container"></div>
+
+        <!-- Toggles & Guide -->
+        <div class="flex flex-col gap-4 mt-auto items-center">
+            <!-- Language Toggle -->
+            <div class="w-10 h-10 rounded-full bg-slate-800/50 flex items-center justify-center cursor-pointer hover:bg-[var(--color-vision)]/20 transition text-[var(--text-subtle)] hover:text-[var(--color-vision)]"
+                onclick="toggleLanguage()" title="Toggle Language">
+                <span id="lang-indicator" class="font-bold font-mono text-xs">EN</span>
+            </div>
+
+            <!-- Theme Toggle -->
+            <div class="w-10 h-10 rounded-full bg-slate-800/50 flex items-center justify-center cursor-pointer hover:bg-[var(--color-vision)]/20 transition text-[var(--text-subtle)] hover:text-[var(--color-vision)]"
+                onclick="toggleTheme()" title="Toggle Theme">
+                <i id="theme-icon" data-lucide="sun" class="w-4 h-4"></i>
+            </div>
+
+            <!-- Guide -->
+            <div class="text-[var(--text-subtle)] text-xs flex flex-col items-center gap-1 cursor-pointer hover:text-[var(--color-vision)] transition mt-2"
+                onclick="showHelp()">
+                <i data-lucide="help-circle" class="w-4 h-4 text-[var(--color-vision)]"></i>
+                <span class="text-[9px] uppercase tracking-wider font-mono lang-de">Guide</span>
+                <span class="text-[9px] uppercase tracking-wider font-mono lang-en">Help</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 relative overflow-hidden">
+
+        <!-- SLIDE 1: TITLE & INTRO -->
+        <section class="slide active items-center justify-center" id="slide-0">
+            <div class="flex flex-col items-center text-center w-full max-w-5xl mx-auto">
+
+                <!-- Badge -->
+                <div class="mb-6">
+                    <span class="code-badge lang-de">DIGITAL TRANSFORMATION TEAM // TRAINING V1</span>
+                    <span class="code-badge lang-en">DIGITAL TRANSFORMATION TEAM // TRAINING V1</span>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight leading-tight">
+                    Microsoft Copilot:<br>
+                    <span class="text-gradient drop-shadow-[0_0_15px_rgba(8,204,171,0.2)] lang-de">Ihr Einstieg in die
+                        KI-Assistenz</span>
+                    <span class="text-gradient drop-shadow-[0_0_15px_rgba(8,204,171,0.2)] lang-en">Your Gateway to AI
+                        Assistance</span>
+                </h1>
+
+                <!-- Presenter Badge -->
+                <div
+                    class="flex items-center gap-3 mb-10 px-5 py-3 glass rounded-full border border-[var(--color-vision)]/30">
+                    <div
+                        class="w-8 h-8 rounded-full bg-[var(--color-vision)]/10 border border-[var(--color-vision)]/40 flex items-center justify-center">
+                        <i data-lucide="user-circle" class="text-[var(--color-vision)] w-4 h-4"></i>
+                    </div>
+                    <div class="text-left">
+                        <p class="text-white font-bold text-sm leading-tight">Reto Wuhrmann</p>
+                        <p class="text-xs text-[var(--color-vision)] font-mono tracking-wide">Digital Transformation
+                            Lead</p>
+                    </div>
+                </div>
+
+                <!-- Feature Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 w-full mb-10">
+                    <div class="glass p-5 rounded-xl flex flex-col items-center text-center glass-interactive floating"
+                        style="animation-delay: 0s;">
+                        <div class="p-3 rounded-lg bg-[rgba(14,165,233,0.1)] border border-[var(--color-cyan)] mb-3"><i
+                                data-lucide="zap" class="w-5 h-5 text-[var(--color-cyan)]"></i></div>
+                        <h3 class="text-base font-bold mb-1"><span class="lang-de">Praxisnah</span><span
+                                class="lang-en">Hands-on</span></h3>
+                        <p class="text-sm text-[var(--text-subtle)]"><span class="lang-de">Sofort anwendbare Prompts für
+                                den Alltag.</span><span class="lang-en">Immediately applicable prompts for daily
+                                work.</span></p>
+                    </div>
+                    <div class="glass p-5 rounded-xl flex flex-col items-center text-center glass-interactive floating"
+                        style="animation-delay: 1.5s;">
+                        <div class="p-3 rounded-lg bg-[rgba(139,92,246,0.1)] border border-[var(--color-purple)] mb-3">
+                            <i data-lucide="layout" class="w-5 h-5 text-[var(--color-purple)]"></i>
+                        </div>
+                        <h3 class="text-base font-bold mb-1"><span class="lang-de">Klar Strukturiert</span><span
+                                class="lang-en">Clearly Structured</span></h3>
+                        <p class="text-sm text-[var(--text-subtle)]"><span class="lang-de">Aufbau von Basis bis zu
+                                autonomen Agenten.</span><span class="lang-en">Structured from basics to autonomous
+                                agents.</span></p>
+                    </div>
+                    <div class="glass p-5 rounded-xl flex flex-col items-center text-center glass-interactive floating"
+                        style="animation-delay: 3s;">
+                        <div class="p-3 rounded-lg bg-[rgba(16,185,129,0.1)] border border-[var(--color-emerald)] mb-3">
+                            <i data-lucide="shield-check" class="w-5 h-5 text-[var(--color-emerald)]"></i>
+                        </div>
+                        <h3 class="text-base font-bold mb-1"><span class="lang-de">Datenschutz-konform</span><span
+                                class="lang-en">Privacy-Compliant</span></h3>
+                        <p class="text-sm text-[var(--text-subtle)]"><span class="lang-de">Ihre Daten bleiben sicher im
+                                M365 Tenant.</span><span class="lang-en">Your data stays securely within the M365
+                                Tenant.</span></p>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                <button class="btn-primary" onclick="goToSlide(1)">
+                    <span class="lang-de">Training starten</span><span class="lang-en">Start Training</span>
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+
+            </div>
+        </section>
+
+        <!-- SLIDE 2: DIMENSIONS OF COPILOT -->
+        <section class="slide" id="slide-1">
+            <div class="mb-4">
+                <span class="code-badge lang-de">ÖKOSYSTEM // ARCHITEKTUR</span>
+                <span class="code-badge lang-en">ECOSYSTEM // ARCHITECTURE</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-6">
+                <span class="lang-de">Ein Name, viele Dimensionen</span>
+                <span class="lang-en">One Name, Many Dimensions</span>
+            </h2>
+            <p class="text-base text-[var(--text-subtle)] mb-10 max-w-3xl">
+                <span class="lang-de">"Copilot" ist der Überbegriff für verschiedene KI-Assistenten. Verstehen Sie die
+                    Unterschiede, um das richtige Werkzeug zu wählen.</span>
+                <span class="lang-en">"Copilot" is an umbrella term for various AI assistants. Understand the
+                    differences to choose the right tool.</span>
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                <div class="glass p-8 rounded-xl border-t-4 border-t-[var(--color-cyan)] flex flex-col justify-center">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="p-3 bg-[var(--color-cyan)]/10 rounded-xl border border-[var(--color-cyan)]/20"><i
+                                data-lucide="layout-template" class="w-8 h-8 text-[var(--color-cyan)]"></i></div>
+                        <h3 class="text-2xl font-bold text-white">In-App Copilot</h3>
+                    </div>
+                    <p class="text-base text-[var(--text-normal)] leading-relaxed">
+                        <span class="lang-de">Tief im Kontext. Integriert in Word, Excel, PowerPoint und Teams.
+                            Assistiert exakt im richtigen Moment ohne Kontextwechsel.</span>
+                        <span class="lang-en">Deep in context. Embedded in Word, Excel, PowerPoint, and Teams. Assists
+                            exactly at the right moment without context switching.</span>
+                    </p>
+                </div>
+
+                <div
+                    class="glass p-8 rounded-xl border-t-4 border-t-[var(--color-purple)] flex flex-col justify-center">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="p-3 bg-[var(--color-purple)]/10 rounded-xl border border-[var(--color-purple)]/20">
+                            <i data-lucide="messages-square" class="w-8 h-8 text-[var(--color-purple)]"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Business Chat</h3>
+                    </div>
+                    <p class="text-base text-[var(--text-normal)] leading-relaxed">
+                        <span class="lang-de">Kontextübergreifend. Bündelt E-Mails, Kalender, Teams-Chats und Dokumente.
+                            Ein einziger Assistent für Ihr gesamtes Firmenwissen.</span>
+                        <span class="lang-en">Cross-Context. Bundles emails, calendar, Teams chats and documents. One
+                            assistant for all your company data.</span>
+                    </p>
+                </div>
+
+                <div
+                    class="glass p-8 rounded-xl border-t-4 border-t-[var(--color-emerald)] flex flex-col justify-center">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div
+                            class="p-3 bg-[var(--color-emerald)]/10 rounded-xl border border-[var(--color-emerald)]/20">
+                            <i data-lucide="bot" class="w-8 h-8 text-[var(--color-emerald)]"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Copilot Agents</h3>
+                    </div>
+                    <p class="text-base text-[var(--text-normal)] leading-relaxed">
+                        <span class="lang-de">Autonome Workflows. Spezialisierte KI-Helfer, die mehrstufige Aufgaben
+                            proaktiv und selbstständig ohne ständige Eingaben erledigen.</span>
+                        <span class="lang-en">Automated Workflows. Specialised AI helpers that execute multi-step tasks
+                            proactively without further input.</span>
+                    </p>
+                </div>
+
+                <div class="glass p-8 rounded-xl border-t-4 border-t-[var(--color-gold)] flex flex-col justify-center">
+                    <div class="flex items-center gap-4 mb-4">
+                        <div class="p-3 bg-[var(--color-gold)]/10 rounded-xl border border-[var(--color-gold)]/20"><i
+                                data-lucide="globe" class="w-8 h-8 text-[var(--color-gold)]"></i></div>
+                        <h3 class="text-2xl font-bold text-white">Web Copilot</h3>
+                    </div>
+                    <p class="text-base text-[var(--text-normal)] leading-relaxed">
+                        <span class="lang-de">Browser und Edge. KI-Recherche im Web basierend auf öffentlichen Quellen –
+                            jedoch sicher geschützt durch Ihren Firmen-Account.</span>
+                        <span class="lang-en">Browser and Edge. AI research on the web based on public sources. Secure
+                            in your company account.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: LICENSING -->
+        <section class="slide flex flex-col" id="slide-2">
+            <div class="mb-4">
+                <span class="code-badge lang-de">ZUGANG // LIZENZMODELL</span>
+                <span class="code-badge lang-en">ACCESS // LICENSING</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-10">
+                <span class="lang-de">Copilot: Mit oder ohne Lizenz?</span>
+                <span class="lang-en">Copilot: With or Without a License</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-6xl">
+                <!-- Free -->
+                <div class="glass p-6 rounded-xl relative overflow-hidden">
+                    <div
+                        class="absolute top-0 right-0 bg-slate-800 text-slate-300 text-xs font-mono px-4 py-1.5 rounded-bl-xl">
+                        <span class="lang-de">STANDARD (KOSTENLOS)</span><span class="lang-en">STANDARD (FREE)</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-4 mt-2">
+                        <div
+                            class="w-11 h-11 rounded-full bg-[var(--color-cyan)]/10 border border-[var(--color-cyan)]/20 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="compass" class="w-5 h-5 text-[var(--color-cyan)]"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Microsoft Copilot</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-[var(--text-subtle)]">
+                        <li class="flex items-start gap-3"><i data-lucide="user"
+                                class="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0"></i>
+                            <span class="lang-de"><strong>Profil:</strong> KI-Assistent im Web, <em>ohne</em> Zugriff
+                                auf Ihre Unternehmensdaten.</span>
+                            <span class="lang-en"><strong>Profile:</strong> AI assistant in the web, <em>without</em>
+                                access to company data.</span>
+                        </li>
+                        <li class="flex items-start gap-3"><i data-lucide="database"
+                                class="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0"></i>
+                            <span class="lang-de"><strong>Datenquelle:</strong> Öffentliches Internet und
+                                Web-Quellen.</span>
+                            <span class="lang-en"><strong>Data source:</strong> Internet and public web sources.</span>
+                        </li>
+                        <li class="flex items-start gap-3"><i data-lucide="monitor"
+                                class="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0"></i>
+                            <span class="lang-de"><strong>Apps:</strong> Web-Browser, Microsoft Edge, Windows OS.</span>
+                            <span class="lang-en"><strong>Apps:</strong> Browser, Edge, Windows OS.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Paid -->
+                <div
+                    class="glass p-6 rounded-xl relative overflow-hidden border-t-4 border-t-[var(--color-vision)] shadow-[0_0_30px_rgba(8,204,171,0.1)]">
+                    <div
+                        class="absolute top-0 right-0 bg-[var(--color-vision)] text-white md:text-black text-xs font-mono font-bold px-4 py-1.5 rounded-bl-xl">
+                        <span class="lang-de">LIZENZIERT (PRO)</span><span class="lang-en">LICENSED (PRO)</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-4 mt-2">
+                        <div
+                            class="w-11 h-11 rounded-full bg-[var(--color-vision)]/10 border border-[var(--color-vision)]/20 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="briefcase" class="w-5 h-5 text-[var(--color-vision)]"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Microsoft 365 Copilot</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-[var(--text-subtle)]">
+                        <li class="flex items-start gap-3"><i data-lucide="check-circle"
+                                class="w-4 h-4 text-[var(--color-emerald)] mt-0.5 flex-shrink-0"></i>
+                            <span class="lang-de"><strong>Profil:</strong> Voll integriert in den M365 Arbeitsalltag.
+                                Kennt Ihre Dateien.</span>
+                            <span class="lang-en"><strong>Profile:</strong> Fully integrated into your M365 daily work.
+                                Knows your files.</span>
+                        </li>
+                        <li class="flex items-start gap-3"><i data-lucide="network"
+                                class="w-4 h-4 text-[var(--color-emerald)] mt-0.5 flex-shrink-0"></i>
+                            <span class="lang-de"><strong>Datenquelle:</strong> Microsoft Graph (E-Mails, Kalender,
+                                Dateien, Teams).</span>
+                            <span class="lang-en"><strong>Data source:</strong> Microsoft Graph (emails, calendar,
+                                files, Teams).</span>
+                        </li>
+                        <li class="flex items-start gap-3"><i data-lucide="grid"
+                                class="w-4 h-4 text-[var(--color-emerald)] mt-0.5 flex-shrink-0"></i>
+                            <span class="lang-de"><strong>Apps:</strong> Word, Excel, PowerPoint, Teams, Outlook.</span>
+                            <span class="lang-en"><strong>Apps:</strong> Word, Excel, PowerPoint, Teams, Outlook.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Fazit callout -->
+            <div class="mt-auto pt-5 max-w-6xl">
+                <div class="glass rounded-xl p-4 flex items-start gap-4 border-l-4 border-l-[var(--color-vision)]">
+                    <i data-lucide="lightbulb" class="w-5 h-5 text-[var(--color-vision)] flex-shrink-0 mt-0.5"></i>
+                    <p class="text-sm text-[var(--text-subtle)]">
+                        <span class="lang-de"><strong class="text-white">Fazit:</strong> Für den privaten Einstieg
+                            reicht die kostenlose Version — im Unternehmenseinsatz entfaltet Copilot sein volles
+                            Potenzial erst mit der M365-Lizenz und Zugriff auf Ihre eigenen Daten.</span>
+                        <span class="lang-en"><strong class="text-white">Key takeaway:</strong> The free version works
+                            for personal exploration — but in a business context, Copilot only reaches its full
+                            potential with an M365 license and access to your own company data.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: MINDSET & ROLES -->
+        <section class="slide flex flex-col" id="slide-3">
+            <div class="mb-4">
+                <span class="code-badge lang-de">GRUNDHALTUNG // PARADIGMENWECHSEL</span>
+                <span class="code-badge lang-en">MINDSET // PARADIGM SHIFT</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-4">
+                <span class="lang-de">KI-Assistent, kein Autopilot</span>
+                <span class="lang-en">AI Assistant, Not Autopilot</span>
+            </h2>
+            <p class="text-base text-[var(--text-subtle)] mb-10 max-w-3xl">
+                <span class="lang-de">Sie behalten stets die Kontrolle. Die KI ist Ihr Co-Pilot, nicht der Kapitän.
+                    Erfolg erfordert das richtige Zusammenspiel.</span>
+                <span class="lang-en">You always keep control. The AI is your co-pilot, not the captain. Success
+                    requires the right collaboration.</span>
+            </p>
+
+            <div class="flex flex-col md:flex-row gap-5 max-w-6xl items-start">
+                <!-- Human -->
+                <div class="glass p-6 rounded-xl flex-1 border-t-4 border-t-[var(--color-cyan)]">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="w-11 h-11 rounded-full bg-[var(--color-cyan)]/10 border border-[var(--color-cyan)]/20 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="user-check" class="text-[var(--color-cyan)] w-5 h-5"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white"><span class="lang-de">Der Pilot (Sie)</span><span
+                                class="lang-en">The Pilot (You)</span></h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-[var(--text-subtle)]">
+                        <li class="flex gap-3"><i data-lucide="check"
+                                class="w-4 h-4 text-[var(--color-cyan)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong class="text-white">Entscheider:</strong> Sie überprüfen jedes
+                                Ergebnis und tragen die Verantwortung.</span>
+                            <span class="lang-en"><strong class="text-white">Decision-maker:</strong> You review and
+                                bear final responsibility for every outcome.</span>
+                        </li>
+                        <li class="flex gap-3"><i data-lucide="check"
+                                class="w-4 h-4 text-[var(--color-cyan)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong class="text-white">Kontext-Geber:</strong> Sie bringen das
+                                Business-Know-how ein, das keine KI ersetzen kann.</span>
+                            <span class="lang-en"><strong class="text-white">Context provider:</strong> You bring
+                                business know-how that no AI can replace.</span>
+                        </li>
+                        <li class="flex gap-3"><i data-lucide="shield-check"
+                                class="w-4 h-4 text-[var(--color-cyan)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong class="text-white">Qualitätssicherung:</strong> Sie erkennen
+                                Fehler, Lücken und Missverständnisse, die die KI nicht sieht.</span>
+                            <span class="lang-en"><strong class="text-white">Quality control:</strong> You spot errors,
+                                gaps, and misunderstandings the AI cannot detect.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Icon between -->
+                <div class="hidden md:flex items-center justify-center">
+                    <div
+                        class="w-12 h-12 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shadow-lg">
+                        <i data-lucide="arrow-left-right" class="w-6 h-6 text-slate-400"></i>
+                    </div>
+                </div>
+
+                <!-- AI -->
+                <div class="glass p-6 rounded-xl flex-1 border-t-4 border-t-[var(--color-vision)]">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div
+                            class="w-11 h-11 rounded-full bg-[var(--color-vision)]/10 border border-[var(--color-vision)]/20 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="cpu" class="text-[var(--color-vision)] w-5 h-5"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white"><span class="lang-de">Der Co-Pilot (KI)</span><span
+                                class="lang-en">The Co-Pilot (AI)</span></h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-[var(--text-subtle)]">
+                        <li class="flex gap-3"><i data-lucide="zap"
+                                class="w-4 h-4 text-[var(--color-vision)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong class="text-white">Geschwindigkeit:</strong> Generiert
+                                Entwürfe und komplexe Analysen in Sekunden.</span>
+                            <span class="lang-en"><strong class="text-white">Instantly:</strong> Generates drafts and
+                                analyses in seconds instead of hours.</span>
+                        </li>
+                        <li class="flex gap-3"><i data-lucide="zap"
+                                class="w-4 h-4 text-[var(--color-vision)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong class="text-white">Routine-Übernehmer:</strong> Übernimmt
+                                erste Rohentwürfe. Sie verfeinern nur noch.</span>
+                            <span class="lang-en"><strong class="text-white">Routine tasks:</strong> Handles formatting
+                                and first drafts. You only refine.</span>
+                        </li>
+                        <li class="flex gap-3"><i data-lucide="layers"
+                                class="w-4 h-4 text-[var(--color-vision)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong class="text-white">Konsistenz:</strong> Hält Formatierung,
+                                Struktur und Stil über lange Dokumente hinweg einheitlich.</span>
+                            <span class="lang-en"><strong class="text-white">Consistency:</strong> Maintains formatting,
+                                structure, and tone uniformly across long documents.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Quote callout -->
+            <div class="mt-auto pt-5 max-w-6xl">
+                <div class="glass rounded-xl p-4 flex items-start gap-4 border-l-4 border-l-[var(--color-vision)]">
+                    <i data-lucide="quote" class="w-5 h-5 text-[var(--color-vision)] flex-shrink-0 mt-0.5"></i>
+                    <p class="text-sm italic text-[var(--text-subtle)]">
+                        <span class="lang-de">Die KI liefert den Entwurf — Sie liefern das Urteil.</span>
+                        <span class="lang-en">The AI delivers the draft — you deliver the judgment.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: CORE CAPABILITIES -->
+        <section class="slide" id="slide-4">
+            <div class="mb-4">
+                <span class="code-badge lang-de">FUNKTIONEN // WAS IST MÖGLICH?</span>
+                <span class="code-badge lang-en">CAPABILITIES // WHAT IS POSSIBLE?</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-8">
+                <span class="lang-de">Die 6 Kernfähigkeiten</span><span class="lang-en">What Copilot Can Do</span>
+            </h2>
+
+            <div
+                class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl flex-1 overflow-y-auto pr-2 custom-scrollbar pb-4">
+                <div
+                    class="glass p-8 rounded-xl glass-interactive border-t-4 border-t-[var(--color-cyan)] flex flex-col">
+                    <div
+                        class="w-14 h-14 rounded-full bg-[var(--color-cyan)]/10 border border-[var(--color-cyan)]/20 flex items-center justify-center mb-6">
+                        <i data-lucide="pen-tool" class="w-7 h-7 text-[var(--color-cyan)]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3"><span class="lang-de">Erstellung</span><span
+                            class="lang-en">Creation</span></h3>
+                    <p class="text-sm md:text-base text-[var(--text-normal)] leading-relaxed flex-1">
+                        <span class="lang-de">Generiert erste Entwürfe für E-Mails, Management-Berichte und
+                            Präsentationen aus dem Nichts.</span>
+                        <span class="lang-en">Generates first drafts for emails, reports, and presentations from
+                            scratch.</span>
+                    </p>
+                </div>
+                <div
+                    class="glass p-8 rounded-xl glass-interactive border-t-4 border-t-[var(--color-emerald)] flex flex-col">
+                    <div
+                        class="w-14 h-14 rounded-full bg-[var(--color-emerald)]/10 border border-[var(--color-emerald)]/20 flex items-center justify-center mb-6">
+                        <i data-lucide="minimize-2" class="w-7 h-7 text-[var(--color-emerald)]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3"><span class="lang-de">Zusammenfassung</span><span
+                            class="lang-en">Summarisation</span></h3>
+                    <p class="text-sm md:text-base text-[var(--text-normal)] leading-relaxed flex-1">
+                        <span class="lang-de">Bringt es auf den Punkt. Verdichtet lange Dokumente oder Chat-Verläufe in
+                            Sekunden.</span>
+                        <span class="lang-en">To the Point. Condenses long documents or chat histories in
+                            seconds.</span>
+                    </p>
+                </div>
+                <div
+                    class="glass p-8 rounded-xl glass-interactive border-t-4 border-t-[var(--color-gold)] flex flex-col">
+                    <div
+                        class="w-14 h-14 rounded-full bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 flex items-center justify-center mb-6">
+                        <i data-lucide="bar-chart-2" class="w-7 h-7 text-[var(--color-gold)]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3"><span class="lang-de">Analyse</span><span
+                            class="lang-en">Analysis</span></h3>
+                    <p class="text-sm md:text-base text-[var(--text-normal)] leading-relaxed flex-1">
+                        <span class="lang-de">Versteht komplexe Daten. Identifiziert Trends in Excel-Tabellen und zieht
+                            logische Schlüsse.</span>
+                        <span class="lang-en">Understanding Data. Identifies trends in data and draws logical
+                            conclusions.</span>
+                    </p>
+                </div>
+                <div
+                    class="glass p-8 rounded-xl glass-interactive border-t-4 border-t-[var(--color-purple)] flex flex-col">
+                    <div
+                        class="w-14 h-14 rounded-full bg-[var(--color-purple)]/10 border border-[var(--color-purple)]/20 flex items-center justify-center mb-6">
+                        <i data-lucide="refresh-cw" class="w-7 h-7 text-[var(--color-purple)]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3"><span class="lang-de">Transformation</span><span
+                            class="lang-en">Transformation</span></h3>
+                    <p class="text-sm md:text-base text-[var(--text-normal)] leading-relaxed flex-1">
+                        <span class="lang-de">Wandelt Inhalte um. Schreibt Texte um, ändert die Tonalität, übersetzt
+                            oder kürzt Dokumente.</span>
+                        <span class="lang-en">Transforming Content. Rewrites texts, changes the tone, translates or
+                            shortens.</span>
+                    </p>
+                </div>
+                <div
+                    class="glass p-8 rounded-xl glass-interactive border-t-4 border-t-[var(--color-pink)] flex flex-col">
+                    <div
+                        class="w-14 h-14 rounded-full bg-[var(--color-pink)]/10 border border-[var(--color-pink)]/20 flex items-center justify-center mb-6">
+                        <i data-lucide="settings" class="w-7 h-7 text-[var(--color-pink)]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3"><span class="lang-de">Automatisierung</span><span
+                            class="lang-en">Automation</span></h3>
+                    <p class="text-sm md:text-base text-[var(--text-normal)] leading-relaxed flex-1">
+                        <span class="lang-de">Übernimmt Routine. Nimmt Ihnen wiederkehrende Aufgaben wie das Erstellen
+                            von Meeting-Protokollen ab.</span>
+                        <span class="lang-en">Taking over Routine. Takes over tasks such as creating meeting
+                            minutes.</span>
+                    </p>
+                </div>
+                <div
+                    class="glass p-8 rounded-xl glass-interactive border-t-4 border-t-[var(--color-vision)] flex flex-col">
+                    <div
+                        class="w-14 h-14 rounded-full bg-[var(--color-vision)]/10 border border-[var(--color-vision)]/20 flex items-center justify-center mb-6">
+                        <i data-lucide="search" class="w-7 h-7 text-[var(--color-vision)]"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-3"><span class="lang-de">Recherche</span><span
+                            class="lang-en">Research</span></h3>
+                    <p class="text-sm md:text-base text-[var(--text-normal)] leading-relaxed flex-1">
+                        <span class="lang-de">Findet Wissen. Sucht und konsolidiert Informationen aus dem Web oder tief
+                            aus internen Dokumenten.</span>
+                        <span class="lang-en">Finding Knowledge. Finds and consolidates info from web or internal
+                            documents.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: A DAY WITH COPILOT (STORY) -->
+        <section class="slide" id="slide-5">
+            <div class="mb-4">
+                <span class="code-badge lang-de">STORYTELLING // USE CASES</span>
+                <span class="code-badge lang-en">STORYTELLING // USE CASES</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-10">
+                <span class="lang-de">Ein Tag mit Copilot</span><span class="lang-en">A Day with Copilot</span>
+            </h2>
+
+            <div class="relative pl-10 max-w-5xl flex-1 overflow-y-auto custom-scrollbar pb-6">
+                <!-- Item 1 -->
+                <div class="relative mb-12 mt-10 timeline-item-lg">
+                    <div class="timeline-dot-lg bg-[var(--color-cyan)] shadow-[0_0_15px_var(--color-cyan)]"></div>
+                    <div class="timeline-line-lg"></div>
+                    <div class="glass p-8 rounded-xl ml-6 hover:-translate-y-1 transition duration-300">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span
+                                class="px-3 py-1.5 bg-[var(--color-cyan)]/10 border border-[var(--color-cyan)]/30 rounded-lg text-sm font-mono text-[var(--color-cyan)] font-bold">08:30</span>
+                            <h3 class="text-2xl font-bold text-white"><span class="lang-de">Das E-Mail Chaos</span><span
+                                    class="lang-en">The Emails</span></h3>
+                        </div>
+                        <p class="text-base text-[var(--text-subtle)] leading-relaxed">
+                            <span class="lang-de">Überwältigt von 23 ungelesenen E-Mails. Copilot entwirft sofort eine
+                                Antwort für die wichtigste E-Mail und kategorisiert den Rest.</span>
+                            <span class="lang-en">Overwhelmed with 23 unread emails. Copilot drafts a reply for the
+                                top-priority email and categorizes the rest.</span>
+                            <span class="block mt-4 text-[var(--color-cyan)] font-bold"><i data-lucide="clock"
+                                    class="inline w-5 h-5 mr-1 align-sub"></i> <span class="lang-de">Ergebnis: 40
+                                    Minuten gespart.</span><span class="lang-en">Result: Saves 40 minutes.</span></span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="relative mb-12 timeline-item-lg">
+                    <div class="timeline-dot-lg bg-[var(--color-purple)] shadow-[0_0_15px_var(--color-purple)]"></div>
+                    <div class="timeline-line-lg"></div>
+                    <div class="glass p-8 rounded-xl ml-6 hover:-translate-y-1 transition duration-300">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span
+                                class="px-3 py-1.5 bg-[var(--color-purple)]/10 border border-[var(--color-purple)]/30 rounded-lg text-sm font-mono text-[var(--color-purple)] font-bold">12:15</span>
+                            <h3 class="text-2xl font-bold text-white"><span class="lang-de">Das
+                                    Projekt-Meeting</span><span class="lang-en">The Meeting</span></h3>
+                        </div>
+                        <p class="text-base text-[var(--text-subtle)] leading-relaxed">
+                            <span class="lang-de">Hektisches Projektmeeting mit 8 Personen. Copilot macht Live-Notizen
+                                in Teams. Das Meeting endet und Copilot hat bereits 3 Entscheidungen und 7 To-Dos
+                                erfasst und an alle verteilt.</span>
+                            <span class="lang-en">Busy 8-person project meeting. Copilot takes live notes. Ends meeting
+                                with 3 decisions and 7 action items instantly distributed.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="relative timeline-item-lg">
+                    <div class="timeline-dot-lg bg-[var(--color-gold)] shadow-[0_0_15px_var(--color-gold)]"></div>
+                    <div class="timeline-line-lg"></div>
+                    <div class="glass p-8 rounded-xl ml-6 hover:-translate-y-1 transition duration-300">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span
+                                class="px-3 py-1.5 bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/30 rounded-lg text-sm font-mono text-[var(--color-gold)] font-bold">15:45</span>
+                            <h3 class="text-2xl font-bold text-white"><span class="lang-de">Die Datenanalyse</span><span
+                                    class="lang-en">The Analysis</span></h3>
+                        </div>
+                        <p class="text-base text-[var(--text-subtle)] leading-relaxed">
+                            <span class="lang-de">Rohe Excel-Daten müssen zum CFO. Copilot analysiert die Tabelle (+12%
+                                Umsatzwachstum) und generiert sofort eine fertige 8-Folien
+                                PowerPoint-Präsentation.</span>
+                            <span class="lang-en">Raw Excel data needs to go to the CFO. Copilot analyzes the data (+12%
+                                revenue) and instantly generates an 8-slide PowerPoint presentation.</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 7: IN-APP CAPABILITIES (INTERACTIVE) -->
+        <section class="slide" id="slide-6">
+            <div class="mb-4">
+                <span class="code-badge lang-de">INTEGRATION // M365</span><span class="code-badge lang-en">INTEGRATION
+                    // M365</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-4">
+                <span class="lang-de">Intelligenz direkt in Ihren Apps</span><span class="lang-en">Intelligence Directly
+                    in Your Apps</span>
+            </h2>
+            <p class="text-base text-[var(--text-subtle)] mb-8 max-w-3xl">
+                <span class="lang-de">Wählen Sie eine App aus, um zu sehen, wie Copilot Sie im Arbeitsalltag
+                    unterstützt.</span>
+                <span class="lang-en">Select an app to see how Copilot supports you in your daily tasks.</span>
+            </p>
+
+            <div class="flex flex-col lg:flex-row gap-6 max-w-6xl h-full pb-10">
+                <!-- App Selector -->
+                <div class="w-full lg:w-1/3 flex lg:flex-col gap-3 flex-wrap">
+                    <button
+                        class="app-btn active glass p-5 rounded-2xl flex-1 lg:flex-none flex items-center gap-4 border border-slate-700"
+                        id="btn-word" onclick="simulateApp('word')">
+                        <svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 32 32">
+                            <rect width="32" height="32" rx="6" fill="#2b579a" /><text x="16" y="22"
+                                text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-weight="900"
+                                font-size="17">W</text>
+                        </svg>
+                        <span class="font-bold text-white text-sm">Word</span>
+                    </button>
+                    <button
+                        class="app-btn glass p-5 rounded-2xl flex-1 lg:flex-none flex items-center gap-4 border border-slate-700"
+                        id="btn-excel" onclick="simulateApp('excel')">
+                        <svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 32 32">
+                            <rect width="32" height="32" rx="6" fill="#217346" /><text x="16" y="22"
+                                text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-weight="900"
+                                font-size="17">X</text>
+                        </svg>
+                        <span class="font-bold text-white text-sm">Excel</span>
+                    </button>
+                    <button
+                        class="app-btn glass p-5 rounded-2xl flex-1 lg:flex-none flex items-center gap-4 border border-slate-700"
+                        id="btn-powerpoint" onclick="simulateApp('powerpoint')">
+                        <svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 32 32">
+                            <rect width="32" height="32" rx="6" fill="#b7472a" /><text x="16" y="22"
+                                text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-weight="900"
+                                font-size="17">P</text>
+                        </svg>
+                        <span class="font-bold text-white text-sm">PowerPoint</span>
+                    </button>
+                    <button
+                        class="app-btn glass p-5 rounded-2xl flex-1 lg:flex-none flex items-center gap-4 border border-slate-700"
+                        id="btn-outlook" onclick="simulateApp('outlook')">
+                        <svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 32 32">
+                            <rect width="32" height="32" rx="6" fill="#0078d4" /><text x="16" y="22"
+                                text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-weight="900"
+                                font-size="17">O</text>
+                        </svg>
+                        <span class="font-bold text-white text-sm">Outlook</span>
+                    </button>
+                    <button
+                        class="app-btn glass p-5 rounded-2xl flex-1 lg:flex-none flex items-center gap-4 border border-slate-700"
+                        id="btn-teams" onclick="simulateApp('teams')">
+                        <svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 32 32">
+                            <rect width="32" height="32" rx="6" fill="#6264a7" /><text x="16" y="22"
+                                text-anchor="middle" fill="white" font-family="Arial,sans-serif" font-weight="900"
+                                font-size="17">T</text>
+                        </svg>
+                        <span class="font-bold text-white text-sm">Teams</span>
+                    </button>
+                </div>
+
+                <!-- Chat Simulation -->
+                <div
+                    class="flex-1 glass rounded-2xl border border-slate-700 flex flex-col overflow-hidden shadow-2xl bg-black/10 h-[450px]">
+                    <div class="bg-slate-900/80 p-3 flex items-center justify-between border-b border-slate-700">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center shadow-lg">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
+                            </div>
+                            <span class="text-sm font-bold text-white font-sans" id="app-chat-title">Word Copilot</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4 flex-1 overflow-y-auto font-sans text-sm custom-scrollbar bg-black/10"
+                        id="app-chat-ui">
+                        <!-- Filled dynamically by simulateApp() -->
+                        <div id="app-empty-state"
+                            class="h-full flex flex-col items-center justify-center gap-3 text-center text-slate-500 select-none">
+                            <i data-lucide="mouse-pointer-click" class="w-8 h-8 opacity-40"></i>
+                            <p class="text-xs font-mono lang-de">App links auswählen …</p>
+                            <p class="text-xs font-mono lang-en">Select an app on the left …</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-900/90 border-t border-slate-700 flex items-center gap-3">
+                        <div class="w-full h-8 bg-slate-800 rounded-lg animate-pulse opacity-20"></div>
+                        <div class="w-8 h-8 rounded bg-[var(--color-vision)]/20 flex-shrink-0"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 8: BUSINESS CHAT -->
+        <section class="slide" id="slide-7">
+            <div class="mb-4">
+                <span class="code-badge lang-de">CROSS-CONTEXT // MICROSOFT GRAPH</span><span
+                    class="code-badge lang-en">CROSS-CONTEXT // MICROSOFT GRAPH</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-6">
+                <span class="lang-de">Business Chat: Ihr universeller Assistent</span><span class="lang-en">Business
+                    Chat: Your Universal Assistant</span>
+            </h2>
+
+            <div class="flex flex-col lg:flex-row gap-6 max-w-6xl h-full pb-10">
+                <div class="flex-1 flex flex-col gap-4">
+                    <p class="text-sm md:text-base text-[var(--text-subtle)]">
+                        <span class="lang-de">Der Business Chat bündelt all Ihre Unternehmensdatenquellen über den MS
+                            Graph. Eine Aufgabe, die einen Menschen Stunden kosten würde, wird sofort erledigt.</span>
+                        <span class="lang-en">Business Chat bundles all your sources via MS Graph. A task that would
+                            take a human hours, done instantly.</span>
+                    </p>
+                    <div class="grid grid-cols-2 gap-3 mt-2">
+                        <div class="glass p-3 rounded-lg flex items-center gap-2"><i data-lucide="mail"
+                                class="w-4 h-4 text-cyan-500"></i><span class="text-xs font-bold text-white"><span
+                                    class="lang-de">E-Mails</span><span class="lang-en">Emails</span></span></div>
+                        <div class="glass p-3 rounded-lg flex items-center gap-2"><i data-lucide="message-square"
+                                class="w-4 h-4 text-purple-500"></i><span class="text-xs font-bold text-white">Teams
+                                Chats</span></div>
+                        <div class="glass p-3 rounded-lg flex items-center gap-2"><i data-lucide="calendar"
+                                class="w-4 h-4 text-emerald-500"></i><span class="text-xs font-bold text-white"><span
+                                    class="lang-de">Kalender</span><span class="lang-en">Calendar</span></span></div>
+                        <div class="glass p-3 rounded-lg flex items-center gap-2"><i data-lucide="file-text"
+                                class="w-4 h-4 text-gold-500"></i><span class="text-xs font-bold text-white">SharePoint
+                                Docs</span></div>
+                    </div>
+                </div>
+
+                <!-- Friendly Copilot Chat Interface -->
+                <div
+                    class="flex-[1.5] glass rounded-xl border border-slate-700 flex flex-col overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)] bg-transparent">
+                    <div class="bg-slate-900/80 p-3 flex items-center justify-between border-b border-slate-700">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center shadow-lg">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
+                            </div>
+                            <div>
+                                <span class="text-sm font-bold text-white font-sans block">M365 Copilot</span>
+                                <span class="text-[10px] text-[var(--color-emerald)] flex items-center gap-1"><span
+                                        class="w-1.5 h-1.5 bg-[var(--color-emerald)] rounded-full"></span> <span
+                                        class="lang-de">Bereit</span><span class="lang-en">Ready</span></span>
+                            </div>
+                        </div>
+                        <i data-lucide="more-horizontal" class="w-5 h-5 text-slate-400"></i>
+                    </div>
+
+                    <div class="p-5 flex-1 overflow-y-auto space-y-4 font-sans text-sm custom-scrollbar bg-black/10"
+                        id="bizchat-ui">
+                        <div class="flex flex-col items-center justify-center h-full text-center opacity-80"
+                            id="bizchat-empty">
+                            <div
+                                class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4 border border-slate-700 shadow-lg">
+                                <i data-lucide="sparkles" class="w-8 h-8 text-[#0ea5e9]"></i>
+                            </div>
+                            <h4 class="text-white font-bold text-lg mb-1"><span class="lang-de">Guten Tag!</span><span
+                                    class="lang-en">Hello!</span></h4>
+                            <p class="text-xs text-slate-400 max-w-xs"><span class="lang-de">Ich bin Ihr KI-Assistent.
+                                    Greifen Sie über mich auf Ihre Chats, Mails und Dateien zu.</span><span
+                                    class="lang-en">I am your AI assistant. Access your chats, emails and files through
+                                    me.</span></p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-900/90 border-t border-slate-700">
+                        <div class="relative flex items-center">
+                            <div class="absolute left-3"><i data-lucide="paperclip" class="w-4 h-4 text-slate-400"></i>
+                            </div>
+                            <input type="text" id="bizchat-input" value="" disabled
+                                class="w-full bg-slate-800 border border-slate-600 rounded-xl py-2.5 pl-10 pr-12 text-xs text-slate-300 opacity-90 cursor-not-allowed shadow-inner focus:outline-none">
+                            <button
+                                class="absolute right-1.5 top-1.5 w-7 h-7 rounded-lg bg-[var(--color-vision)] flex items-center justify-center hover:bg-emerald-400 transition"
+                                onclick="simulateBizChat()" id="btn-bizchat">
+                                <i data-lucide="send" class="w-3.5 h-3.5 text-black ml-0.5 mt-0.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 9: CHOOSING THE RIGHT TOOL -->
+        <section class="slide" id="slide-8">
+            <div class="mb-4">
+                <span class="code-badge lang-de">ENTSCHEIDUNG // BEST PRACTICE</span><span
+                    class="code-badge lang-en">DECISION // BEST PRACTICE</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-10">
+                <span class="lang-de">Chat oder In-App?</span><span class="lang-en">Chat or In-App?</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl">
+                <div class="glass p-8 rounded-xl flex flex-col items-center text-center">
+                    <div
+                        class="w-16 h-16 rounded-full bg-[var(--color-purple)]/20 flex items-center justify-center mb-6 border border-[var(--color-purple)]/30">
+                        <i data-lucide="globe" class="w-8 h-8 text-[var(--color-purple)]"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Copilot Chat</h3>
+                    <span
+                        class="px-3 py-1 bg-slate-800 rounded-full text-xs text-slate-300 font-mono mb-4 border border-slate-700"><span
+                            class="lang-de">Kontextübergreifend</span><span class="lang-en">Cross-app</span></span>
+                    <p class="text-base text-[var(--text-subtle)] leading-relaxed">
+                        <span class="lang-de">Nutzen Sie den Chat, wenn Sie Informationen aus <strong>mehreren Apps,
+                                Dateien oder Quellen</strong> zusammenführen müssen.</span>
+                        <span class="lang-en">Use when you want to bring together information from <strong>multiple
+                                apps, files, or sources</strong>.</span>
+                    </p>
+                </div>
+
+                <div class="glass p-8 rounded-xl flex flex-col items-center text-center">
+                    <div
+                        class="w-16 h-16 rounded-full bg-[var(--color-cyan)]/20 flex items-center justify-center mb-6 border border-[var(--color-cyan)]/30">
+                        <i data-lucide="file-edit" class="w-8 h-8 text-[var(--color-cyan)]"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">In-App Copilot</h3>
+                    <span
+                        class="px-3 py-1 bg-slate-800 rounded-full text-xs text-slate-300 font-mono mb-4 border border-slate-700"><span
+                            class="lang-de">Fokussiert</span><span class="lang-en">Focused</span></span>
+                    <p class="text-base text-[var(--text-subtle)] leading-relaxed">
+                        <span class="lang-de">Fokussiert sich exakt auf das aktuelle Dokument. Nutzen Sie ihn, wenn Sie
+                            tief in einem <strong>spezifischen Dokument, oder Chat</strong> arbeiten.</span>
+                        <span class="lang-en">Focuses on exactly the current document. Use when you are working deeply
+                            in a <strong>specific document, or chat thread</strong>.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 10: STANDARD VS AGENTS -->
+        <section class="slide" id="slide-9">
+            <div class="mb-4">
+                <span class="code-badge lang-de">ZUKUNFT // AUTOMATISIERUNG</span><span
+                    class="code-badge lang-en">FUTURE // AUTOMATION</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-8">
+                <span class="lang-de">Ausblick: Copilot Agents</span><span class="lang-en">A Look Ahead: Copilot
+                    Agents</span>
+            </h2>
+
+            <div class="flex flex-col gap-6 max-w-5xl">
+                <!-- Standard -->
+                <div class="glass p-6 md:p-8 rounded-xl flex items-center gap-6">
+                    <div
+                        class="w-16 h-16 flex-shrink-0 rounded-full border-2 border-slate-600 flex items-center justify-center bg-slate-800/50">
+                        <i data-lucide="user" class="text-white w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+                            <h3 class="text-2xl font-bold text-white">Standard Copilot</h3>
+                            <span
+                                class="text-xs bg-slate-800 text-slate-300 px-2 py-1 rounded font-mono border border-slate-600 w-fit"><span
+                                    class="lang-de">Auf Anfrage / Reaktiv</span><span class="lang-en">On request /
+                                    Reactive</span></span>
+                        </div>
+                        <p class="text-base text-[var(--text-subtle)]">
+                            <span class="lang-de">Sie stellen eine Frage, Copilot antwortet. Er wartet stets auf Ihren
+                                Input.</span>
+                            <span class="lang-en">You ask a question, and Copilot answers. Waits for your input.</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex justify-center"><i data-lucide="arrow-down"
+                        class="text-[var(--color-vision)] w-8 h-8"></i></div>
+
+                <!-- Agents -->
+                <div
+                    class="glass p-6 md:p-8 rounded-xl flex items-center gap-6 border-t-4 border-t-[var(--color-vision)] shadow-[0_0_30px_rgba(8,204,171,0.15)] relative overflow-hidden">
+                    <div
+                        class="absolute right-0 top-0 bottom-0 w-48 bg-gradient-to-l from-[var(--color-vision)]/10 to-transparent pointer-events-none">
+                    </div>
+                    <div
+                        class="w-16 h-16 flex-shrink-0 rounded-full border-2 border-[var(--color-vision)] bg-[var(--color-vision)]/10 flex items-center justify-center">
+                        <i data-lucide="bot" class="text-[var(--color-vision)] w-8 h-8"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+                            <h3 class="text-2xl font-bold text-white">Copilot Agents</h3>
+                            <span
+                                class="text-xs bg-[var(--color-vision)] text-black font-bold px-2 py-1 rounded font-mono w-fit"><span
+                                    class="lang-de">Autonom / Proaktiv</span><span class="lang-en">Autonomous /
+                                    Proactive</span></span>
+                        </div>
+                        <p class="text-base text-[var(--text-subtle)] mb-4">
+                            <span class="lang-de">Läuft selbstständig. Wird durch ein Ereignis oder einen Zeitplan
+                                ausgelöst.</span>
+                            <span class="lang-en">Runs independently. Triggered by an event or schedule.</span>
+                        </p>
+                        <div class="flex flex-wrap gap-2 text-xs font-mono text-slate-300">
+                            <span class="px-2 py-1 bg-slate-900 rounded border border-slate-700 shadow"><span
+                                    class="lang-de">1. Neuer Vertrag</span><span class="lang-en">1. New
+                                    contract</span></span> ➔
+                            <span class="px-2 py-1 bg-slate-900 rounded border border-slate-700 shadow"><span
+                                    class="lang-de">2. Klauseln prüfen</span><span class="lang-en">2. Check
+                                    clauses</span></span> ➔
+                            <span class="px-2 py-1 bg-slate-900 rounded border border-slate-700 shadow"><span
+                                    class="lang-de">3. An Legal senden</span><span class="lang-en">3. Send to
+                                    Legal</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 11: STRENGTHS & LIMITS -->
+        <section class="slide" id="slide-10">
+            <div class="mb-4">
+                <span class="code-badge lang-de">FLUGREGELN // GRENZEN KENNEN</span><span
+                    class="code-badge lang-en">FLIGHT RULES // LIMITS</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-8">
+                <span class="lang-de">Stärken & Limits</span><span class="lang-en">Strengths & Limits</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl">
+                <!-- Strengths -->
+                <div class="glass p-8 rounded-xl border-t-4 border-t-[var(--color-emerald)]">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                        <div class="p-2 bg-[var(--color-emerald)]/10 rounded-lg"><i data-lucide="trending-up"
+                                class="text-[var(--color-emerald)] w-6 h-6"></i></div>
+                        <span class="lang-de">Stärken nutzen</span><span class="lang-en">Use Strengths</span>
+                    </h3>
+                    <ul class="space-y-5 text-base text-[var(--text-subtle)]">
+                        <li class="flex items-start gap-4"><i data-lucide="check"
+                                class="w-6 h-6 text-[var(--color-emerald)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong>Leeres Blatt Syndrom:</strong> Überwindet
+                                Schreibblockaden.</span><span class="lang-en"><strong>Blank page syndrome:</strong>
+                                Overcomes writing blocks.</span>
+                        </li>
+                        <li class="flex items-start gap-4"><i data-lucide="check"
+                                class="w-6 h-6 text-[var(--color-emerald)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong>Enorme Geschwindigkeit:</strong> Für
+                                Routineaufgaben.</span><span class="lang-en"><strong>Enormous speed:</strong> For
+                                routine tasks.</span>
+                        </li>
+                        <li class="flex items-start gap-4"><i data-lucide="check"
+                                class="w-6 h-6 text-[var(--color-emerald)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong>Keine Unterbrechung:</strong> Direkt in Ihre Werkzeuge
+                                eingebaut.</span><span class="lang-en"><strong>No interruption:</strong> Built right
+                                into your tools.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Limits -->
+                <div class="glass p-8 rounded-xl border-t-4 border-t-[var(--color-pink)]">
+                    <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+                        <div class="p-2 bg-[var(--color-pink)]/10 rounded-lg"><i data-lucide="alert-octagon"
+                                class="text-[var(--color-pink)] w-6 h-6"></i></div>
+                        <span class="lang-de">Limits kennen</span><span class="lang-en">Know Limits</span>
+                    </h3>
+                    <ul class="space-y-5 text-base text-[var(--text-subtle)]">
+                        <li class="flex items-start gap-4"><i data-lucide="x"
+                                class="w-6 h-6 text-[var(--color-pink)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong>Halluzinationen möglich:</strong> Daten <em>immer</em>
+                                verifizieren!</span><span class="lang-en"><strong>Hallucinations:</strong>
+                                <em>Always</em> verify data!</span>
+                        </li>
+                        <li class="flex items-start gap-4"><i data-lucide="x"
+                                class="w-6 h-6 text-[var(--color-pink)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong>Kein Fachexperte:</strong> Es fehlt menschliches
+                                Urteilsvermögen.</span><span class="lang-en"><strong>Not an expert:</strong> Lacks human
+                                judgment.</span>
+                        </li>
+                        <li class="flex items-start gap-4"><i data-lucide="x"
+                                class="w-6 h-6 text-[var(--color-pink)] flex-shrink-0 mt-0.5"></i>
+                            <span class="lang-de"><strong>Kontext-abhängig:</strong> Garbage in, Garbage
+                                out.</span><span class="lang-en"><strong>Context-dependent:</strong> Garbage in, Garbage
+                                out.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 12: PROMPTING GUIDE -->
+        <section class="slide" id="slide-11">
+            <div class="mb-4">
+                <span class="code-badge lang-de">HANDWERK // DELEGIEREN</span><span class="code-badge lang-en">CRAFT //
+                    DELEGATING</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-4">
+                <span class="lang-de">Prompting: Wie man delegiert</span><span class="lang-en">Prompting: How to
+                    Delegate</span>
+            </h2>
+            <p class="text-base text-[var(--text-subtle)] mb-8">
+                <span class="lang-de">Die Magie liegt in der Instruktion. Nutzen Sie diese Formel für den perfekten
+                    Prompt.</span><span class="lang-en">The magic is in the instruction. Use this formula for the
+                    perfect prompt.</span>
+            </p>
+
+            <!-- Formula -->
+            <div
+                class="flex flex-wrap items-center justify-center gap-2 md:gap-4 mb-10 p-5 bg-slate-900/50 rounded-xl border border-slate-800 font-mono text-base md:text-xl max-w-5xl mx-auto shadow-inner">
+                <span class="text-[var(--color-cyan)] font-bold"><span class="lang-de">Ziel</span><span
+                        class="lang-en">Goal</span></span> <span class="text-slate-500">+</span>
+                <span class="text-[var(--color-purple)] font-bold"><span class="lang-de">Kontext</span><span
+                        class="lang-en">Context</span></span> <span class="text-slate-500">+</span>
+                <span class="text-[var(--color-gold)] font-bold">Format</span> <span class="text-slate-500">+</span>
+                <span class="text-[var(--color-pink)] font-bold"><span class="lang-de">Ton</span><span
+                        class="lang-en">Tone</span></span> <span class="text-slate-500">=</span>
+                <span
+                    class="text-[var(--color-emerald)] font-bold bg-[var(--color-emerald)]/10 px-4 py-1.5 rounded border border-[var(--color-emerald)]/30"><span
+                        class="lang-de">Perfekter Prompt</span><span class="lang-en">Perfect Prompt</span></span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                <div class="glass p-6 rounded-xl border-t-4 border-t-[var(--color-cyan)]">
+                    <h4 class="font-bold text-white text-lg mb-2"><span class="lang-de">1. Ziel</span><span
+                            class="lang-en">1. Goal</span></h4>
+                    <p class="text-sm text-[var(--text-subtle)]">
+                        <span class="lang-de">Was soll passieren? Beschreiben Sie die Aufgabe konkret.</span><span
+                            class="lang-en">What should happen? Describe the task concretely.</span>
+                    </p>
+                </div>
+                <div class="glass p-6 rounded-xl border-t-4 border-t-[var(--color-purple)]">
+                    <h4 class="font-bold text-white text-lg mb-2"><span class="lang-de">2. Kontext</span><span
+                            class="lang-en">2. Context</span></h4>
+                    <p class="text-sm text-[var(--text-subtle)]">
+                        <span class="lang-de">Wofür und für wen? Hintergrund, Situation.</span><span
+                            class="lang-en">What for and for whom? Background, situation.</span>
+                    </p>
+                </div>
+                <div class="glass p-6 rounded-xl border-t-4 border-t-[var(--color-gold)]">
+                    <h4 class="font-bold text-white text-lg mb-2">3. Format</h4>
+                    <p class="text-sm text-[var(--text-subtle)]">
+                        <span class="lang-de">Wie soll es aussehen? Struktur, 5 Stichpunkte.</span><span
+                            class="lang-en">How should it look? Length, structure.</span>
+                    </p>
+                </div>
+                <div class="glass p-6 rounded-xl border-t-4 border-t-[var(--color-pink)]">
+                    <h4 class="font-bold text-white text-lg mb-2"><span class="lang-de">4. Ton</span><span
+                            class="lang-en">4. Tone</span></h4>
+                    <p class="text-sm text-[var(--text-subtle)]">
+                        <span class="lang-de">Wie klingt es? Formell, locker, direkt, empathisch.</span><span
+                            class="lang-en">What does it sound like? Formal, casual, direct.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 13: ITERATION LOOP -->
+        <section class="slide" id="slide-12">
+            <div class="mb-4">
+                <span class="code-badge lang-de">PROZESS // OPTIMIERUNG</span><span class="code-badge lang-en">PROCESS
+                    // OPTIMISATION</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-8">
+                <span class="lang-de">Die Iterationsschleife (Dialog)</span><span class="lang-en">The Dialogue with
+                    AI</span>
+            </h2>
+
+            <div class="flex flex-col lg:flex-row gap-8 max-w-6xl items-center h-full pb-10">
+                <div class="flex-1 space-y-6 w-full">
+                    <p class="text-base text-[var(--text-subtle)] mb-6">
+                        <span class="lang-de">Kein Prompt ist beim ersten Versuch perfekt. Betrachten Sie es als Dialog
+                            mit einem Mitarbeiter.</span>
+                        <span class="lang-en">No prompt is perfect on the first try. Treat it like a dialogue.</span>
+                    </p>
+
+                    <div class="glass p-5 rounded-xl flex items-start gap-4">
+                        <div
+                            class="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold flex-shrink-0 text-lg border border-slate-600">
+                            1</div>
+                        <div>
+                            <h4 class="font-bold text-white text-base"><span class="lang-de">Sende Prompt</span><span
+                                    class="lang-en">Send Prompt</span></h4>
+                            <p class="text-sm text-[var(--text-subtle)] mt-1"><span class="lang-de">Nutzen Sie die
+                                    Formel.</span><span class="lang-en">Goal, context, format, tone.</span></p>
+                        </div>
+                    </div>
+                    <div class="glass p-5 rounded-xl flex items-start gap-4">
+                        <div
+                            class="w-10 h-10 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold flex-shrink-0 text-lg border border-slate-600">
+                            2</div>
+                        <div>
+                            <h4 class="font-bold text-white text-base"><span class="lang-de">Ergebnis Prüfen</span><span
+                                    class="lang-en">Review Result</span></h4>
+                            <p class="text-sm text-[var(--text-subtle)] mt-1"><span class="lang-de">Ist der Inhalt
+                                    korrekt? Stimmt die Tonalität?</span><span class="lang-en">Is the content correct?
+                                    Tone right?</span></p>
+                        </div>
+                    </div>
+                    <div
+                        class="glass p-5 rounded-xl flex items-start gap-4 border-[var(--color-vision)] shadow-[0_0_15px_rgba(8,204,171,0.1)] relative overflow-hidden">
+                        <div
+                            class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[var(--color-vision)]/10 to-transparent pointer-events-none">
+                        </div>
+                        <div
+                            class="w-10 h-10 rounded-full bg-[var(--color-vision)] text-black flex items-center justify-center font-bold flex-shrink-0 text-lg shadow">
+                            3</div>
+                        <div class="relative z-10">
+                            <h4 class="font-bold text-white text-base"><span class="lang-de">Verfeinern
+                                    (Refine)</span><span class="lang-en">Refine</span></h4>
+                            <p class="text-sm text-[var(--text-subtle)] mt-1"><span class="lang-de">"Kürzer",
+                                    "Lockerer", "Struktur ändern".</span><span class="lang-en">"Shorter", "More formal",
+                                    "Different structure".</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Copilot Chat Interface -->
+                <div
+                    class="flex-[1.5] w-full glass rounded-xl border border-slate-700 flex flex-col overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)] h-[450px] bg-transparent">
+                    <div class="bg-slate-900/80 p-3 flex items-center justify-between border-b border-slate-700">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center shadow-lg">
+                                <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
+                            </div>
+                            <span class="text-sm font-bold text-white font-sans block">Copilot Iteration</span>
+                        </div>
+                    </div>
+
+                    <div class="p-5 flex-1 overflow-y-auto space-y-4 font-sans text-sm custom-scrollbar bg-black/10"
+                        id="iter-ui">
+                        <div class="flex flex-col items-center justify-center h-full text-center opacity-80"
+                            id="iter-empty">
+                            <div
+                                class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4 border border-slate-700 shadow-lg">
+                                <i data-lucide="message-square" class="w-8 h-8 text-[#8b5cf6]"></i>
+                            </div>
+                            <h4 class="text-white font-bold text-lg mb-1"><span
+                                    class="lang-de">Iterations-Training</span><span class="lang-en">Iteration
+                                    Training</span></h4>
+                            <p class="text-xs text-slate-400 max-w-xs"><span class="lang-de">Simulieren Sie den
+                                    perfekten Dialog zur Verfeinerung.</span><span class="lang-en">Simulate the perfect
+                                    dialogue for refining a prompt.</span></p>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-900/90 border-t border-slate-700">
+                        <div class="relative flex items-center">
+                            <input type="text" id="iter-input" value="" disabled
+                                class="w-full bg-slate-800 border border-slate-600 rounded-xl py-2.5 pl-4 pr-12 text-xs text-slate-300 opacity-90 cursor-not-allowed shadow-inner focus:outline-none">
+                            <button
+                                class="absolute right-1.5 top-1.5 w-7 h-7 rounded-lg bg-[var(--color-vision)] flex items-center justify-center hover:bg-emerald-400 transition shadow"
+                                onclick="simulateIteration()" id="btn-iter">
+                                <i data-lucide="send" class="w-3.5 h-3.5 text-black ml-0.5 mt-0.5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 14: DATA PRIVACY -->
+        <section class="slide" id="slide-13">
+            <div class="mb-4">
+                <span class="code-badge lang-de">SICHERHEIT // COMPLIANCE</span><span
+                    class="code-badge lang-en">SECURITY // COMPLIANCE</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-12">
+                <span class="lang-de">Sicherer Flug: Datenschutz im Fokus</span><span class="lang-en">Safe Flight: Data
+                    Privacy in Focus</span>
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl">
+                <div class="glass p-8 rounded-xl text-center flex flex-col items-center">
+                    <div
+                        class="w-20 h-20 rounded-full bg-[var(--color-emerald)]/10 flex items-center justify-center mb-6 border border-[var(--color-emerald)]/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                        <i data-lucide="lock" class="w-10 h-10 text-[var(--color-emerald)]"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4"><span class="lang-de">Im Tenant gesperrt</span><span
+                            class="lang-en">Locked in Tenant</span></h3>
+                    <p class="text-base text-[var(--text-subtle)] leading-relaxed">
+                        <span class="lang-de">Copilot greift auf Daten zu, verlässt aber <strong>niemals</strong> die
+                            sichere M365 Umgebung. Kein Datenabfluss.</span>
+                        <span class="lang-en">Accesses data, but never leaves the secure M365 environment. No data
+                            transfer outside.</span>
+                    </p>
+                </div>
+                <div class="glass p-8 rounded-xl text-center flex flex-col items-center">
+                    <div
+                        class="w-20 h-20 rounded-full bg-[var(--color-emerald)]/10 flex items-center justify-center mb-6 border border-[var(--color-emerald)]/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                        <i data-lucide="shield-off" class="w-10 h-10 text-[var(--color-emerald)]"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4"><span class="lang-de">Kein KI-Training</span><span
+                            class="lang-en">No AI Training</span></h3>
+                    <p class="text-base text-[var(--text-subtle)] leading-relaxed">
+                        <span class="lang-de">Ihre Prompts und Dokumente werden <strong>nicht</strong> genutzt, um
+                            öffentliche KI-Modelle zu trainieren.</span>
+                        <span class="lang-en">Your prompts and documents are <strong>not</strong> used to train public
+                            AI models.</span>
+                    </p>
+                </div>
+                <div class="glass p-8 rounded-xl text-center flex flex-col items-center">
+                    <div
+                        class="w-20 h-20 rounded-full bg-[var(--color-emerald)]/10 flex items-center justify-center mb-6 border border-[var(--color-emerald)]/20 shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                        <i data-lucide="users" class="w-10 h-10 text-[var(--color-emerald)]"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4"><span class="lang-de">Strikte
+                            Berechtigungen</span><span class="lang-en">Strict Permissions</span></h3>
+                    <p class="text-base text-[var(--text-subtle)] leading-relaxed">
+                        <span class="lang-de">Copilot sieht nur das, was <strong>Sie</strong> sehen dürfen. Er
+                            respektiert alle SharePoint-Rechte rigoros.</span>
+                        <span class="lang-en">Copilot only sees what <strong>you</strong> are allowed to see. Respects
+                            all SharePoint access rights.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 15: FINAL CHECKLIST -->
+        <section class="slide" id="slide-14">
+            <div class="mb-4">
+                <span class="code-badge lang-de">ZUSAMMENFASSUNG // LOS GEHT'S</span><span
+                    class="code-badge lang-en">SUMMARY // LET'S GO</span>
+            </div>
+            <h2 class="text-4xl font-bold text-[var(--color-vision)] mb-10">Ready for Takeoff</h2>
+
+            <div class="glass p-10 rounded-xl max-w-4xl mx-auto border border-slate-700 shadow-2xl">
+                <ul class="space-y-6 text-lg md:text-xl">
+                    <li class="flex items-center gap-5 text-white">
+                        <div
+                            class="w-10 h-10 flex-shrink-0 rounded bg-[var(--color-vision)]/20 flex items-center justify-center border border-[var(--color-vision)]">
+                            <i data-lucide="check" class="text-[var(--color-vision)] w-6 h-6"></i>
+                        </div>
+                        <span>
+                            <span class="lang-de"><strong>Sie sind der Pilot:</strong> Finale Verantwortung liegt immer
+                                bei Ihnen.</span>
+                            <span class="lang-en"><strong>You are the Pilot:</strong> The final responsibility rests
+                                with you.</span>
+                        </span>
+                    </li>
+                    <li class="flex items-center gap-5 text-white">
+                        <div
+                            class="w-10 h-10 flex-shrink-0 rounded bg-[var(--color-vision)]/20 flex items-center justify-center border border-[var(--color-vision)]">
+                            <i data-lucide="check" class="text-[var(--color-vision)] w-6 h-6"></i>
+                        </div>
+                        <span>
+                            <span class="lang-de"><strong>Präzise Prompts:</strong> Ziel + Kontext + Format +
+                                Ton.</span>
+                            <span class="lang-en"><strong>Prompt Precisely:</strong> Goal + Context + Format +
+                                Tone.</span>
+                        </span>
+                    </li>
+                    <li class="flex items-center gap-5 text-white">
+                        <div
+                            class="w-10 h-10 flex-shrink-0 rounded bg-[var(--color-vision)]/20 flex items-center justify-center border border-[var(--color-vision)]">
+                            <i data-lucide="check" class="text-[var(--color-vision)] w-6 h-6"></i>
+                        </div>
+                        <span>
+                            <span class="lang-de"><strong>Kritische Prüfung:</strong> Fakten immer gegenprüfen.</span>
+                            <span class="lang-en"><strong>Review Critically:</strong> Always cross-check facts.</span>
+                        </span>
+                    </li>
+                    <li class="flex items-center gap-5 text-white">
+                        <div
+                            class="w-10 h-10 flex-shrink-0 rounded bg-[var(--color-vision)]/20 flex items-center justify-center border border-[var(--color-vision)]">
+                            <i data-lucide="check" class="text-[var(--color-vision)] w-6 h-6"></i>
+                        </div>
+                        <span>
+                            <span class="lang-de"><strong>Sicherheit:</strong> Ihre Daten trainieren keine öffentlichen
+                                Modelle.</span>
+                            <span class="lang-en"><strong>Data is Safe:</strong> Your content does not train public
+                                models.</span>
+                        </span>
+                    </li>
+                    <li
+                        class="flex items-center gap-5 text-[var(--color-gold)] font-bold mt-6 pt-6 border-t border-slate-700/50">
+                        <div
+                            class="w-10 h-10 flex-shrink-0 rounded bg-[var(--color-gold)]/20 flex items-center justify-center border border-[var(--color-gold)] shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                            <i data-lucide="rocket" class="text-[var(--color-gold)] w-6 h-6"></i>
+                        </div>
+                        <span>
+                            <span class="lang-de">Einfach anfangen: Erste Aufgabe heute – fassen Sie eine E-Mail
+                                zusammen!</span>
+                            <span class="lang-en">Just Start Now: First task today – summarize an email!</span>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Global Absolute Footer Layout -->
+        <footer class="absolute bottom-8 right-8 z-40 pointer-events-none flex flex-col items-end gap-1 text-right">
+            <div class="text-base font-extrabold tracking-tight text-white flex items-center gap-1 font-sans">
+                <span>vision</span><span class="text-[var(--color-vision)] font-mono">&amp;</span>
+            </div>
+            <div class="text-[10px] uppercase tracking-widest font-mono text-[var(--text-subtle)]">
+                <span class="lang-de">Copilot Training</span><span class="lang-en">Copilot Training</span>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Guide Modal Backdrop -->
+    <div id="guide-modal" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center p-4">
+        <div class="glass max-w-md w-full p-6 relative">
+            <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                <i data-lucide="info" class="text-[var(--color-vision)]"></i>
+                <span class="lang-de">Navigationshilfe</span><span class="lang-en">Navigation Guide</span>
+            </h3>
+            <p class="text-sm text-[var(--text-subtle)] mb-6">
+                <span class="lang-de">Nutzen Sie diese Steuerung:</span><span class="lang-en">Use these controls:</span>
+            </p>
+            <div class="space-y-3 text-sm font-mono">
+                <div class="flex items-center justify-between p-3 rounded bg-slate-900/50 border border-slate-700/50">
+                    <span class="text-white font-bold"><span class="lang-de">Pfeil Rechts / Runter</span><span
+                            class="lang-en">Right / Down Arrow</span></span>
+                    <span class="text-[var(--color-vision)]"><span class="lang-de">Nächste Folie</span><span
+                            class="lang-en">Next Slide</span></span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded bg-slate-900/50 border border-slate-700/50">
+                    <span class="text-white font-bold"><span class="lang-de">Pfeil Links / Hoch</span><span
+                            class="lang-en">Left / Up Arrow</span></span>
+                    <span class="text-[var(--color-vision)]"><span class="lang-de">Vorherige Folie</span><span
+                            class="lang-en">Prev Slide</span></span>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-end">
+                <button onclick="closeHelp()"
+                    class="px-5 py-2.5 rounded bg-[var(--color-vision)]/10 border border-[var(--color-vision)]/40 hover:bg-[var(--color-vision)]/20 text-[var(--color-vision)] text-sm font-bold font-mono transition">
+                    <span class="lang-de">Verstanden</span><span class="lang-en">Understood</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Setup Toggles & Localization ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.getAttribute('data-theme') === 'light') {
+                html.removeAttribute('data-theme');
+                document.getElementById('theme-icon').setAttribute('data-lucide', 'sun');
+            } else {
+                html.setAttribute('data-theme', 'light');
+                document.getElementById('theme-icon').setAttribute('data-lucide', 'moon');
+            }
+            lucide.createIcons();
+        }
+
+        function toggleLanguage() {
+            const html = document.documentElement;
+            const currentLang = html.getAttribute('lang') || 'de';
+            const newLang = currentLang === 'de' ? 'en' : 'de';
+            html.setAttribute('lang', newLang);
+            document.getElementById('lang-indicator').innerText = newLang.toUpperCase();
+
+            // Update inputs dynamically
+            const bizInput = document.getElementById('bizchat-input');
+            const iterInput = document.getElementById('iter-input');
+            if (bizInput) bizInput.value = newLang === 'en' ? "Summarise the project updates..." : "Fasse die Projekt-Updates der letzten Woche zusammen...";
+            if (iterInput) iterInput.value = newLang === 'en' ? "Write an email to the team..." : "Schreibe eine E-Mail an das Team...";
+        }
+
+        // Initialize lang inputs on load
+        toggleLanguage(); toggleLanguage(); // Trigger re-render to set correct values
+
+        // --- Navigation Logic ---
+        const totalSlides = 15;
+        let currentSlideIndex = 0;
+
+        const dotsContainer = document.getElementById('nav-dots-container');
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = `nav-dot ${i === 0 ? 'active' : ''}`;
+            dot.onclick = () => goToSlide(i);
+            dot.title = `Slide ${i + 1}`;
+            dotsContainer.appendChild(dot);
+        }
+
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.nav-dot');
+
+        function updateSlideVisibility() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlideIndex) { slide.classList.add('active'); }
+                else { slide.classList.remove('active'); }
+            });
+            dots.forEach((dot, index) => {
+                if (index === currentSlideIndex) { dot.classList.add('active'); }
+                else { dot.classList.remove('active'); }
+            });
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlideIndex = index;
+                updateSlideVisibility();
+                // Auto-play Word demo when entering slide 7, reset when leaving
+                if (index === 6) {
+                    appSimRunning = false;
+                    simulateApp('word');
+                } else {
+                    appSimRunning = false;
+                }
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                if (currentSlideIndex < totalSlides - 1) { currentSlideIndex++; updateSlideVisibility(); }
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                if (currentSlideIndex > 0) { currentSlideIndex--; updateSlideVisibility(); }
+            }
+        });
+
+        function showHelp() { document.getElementById('guide-modal').classList.remove('hidden'); }
+        function closeHelp() { document.getElementById('guide-modal').classList.add('hidden'); }
+
+        // --- App Simulation (Slide 7) ---
+        const appData = {
+            word: {
+                title: 'Word Copilot',
+                color: '#2b579a',
+                icon: 'devicon-word-plain',
+                turns: [
+                    {
+                        promptDe: 'Erstelle eine kurze Zusammenfassung dieses Dokuments.',
+                        promptEn: 'Draft a short summary of this document.',
+                        thinkingDe: 'Dokument wird analysiert…',
+                        thinkingEn: 'Analysing document…',
+                        responseDe: '📄 <strong>Zusammenfassung:</strong> Das Projekt ist im Zeitplan. Das Budget wurde eingehalten und die nächste Phase startet kommenden Montag.',
+                        responseEn: '📄 <strong>Summary:</strong> The project is on track. The budget has been met and the next phase starts this coming Monday.'
+                    },
+                    {
+                        promptDe: 'Kannst du das etwas formeller formulieren?',
+                        promptEn: 'Can you make it a bit more formal?',
+                        thinkingDe: 'Text wird überarbeitet…',
+                        thinkingEn: 'Rewriting text…',
+                        responseDe: '✅ <strong>Überarbeitete Version:</strong> Das Projekt befindet sich planmäßig im Zeitrahmen. Die Budgetvorgaben wurden eingehalten. Die nachfolgende Projektphase nimmt ihren Betrieb am kommenden Montag auf.',
+                        responseEn: '✅ <strong>Revised version:</strong> The project is progressing as scheduled and within the defined budget. The subsequent project phase is set to commence on the upcoming Monday.'
+                    }
+                ]
+            },
+            excel: {
+                title: 'Excel Copilot',
+                color: '#217346',
+                icon: 'devicon-excel-plain',
+                turns: [
+                    {
+                        promptDe: 'Analysiere die Umsatzdaten aus Spalte B und zeige den Trend.',
+                        promptEn: 'Analyse the revenue data in column B and show the trend.',
+                        thinkingDe: 'Tabellendaten werden ausgewertet…',
+                        thinkingEn: 'Evaluating spreadsheet data…',
+                        responseDe: '📊 <strong>Analyse:</strong> Der Umsatz stieg von Jan–Sep um 18 %. Q3 war das stärkste Quartal (+12 % vs. Q2). Ein saisonaler Rückgang ist für Q4 zu erwarten.',
+                        responseEn: '📊 <strong>Analysis:</strong> Revenue grew 18% from Jan–Sep. Q3 was the strongest quarter (+12% vs Q2). A seasonal dip is expected in Q4.'
+                    },
+                    {
+                        promptDe: 'Erstelle daraus ein Balkendiagramm und füge es ein.',
+                        promptEn: 'Create a bar chart from this and insert it.',
+                        thinkingDe: 'Diagramm wird generiert…',
+                        thinkingEn: 'Generating chart…',
+                        responseDe: '✅ <strong>Erledigt!</strong> Ein Balkendiagramm mit den monatlichen Umsätzen wurde auf <em>Blatt 2</em> eingefügt. Titel: „Umsatzentwicklung 2025".',
+                        responseEn: '✅ <strong>Done!</strong> A bar chart of monthly revenue has been inserted on <em>Sheet 2</em>. Title: "Revenue Trend 2025".'
+                    }
+                ]
+            },
+            powerpoint: {
+                title: 'PowerPoint Copilot',
+                color: '#b7472a',
+                icon: 'devicon-powerpoint-plain',
+                turns: [
+                    {
+                        promptDe: 'Erstelle eine 4-seitige Präsentation über unsere Q3-Ergebnisse.',
+                        promptEn: 'Create a 4-slide presentation about our Q3 results.',
+                        thinkingDe: 'Folien werden generiert…',
+                        thinkingEn: 'Generating slides…',
+                        responseDe: '🎨 <strong>Präsentation erstellt:</strong><br>1. Titelfolie – Q3 Ergebnisse<br>2. Highlights & KPIs<br>3. Finanzübersicht<br>4. Nächste Schritte & Ausblick',
+                        responseEn: '🎨 <strong>Presentation created:</strong><br>1. Title slide – Q3 Results<br>2. Highlights & KPIs<br>3. Financial overview<br>4. Next steps & outlook'
+                    },
+                    {
+                        promptDe: 'Füge auf Folie 2 ein Diagramm mit unseren Top-3-Produkten hinzu.',
+                        promptEn: 'Add a chart with our top 3 products to slide 2.',
+                        thinkingDe: 'Folie wird aktualisiert…',
+                        thinkingEn: 'Updating slide…',
+                        responseDe: '✅ <strong>Folie 2 aktualisiert!</strong> Ein Säulendiagramm mit Produkt A (42 %), Produkt B (31 %) und Produkt C (27 %) wurde eingefügt.',
+                        responseEn: '✅ <strong>Slide 2 updated!</strong> A column chart with Product A (42%), Product B (31%) and Product C (27%) has been added.'
+                    }
+                ]
+            },
+            outlook: {
+                title: 'Outlook Copilot',
+                color: '#0078d4',
+                icon: 'lucide-mail',
+                turns: [
+                    {
+                        promptDe: 'Fasse die wichtigsten ungelesenen E-Mails von heute zusammen.',
+                        promptEn: 'Summarise the most important unread emails from today.',
+                        thinkingDe: 'Posteingang wird durchsucht…',
+                        thinkingEn: 'Scanning inbox…',
+                        responseDe: '📬 <strong>3 wichtige E-Mails:</strong><br>• Tom (10:14): Feedback bis 15 Uhr benötigt<br>• Kalender: Meeting morgen um 14 Uhr verschoben<br>• Buchhaltung: Rechnung Lieferant A fällig',
+                        responseEn: '📬 <strong>3 important emails:</strong><br>• Tom (10:14): Needs your feedback by 3 PM<br>• Calendar: Tomorrow\'s 2 PM meeting rescheduled<br>• Finance: Invoice from Supplier A is due'
+                    },
+                    {
+                        promptDe: 'Schreibe eine kurze Antwort an Tom, dass ich bis 14 Uhr antworte.',
+                        promptEn: 'Write a short reply to Tom that I\'ll respond by 2 PM.',
+                        thinkingDe: 'Antwort wird verfasst…',
+                        thinkingEn: 'Drafting reply…',
+                        responseDe: '✅ <strong>Entwurf bereit:</strong><br><em>„Hallo Tom, danke für deine Nachricht. Ich werde dir bis spätestens 14:00 Uhr eine Rückmeldung geben. Viele Grüße"</em>',
+                        responseEn: '✅ <strong>Draft ready:</strong><br><em>"Hi Tom, thanks for your message. I\'ll get back to you by 2 PM at the latest. Best regards"</em>'
+                    }
+                ]
+            },
+            teams: {
+                title: 'Teams Copilot',
+                color: '#6264a7',
+                icon: 'lucide-message-square',
+                turns: [
+                    {
+                        promptDe: 'Was habe ich im gestrigen Meeting verpasst?',
+                        promptEn: 'What did I miss in yesterday\'s meeting?',
+                        thinkingDe: 'Meeting-Aufzeichnung wird analysiert…',
+                        thinkingEn: 'Analysing meeting recording…',
+                        responseDe: '🎙️ <strong>Meeting-Zusammenfassung (gestern, 10:00):</strong><br>• Q4-Budget wurde freigegeben<br>• Neues Projekt startet Montag<br>• Anna leitet die Abschlusspräsentation',
+                        responseEn: '🎙️ <strong>Meeting summary (yesterday, 10:00):</strong><br>• Q4 budget approved<br>• New project kicks off Monday<br>• Anna leads the final presentation'
+                    },
+                    {
+                        promptDe: 'Welche offenen Aufgaben wurden mir zugewiesen?',
+                        promptEn: 'Which open action items were assigned to me?',
+                        thinkingDe: 'Aufgaben werden extrahiert…',
+                        thinkingEn: 'Extracting action items…',
+                        responseDe: '✅ <strong>Ihre offenen Aufgaben:</strong><br>• Kickoff-Agenda bis Freitag vorbereiten<br>• Designentwurf von Lisa bis Donnerstag freigeben<br>• API-Statusbericht an Tom senden',
+                        responseEn: '✅ <strong>Your open action items:</strong><br>• Prepare kickoff agenda by Friday<br>• Approve Lisa\'s design draft by Thursday<br>• Send API status report to Tom'
+                    }
+                ]
+            }
+        };
+
+        let appSimRunning = false;
+
+        function buildUserMsg(text) {
+            return `<div class="flex justify-end w-full mb-3 opacity-0 translate-y-2 transition-all duration-300 ease-out" style="transition:opacity .3s ease,transform .3s ease">
+                <div class="bg-slate-700/80 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 max-w-[85%] text-sm shadow-md border border-slate-600">${text}</div>
+            </div>`;
+        }
+
+        function buildTypingIndicator() {
+            return `<div id="app-typing" class="flex justify-start w-full mb-3 opacity-0 translate-y-2" style="transition:opacity .3s ease,transform .3s ease">
+                <div class="flex gap-3 items-start">
+                    <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 shadow-lg">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-white"></i>
+                    </div>
+                    <div class="bg-slate-800/90 border border-slate-700 text-white rounded-2xl rounded-tl-sm px-4 py-3 text-sm shadow-md flex items-center gap-1.5">
+                        <span id="app-thinking-text" class="text-xs text-slate-400 mr-2 italic"></span>
+                        <span class="w-1.5 h-1.5 bg-[var(--color-vision)] rounded-full animate-bounce" style="animation-delay:0ms"></span>
+                        <span class="w-1.5 h-1.5 bg-[var(--color-vision)] rounded-full animate-bounce" style="animation-delay:150ms"></span>
+                        <span class="w-1.5 h-1.5 bg-[var(--color-vision)] rounded-full animate-bounce" style="animation-delay:300ms"></span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function buildCopilotMsg(text) {
+            return `<div class="flex justify-start w-full mb-3 opacity-0 translate-y-2" style="transition:opacity .3s ease,transform .3s ease">
+                <div class="flex gap-3 items-start max-w-[95%]">
+                    <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 mt-0.5 shadow-lg">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-white"></i>
+                    </div>
+                    <div class="bg-slate-800/90 border border-slate-700 text-white rounded-2xl rounded-tl-sm px-4 py-3 text-sm shadow-md w-full leading-relaxed">${text}</div>
+                </div>
+            </div>`;
+        }
+
+        function revealEl(el) {
+            requestAnimationFrame(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            });
+        }
+
+        function appendAndReveal(container, html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html;
+            const node = temp.firstElementChild;
+            container.appendChild(node);
+            lucide.createIcons();
+            container.scrollTop = container.scrollHeight;
+            setTimeout(() => revealEl(node), 30);
+            return node;
+        }
+
+        async function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        async function simulateApp(app) {
+            if (appSimRunning) return;
+            appSimRunning = true;
+
+            const isEn = document.documentElement.getAttribute('lang') === 'en';
+            const data = appData[app];
+            if (!data) { appSimRunning = false; return; }
+
+            // Highlight active button
+            document.querySelectorAll('.app-btn').forEach(btn => {
+                btn.classList.remove('border-[var(--color-vision)]', 'shadow-[0_0_15px_rgba(8,204,171,0.3)]');
+                btn.style.borderColor = '';
+                btn.style.boxShadow = '';
+            });
+            const activeBtn = document.getElementById('btn-' + app);
+            if (activeBtn) {
+                activeBtn.style.borderColor = 'var(--color-vision)';
+                activeBtn.style.boxShadow = '0 0 15px rgba(8,204,171,0.3)';
+            }
+
+            // Update title
+            const titleEl = document.getElementById('app-chat-title');
+            if (titleEl) titleEl.innerText = data.title;
+
+            // Clear chat
+            const chatUi = document.getElementById('app-chat-ui');
+            if (!chatUi) { appSimRunning = false; return; }
+            chatUi.innerHTML = '';
+
+            // Play through each turn
+            for (const turn of data.turns) {
+                const prompt = isEn ? turn.promptEn : turn.promptDe;
+                const thinking = isEn ? turn.thinkingEn : turn.thinkingDe;
+                const response = isEn ? turn.responseEn : turn.responseDe;
+
+                // User message
+                appendAndReveal(chatUi, buildUserMsg(prompt));
+                await wait(500);
+
+                // Typing indicator
+                const typingNode = appendAndReveal(chatUi, buildTypingIndicator());
+                const thinkingTextEl = typingNode.querySelector('#app-thinking-text');
+                if (thinkingTextEl) thinkingTextEl.innerText = thinking;
+                await wait(1600);
+
+                // Replace typing with response
+                typingNode.remove();
+                appendAndReveal(chatUi, buildCopilotMsg(response));
+                await wait(800);
+            }
+
+            appSimRunning = false;
+        }
+
+        // --- Simulations ---
+        function simulateBizChat() {
+            const isEn = document.documentElement.getAttribute('lang') === 'en';
+            const term = document.getElementById('bizchat-ui');
+            const emptyState = document.getElementById('bizchat-empty');
+            const btn = document.getElementById('btn-bizchat');
+
+            if (emptyState) emptyState.style.display = 'none';
+            btn.disabled = true; btn.style.opacity = '0.5';
+            term.innerHTML = '';
+
+            const userMsgText = isEn ? "Summarise the project updates from my team's emails and chats from the last week and write a brief status report." : "Fasse die Projekt-Updates aus den E-Mails und Chats meines Teams der letzten Woche zusammen und schreibe einen kurzen Statusbericht.";
+
+            const userMsg = `
+                <div class="flex justify-end w-full mb-4">
+                    <div class="bg-slate-700/80 text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] text-sm shadow-md border border-slate-600">
+                        ${userMsgText}
+                    </div>
+                </div>
+            `;
+
+            const thinkingText = isEn ? "Searching your Outlook inbox..." : "Durchsuche Ihren Outlook-Posteingang...";
+            const copilotThinking = `
+                <div class="flex justify-start w-full mb-4" id="copilot-thinking">
+                    <div class="flex gap-3 max-w-[90%]">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 mt-1 shadow-lg"><i data-lucide="sparkles" class="w-4 h-4 text-white"></i></div>
+                        <div class="flex flex-col gap-2 w-full mt-1.5">
+                            <div class="flex items-center gap-2 text-xs text-[var(--color-cyan)] bg-[#0ea5e9]/10 rounded-lg px-3 py-2 w-fit border border-[#0ea5e9]/20">
+                                <i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i>
+                                <span id="thinking-text">${thinkingText}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const title = isEn ? "Status Report: Project Alpha" : "Statusbericht: Projekt Alpha";
+            const design = isEn ? "<strong>Design:</strong> Final mockups were approved in the Teams chat by Lisa." : "<strong>Design:</strong> Die finalen Mockups wurden von Lisa im Teams-Chat genehmigt.";
+            const dev = isEn ? "<strong>Development:</strong> API integration is 80% complete, Tom reported a 2-day delay via email." : "<strong>Entwicklung:</strong> Die API-Integration ist zu 80% abgeschlossen, Tom meldete per E-Mail eine Verzögerung von 2 Tagen.";
+            const next = isEn ? "<strong>Next Steps:</strong> Prepare kickoff meeting for Friday." : "<strong>Nächste Schritte:</strong> Kickoff-Meeting für Freitag vorbereiten.";
+
+            const copilotFinal = `
+                <div class="flex justify-start w-full mb-4">
+                    <div class="flex gap-3 max-w-[95%]">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 mt-1 shadow-lg"><i data-lucide="sparkles" class="w-4 h-4 text-white"></i></div>
+                        <div class="bg-slate-800/90 border border-slate-700 text-white rounded-2xl rounded-tl-sm px-5 py-4 text-sm shadow-md w-full leading-relaxed">
+                            <p class="mb-4 font-bold text-base border-b border-slate-700 pb-2">${title}</p>
+                            <ul class="space-y-3 mb-4">
+                                <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-[var(--color-emerald)] flex-shrink-0 mt-0.5"></i><span>${design}</span></li>
+                                <li class="flex items-start gap-2"><i data-lucide="alert-circle" class="w-4 h-4 text-[var(--color-gold)] flex-shrink-0 mt-0.5"></i><span>${dev}</span></li>
+                                <li class="flex items-start gap-2"><i data-lucide="arrow-right-circle" class="w-4 h-4 text-[var(--color-cyan)] flex-shrink-0 mt-0.5"></i><span>${next}</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => { term.innerHTML += userMsg; lucide.createIcons(); term.scrollTop = term.scrollHeight; }, 200);
+            setTimeout(() => { term.innerHTML += copilotThinking; lucide.createIcons(); term.scrollTop = term.scrollHeight; }, 800);
+            setTimeout(() => {
+                const txt = document.getElementById('thinking-text');
+                if (txt) txt.innerText = isEn ? "Analyzing Teams chats and generating summary..." : "Analysiere Teams-Chats und generiere Zusammenfassung...";
+            }, 2200);
+            setTimeout(() => {
+                const thinkingEl = document.getElementById('copilot-thinking');
+                if (thinkingEl) thinkingEl.remove();
+                term.innerHTML += copilotFinal; lucide.createIcons(); term.scrollTop = term.scrollHeight;
+                btn.disabled = false; btn.style.opacity = '1';
+            }, 3800);
+        }
+
+        function simulateIteration() {
+            const isEn = document.documentElement.getAttribute('lang') === 'en';
+            const term = document.getElementById('iter-ui');
+            const emptyState = document.getElementById('iter-empty');
+            const btn = document.getElementById('btn-iter');
+
+            if (emptyState) emptyState.style.display = 'none';
+            btn.disabled = true; btn.style.opacity = '0.5';
+            term.innerHTML = '';
+
+            const prompt1 = isEn ? "Write an email to the team about the new Copilot licenses." : "Schreibe eine E-Mail an das Team über die neuen Copilot-Lizenzen.";
+            const userMsg1 = `
+                <div class="flex justify-end w-full mb-4">
+                    <div class="bg-slate-700/80 text-white rounded-2xl rounded-tr-sm px-4 py-3 max-w-[85%] text-sm shadow-md border border-slate-600">${prompt1}</div>
+                </div>
+            `;
+
+            const thinkText = isEn ? "Generating draft..." : "Generiere Entwurf...";
+            const copilotThinking = `
+                <div class="flex justify-start w-full mb-4" id="iter-thinking">
+                    <div class="flex gap-3 max-w-[90%]">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 mt-1 shadow-lg"><i data-lucide="sparkles" class="w-4 h-4 text-white"></i></div>
+                        <div class="flex items-center gap-2 text-xs text-[var(--color-purple)] bg-[#8b5cf6]/10 rounded-lg px-3 py-2 w-fit border border-[#8b5cf6]/20 mt-1.5">
+                            <i data-lucide="loader" class="w-3.5 h-3.5 animate-spin"></i><span>${thinkText}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const msg1Content = isEn ? "Dear Team,<br><br>I would like to officially inform you that the new Microsoft Copilot licenses are now available. It is expected that all employees... <br><br><span class='text-xs text-slate-500 italic'>[Long, very formal text...]</span>" : "Sehr geehrte Damen und Herren,<br><br>hiermit möchte ich Sie offiziell darüber in Kenntnis setzen, dass die neuen Microsoft Copilot-Lizenzen ab sofort zur Verfügung stehen. Es wird erwartet, dass alle Mitarbeiter... <br><br><span class='text-xs text-slate-500 italic'>[Langer, sehr formeller Text...]</span>";
+            const copilotMsg1 = `
+                <div class="flex justify-start w-full mb-4">
+                    <div class="flex gap-3 max-w-[95%]">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 mt-1 shadow-lg"><i data-lucide="sparkles" class="w-4 h-4 text-white"></i></div>
+                        <div class="bg-slate-800/90 border border-slate-700 text-slate-300 rounded-2xl rounded-tl-sm px-4 py-3 text-sm shadow-md w-full">${msg1Content}</div>
+                    </div>
+                </div>
+            `;
+
+            const prompt2 = isEn ? "Make it shorter (max 3 bullet points). The tone should be motivating. Add a call to action at the end for Friday's training." : "Mache es kürzer (max 3 Bulletpoints). Der Ton soll motivierend sein. Füge am Ende einen Call-to-Action für das Training am Freitag hinzu.";
+            const refineLabel = isEn ? "3. Refine" : "3. Verfeinerung";
+            const userMsg2 = `
+                <div class="flex justify-end w-full mb-4 mt-2">
+                    <div class="flex flex-col items-end max-w-[85%]">
+                        <span class="text-[10px] text-[var(--color-vision)] font-bold mb-1 mr-1 uppercase tracking-wider">${refineLabel}</span>
+                        <div class="bg-[var(--color-vision)]/20 text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm shadow-md border border-[var(--color-vision)]/50">
+                            ${prompt2}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const msg2Content = isEn ?
+                `Hello Team! 🚀<br><br>Great news: Your Microsoft Copilot licenses are here!<br><br>
+                <ul class="list-disc pl-5 my-2 space-y-1 text-slate-200">
+                    <li>Ready to use in Word, Teams & more.</li><li>Saves time on routine tasks.</li><li>Data privacy is 100% guaranteed.</li>
+                </ul><br>👉 <strong>Call-to-Action:</strong> Join the interactive training this Friday to get started!` :
+                `Hallo Team! 🚀<br><br>Gute Nachrichten: Eure Microsoft Copilot-Lizenzen sind da!<br><br>
+                <ul class="list-disc pl-5 my-2 space-y-1 text-slate-200">
+                    <li>Sofort einsatzbereit in Word, Teams & Co.</li><li>Spart Zeit bei Routineaufgaben.</li><li>Datenschutz ist zu 100% gewährleistet.</li>
+                </ul><br>👉 <strong>Call-to-Action:</strong> Seid beim interaktiven Training diesen Freitag dabei, um direkt loszulegen!`;
+
+            const copilotMsg2 = `
+                <div class="flex justify-start w-full mb-4">
+                    <div class="flex gap-3 max-w-[95%]">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 mt-1 shadow-lg"><i data-lucide="sparkles" class="w-4 h-4 text-white"></i></div>
+                        <div class="bg-slate-800/90 border border-[var(--color-emerald)]/50 text-white rounded-2xl rounded-tl-sm px-5 py-4 text-sm shadow-[0_0_15px_rgba(16,185,129,0.15)] w-full">
+                            ${msg2Content}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            setTimeout(() => { term.innerHTML += userMsg1; term.scrollTop = term.scrollHeight; lucide.createIcons(); }, 200);
+            setTimeout(() => { term.innerHTML += copilotThinking; term.scrollTop = term.scrollHeight; lucide.createIcons(); }, 800);
+            setTimeout(() => {
+                const thinkingEl = document.getElementById('iter-thinking');
+                if (thinkingEl) thinkingEl.remove();
+                term.innerHTML += copilotMsg1; term.scrollTop = term.scrollHeight; lucide.createIcons();
+            }, 2500);
+            setTimeout(() => { term.innerHTML += userMsg2; term.scrollTop = term.scrollHeight; lucide.createIcons(); }, 4500);
+            setTimeout(() => { term.innerHTML += copilotThinking; term.scrollTop = term.scrollHeight; lucide.createIcons(); }, 5300);
+            setTimeout(() => {
+                const thinkingEl = document.getElementById('iter-thinking');
+                if (thinkingEl) thinkingEl.remove();
+                term.innerHTML += copilotMsg2; term.scrollTop = term.scrollHeight; lucide.createIcons();
+                btn.disabled = false; btn.style.opacity = '1';
+            }, 7500);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
+    </script>
+</body>
+
+</html>
