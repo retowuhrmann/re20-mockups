@@ -1,0 +1,1887 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EWZ Störungsmanagement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Warm palette (from reference) */
+  --cream:#FAF8F4;--paper:#F5F1E8;--ink:#1F2A22;--muted:#6B6A63;--subtle:#A8A79F;
+  --accent:#2B3A2E;--accent-l:#E8EDE8;--accent-t:#1a2a1d;
+  /* Aliases for existing code */
+  --bg:var(--cream);--surface:#FFF;--surface2:var(--paper);
+  --t1:var(--ink);--t2:var(--muted);--t3:var(--subtle);
+  --b:rgba(31,42,34,.12);
+  --sh:0 1px 0 rgba(31,42,34,.04),0 6px 24px -12px rgba(31,42,34,.18);
+  --ring:rgba(43,58,46,.15);
+  --blue:#2563EB;--blue-l:#EFF6FF;--blue-t:#1D4ED8;
+  --c-open:#D97706;--bg-open:#FFFBEB;--bd-open:#FDE68A;
+  --c-wip:#2563EB;--bg-wip:#EFF6FF;--bd-wip:#BFDBFE;
+  --c-impl:#7C3AED;--bg-impl:#F5F3FF;--bd-impl:#DDD6FE;
+  --c-wait:#EA580C;--bg-wait:#FFF7ED;--bd-wait:#FDBA74;
+  --c-done:#059669;--bg-done:#F0FDF4;--bd-done:#6EE7B7;
+  --c-live:#0F766E;--bg-live:#F0FDFA;--bd-live:#99F6E4;
+  --ph:#F5A0A0;--pm:#F5D48A;--pl:#8ADFB8;
+  --font:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'SF Mono','Fira Code',monospace;
+  --r:12px;
+}
+body{font-family:var(--font);font-size:13px;line-height:1.5;color:var(--t1);background:var(--bg);display:flex;height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+
+/* ── Nav ── */
+.nav{width:216px;background:var(--paper);display:flex;flex-direction:column;flex-shrink:0;border-right:1px solid var(--b)}
+.nav-logo{padding:18px 16px 14px;display:flex;align-items:center;gap:10px}
+.nav-mark{width:30px;height:30px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.nav-brand{font-size:13px;font-weight:600;color:var(--ink)}
+.nav-brand span{font-weight:400;color:var(--muted);font-size:11px;display:block}
+.nav-sep{height:1px;background:var(--b);margin:2px 0}
+.nav-section{padding:10px 8px 4px}
+.nav-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--subtle);padding:0 8px 6px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer;user-select:none;transition:background .1s,color .1s}
+.nav-item:hover{background:rgba(255,255,255,.65);color:var(--ink)}
+.nav-item.active{background:#fff;color:var(--ink);font-weight:500;box-shadow:var(--sh)}
+.nav-badge{margin-left:auto;background:rgba(31,42,34,.09);color:var(--muted);font-size:10px;font-weight:600;padding:1px 6px;border-radius:10px}
+.nav-foot{margin-top:auto;padding:12px;border-top:1px solid var(--b);display:flex;align-items:center;gap:8px}
+.nav-av{width:30px;height:30px;border-radius:50%;background:var(--accent-l);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--accent);flex-shrink:0}
+.nav-who{font-size:12px;color:var(--ink);font-weight:500}
+.nav-role{font-size:11px;color:var(--muted)}
+
+/* ── Layout ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden}
+.screen.active{display:flex}
+.topbar,.detail-bar{height:52px;background:var(--cream);border-bottom:1px solid var(--b);padding:0 24px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:700}
+.back{display:flex;align-items:center;gap:4px;font-size:13px;color:var(--t2);cursor:pointer;padding:6px 8px;border-radius:6px;transition:background .1s,color .1s}
+.back:hover{background:var(--surface2);color:var(--t1)}
+.crumb-id{font-size:12px;font-family:var(--mono);color:var(--t3)}
+
+/* ── Buttons ── */
+.btn{height:32px;display:inline-flex;align-items:center;gap:6px;padding:0 14px;font-size:13px;font-family:var(--font);font-weight:500;border-radius:8px;border:1px solid transparent;cursor:pointer;white-space:nowrap;transition:background .12s,border-color .12s;letter-spacing:-.01em}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 1px 2px rgba(43,58,46,.25)}
+.btn-primary:hover{background:var(--accent-t)}
+.btn-outline{background:var(--surface);color:var(--t1);border-color:var(--b);box-shadow:var(--sh)}
+.btn-outline:hover{background:var(--surface2);border-color:#CBD5E1}
+.btn-ghost{background:transparent;color:var(--t2)}
+.btn-ghost:hover{background:var(--surface2);color:var(--t1)}
+.btn-sm{height:28px;font-size:12px;padding:0 10px;border-radius:6px}
+
+/* ── Badges ── */
+.badge{height:22px;display:inline-flex;align-items:center;gap:5px;padding:0 9px;border-radius:11px;font-size:11px;font-weight:600;border:1px solid transparent;white-space:nowrap}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.b-open{background:var(--bg-open);color:var(--c-open);border-color:var(--bd-open)}.b-open .dot{background:var(--c-open)}
+.b-wip{background:var(--bg-wip);color:var(--c-wip);border-color:var(--bd-wip)}.b-wip .dot{background:var(--c-wip)}
+.b-impl{background:var(--bg-impl);color:var(--c-impl);border-color:var(--bd-impl)}.b-impl .dot{background:var(--c-impl)}
+.b-wait{background:var(--bg-wait);color:var(--c-wait);border-color:var(--bd-wait)}.b-wait .dot{background:var(--c-wait)}
+.b-done{background:var(--bg-done);color:var(--c-done);border-color:var(--bd-done)}.b-done .dot{background:var(--c-done)}
+.b-live{background:var(--bg-live);color:var(--c-live);border-color:var(--bd-live)}.b-live .dot{background:var(--c-live)}
+
+/* ── Custom Select ── */
+.csel{position:relative}
+.csel-btn{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 10px 0 12px;background:var(--surface);border:1px solid var(--b);border-radius:8px;font-size:13px;color:var(--t1);cursor:pointer;transition:border-color .12s,box-shadow .12s;user-select:none;gap:8px}
+.csel-btn:hover{border-color:#CBD5E1}
+.csel.open .csel-btn{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.csel-val{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.csel-val.ph{color:var(--t3)}
+.csel-chev{color:var(--t3);flex-shrink:0;transition:transform .15s}
+.csel.open .csel-chev{transform:rotate(180deg)}
+.csel-drop{display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:120;background:var(--surface);border:1px solid var(--b);border-radius:var(--r);box-shadow:0 8px 24px rgba(0,0,0,.1);overflow:hidden;max-height:220px;overflow-y:auto}
+.csel.open .csel-drop{display:block}
+.csel-opt{height:34px;display:flex;align-items:center;padding:0 12px;font-size:13px;cursor:pointer;transition:background .08s}
+.csel-opt:hover{background:var(--paper)}
+.csel-opt.sel{background:var(--paper);color:var(--ink);font-weight:500}
+
+/* ── Native inputs ── */
+.ctrl{height:34px;border:1px solid var(--b);border-radius:8px;padding:0 12px;font-size:13px;font-family:var(--font);color:var(--t1);background:var(--surface);outline:none;width:100%;transition:border-color .12s,box-shadow .12s}
+.ctrl:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+textarea.ctrl{height:auto;padding:8px 12px;resize:vertical;line-height:1.5}
+.ctrl.err{border-color:#EF4444}
+.field-label{display:block;font-size:11px;font-weight:500;color:var(--t3);margin-bottom:5px}
+
+/* ── Stats ── */
+.stats{display:flex;gap:12px;padding:16px 24px;background:var(--cream);border-bottom:1px solid var(--b);flex-shrink:0}
+.stat{flex:1;padding:14px 16px;background:var(--surface);border:1px solid var(--b);border-radius:var(--r);cursor:pointer;transition:border-color .12s,background .12s,box-shadow .12s;user-select:none;box-shadow:var(--sh)}
+.stat:hover{box-shadow:0 2px 12px rgba(31,42,34,.12)}
+.stat.active{border-color:var(--accent);background:var(--accent-l);box-shadow:0 0 0 1px var(--accent)}
+.stat-n{font-size:26px;font-weight:700;letter-spacing:-.04em;line-height:1}
+.stat-l{font-size:11px;color:var(--t2);margin-top:4px;font-weight:500}
+.stat-s{font-size:11px;color:var(--t3);margin-top:1px}
+.stat.c-amber .stat-n{color:#C07A16}.stat.c-blue .stat-n{color:var(--accent)}
+.stat.c-red .stat-n{color:#C0392B}.stat.c-green .stat-n{color:#1A7A4A}
+
+/* ── Toolbar ── */
+.toolbar{display:flex;align-items:center;gap:8px;padding:12px 24px;background:var(--cream);border-bottom:1px solid var(--b);flex-shrink:0}
+.search{height:34px;display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--b);border-radius:8px;padding:0 12px;width:280px;transition:border-color .12s,box-shadow .12s}
+.search:focus-within{background:var(--surface);border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.search input{border:none;background:transparent;font-size:13px;font-family:var(--font);color:var(--t1);outline:none;width:100%}
+.search input::placeholder{color:var(--t3)}
+.tbar-sp{flex:1}
+.row-cnt{font-size:12px;color:var(--t3)}
+
+/* ── Case rows ── */
+.list-wrap{flex:1;overflow:hidden;padding:16px 24px;background:var(--cream);display:flex;flex-direction:column}
+.case-list{display:flex;flex-direction:column;gap:4px}
+.table-card{background:var(--surface);border-radius:var(--r);border:1px solid var(--b);box-shadow:var(--sh);overflow-y:auto;flex:1}
+.case-row{height:56px;background:var(--surface);border:1px solid var(--b);border-radius:var(--r);display:flex;align-items:center;padding:0 16px 0 18px;gap:16px;cursor:pointer;position:relative;overflow:hidden;transition:border-color .12s,box-shadow .12s;box-shadow:var(--sh)}
+.case-row::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.case-row.ph::before{background:var(--ph)}.case-row.pm::before{background:var(--pm)}.case-row.pl::before{background:var(--pl)}
+.case-row:hover{border-color:#BFDBFE;box-shadow:0 2px 8px rgba(37,99,235,.08)}
+.row-body{flex:1;min-width:0}
+.row-l1{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-l2{font-size:12px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.row-l2 .sep{color:var(--b);margin:0 4px}
+.row-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.team-tag{height:22px;padding:0 9px;background:var(--surface2);border:1px solid var(--b);border-radius:11px;font-size:11px;color:var(--t2);font-weight:500;display:inline-flex;align-items:center;white-space:nowrap}
+.due{font-size:12px;color:var(--t2);min-width:64px;text-align:right;white-space:nowrap}
+.due.late{color:#EF4444;font-weight:600}.due.soon{color:#D97706;font-weight:600}
+
+/* ── Hero ── */
+.hero{height:88px;background:var(--cream);border-bottom:1px solid var(--b);padding:0 24px;display:flex;align-items:center;flex-shrink:0}
+.hero-body{flex:1;min-width:0}
+.hero-title{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.02em}
+.hero-meta{display:flex;align-items:center;gap:8px;margin-top:6px;overflow:hidden}
+.meta-chip{height:22px;padding:0 9px;background:#fff;border:1px solid var(--b);border-radius:11px;font-size:11px;color:var(--t2);font-weight:500;display:inline-flex;align-items:center;white-space:nowrap;flex-shrink:0}
+.meta-chip.warn{background:#FFFBEB;border-color:var(--bd-open);color:#92400E}
+.meta-chip.err{background:#FEF2F2;border-color:#FECACA;color:#991B1B}
+
+/* ── Tabs ── */
+.tabs{background:var(--cream);border-bottom:1px solid var(--b);padding:0 24px;display:flex;align-items:center;flex-shrink:0}
+.tab{height:42px;display:flex;align-items:center;gap:6px;padding:0 4px;margin-right:20px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;transition:color .12s}
+.tab:hover{color:var(--t1)}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tab-n{height:18px;padding:0 6px;background:var(--surface);border:1px solid var(--b);border-radius:9px;font-size:10px;font-weight:600;color:var(--t3);display:inline-flex;align-items:center}
+.tab.on .tab-n{background:var(--accent-l);border-color:var(--accent);color:var(--accent-t)}
+/* sidebar toggle in tab bar */
+.tab-bar-end{margin-left:auto;display:flex;align-items:center}
+.sidebar-toggle{height:28px;display:inline-flex;align-items:center;gap:5px;padding:0 10px;border:1px solid var(--b);border-radius:6px;font-size:11px;font-weight:500;color:var(--t2);cursor:pointer;background:var(--surface);transition:border-color .12s,color .12s,background .12s}
+.sidebar-toggle:hover{border-color:rgba(31,42,34,.25);color:var(--t1)}
+.sidebar-toggle.active{background:var(--accent-l);border-color:var(--accent);color:var(--accent-t)}
+
+.panels{flex:1;overflow:hidden}
+.panel{display:none;height:100%}
+.panel.on{display:flex;flex-direction:column}
+
+/* ── Bearbeitung ── */
+.work-layout{flex:1;display:grid;grid-template-columns:1fr 300px;overflow:hidden;transition:grid-template-columns .2s}
+.work-layout.sidebar-hidden{grid-template-columns:1fr 0}
+.work-left{display:flex;flex-direction:column;border-right:1px solid var(--b);overflow:hidden;min-width:0}
+.work-scroll{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:24px}
+.work-save{padding:12px 24px;border-top:1px solid var(--b);background:var(--surface);display:flex;align-items:center;justify-content:flex-end;flex-shrink:0}
+.work-right{overflow-y:auto;padding:20px;background:var(--surface2);display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.work-layout.sidebar-hidden .work-right{display:none}
+
+.section{display:flex;flex-direction:column;gap:10px}
+.section-head{font-size:11px;font-weight:600;color:var(--t3);padding-bottom:8px;border-bottom:1px solid var(--b)}
+.fields-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{display:flex;flex-direction:column}
+.span-2{grid-column:1/-1}
+
+/* Controlled field row (Team / Ursache / Massnahme) */
+.ctrl-row{height:34px;display:flex;align-items:center;padding:0 6px 0 12px;background:var(--surface);border:1px solid var(--b);border-radius:8px;gap:4px;transition:border-color .12s}
+.ctrl-row:hover{border-color:#CBD5E1}
+.ctrl-row-val{flex:1;font-size:13px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400}
+.ctrl-row-val.empty{color:var(--t3);font-weight:400}
+.icon-btn{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;border-radius:6px;color:var(--t3);cursor:pointer;transition:background .1s,color .1s;flex-shrink:0}
+.icon-btn:hover{background:var(--surface2);color:var(--t2)}
+
+/* Fact cards */
+.fact-card{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.fact-head{height:34px;padding:0 12px;background:var(--surface2);border-bottom:1px solid var(--b);display:flex;align-items:center;font-size:11px;font-weight:600;color:var(--t3)}
+.fact-body{padding:12px;display:flex;flex-direction:column;gap:8px}
+.fact-row{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px}
+.kv-l{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);font-weight:600;margin-bottom:3px}
+.kv-v{font-size:13px;color:var(--t1);font-weight:400;line-height:1.3}
+.kv-v.mono{font-family:var(--mono);font-size:12px;font-weight:400;color:var(--t2)}
+.kv-v.err{color:#EF4444;font-weight:600}
+.kv-v.warn{color:#D97706;font-weight:500}
+.kv-v a{color:var(--accent);text-decoration:none}
+.kv-v a:hover{text-decoration:underline}
+
+/* Attachments */
+.attach{display:flex;flex-direction:column;gap:4px}
+.attach-item{height:36px;display:flex;align-items:center;gap:8px;padding:0 10px;background:var(--surface2);border:1px solid var(--b);border-radius:8px;font-size:12px;cursor:pointer;transition:border-color .12s}
+.attach-item:hover{border-color:var(--accent)}
+.attach-name{flex:1;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.attach-size{color:var(--t3);flex-shrink:0}
+
+/* ── Aktivität panel ── */
+#p-feed{flex-direction:column}
+.feed-composer-bar{flex-shrink:0;padding:20px 28px 16px;background:var(--surface);border-bottom:1px solid var(--b)}
+.composer{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:border-color .12s,box-shadow .12s}
+.composer:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+.composer textarea{width:100%;border:none;padding:12px 14px;font-size:13px;font-family:var(--font);color:var(--t1);background:transparent;outline:none;resize:none;height:76px;line-height:1.55}
+.composer textarea::placeholder{color:var(--t3)}
+.composer-foot{height:42px;padding:0 12px;border-top:1px solid var(--b);background:var(--surface2);display:flex;align-items:center;justify-content:flex-end;gap:8px}
+.feed-body{flex:1;overflow-y:auto;padding:24px 28px}
+.feed-divider{display:flex;align-items:center;gap:12px;margin:0 0 20px;font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--t3)}
+.feed-divider::before,.feed-divider::after{content:'';flex:1;height:1px;background:var(--b)}
+.feed{display:flex;flex-direction:column;max-width:800px}
+
+/* Comment */
+.fe-comment{display:flex;gap:12px;padding-bottom:20px}
+.av{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.av-rw{background:linear-gradient(135deg,#10B981,#065F46)}
+.av-ca{background:linear-gradient(135deg,#8B5CF6,#5B21B6)}
+.av-ab{background:linear-gradient(135deg,#3B82F6,#1D4ED8)}
+.av-jm{background:linear-gradient(135deg,#F59E0B,#92400E)}
+.av-om{background:linear-gradient(135deg,#EC4899,#9D174D)}
+.fc-body{flex:1;min-width:0}
+.fc-meta{font-size:12px;color:var(--t3);margin-bottom:6px}
+.fc-meta strong{color:var(--t2);font-weight:600}
+.fc-bubble{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);border-top-left-radius:3px;padding:12px 14px;font-size:13px;line-height:1.6;color:var(--t1);box-shadow:var(--sh)}
+.at{color:var(--accent);font-weight:600}
+
+/* Event */
+.fe-event{display:flex;align-items:flex-start;gap:12px;padding-bottom:14px}
+.ev-dot-col{display:flex;flex-direction:column;align-items:center;padding-top:3px;flex-shrink:0;width:32px}
+.ev-dot{width:8px;height:8px;border-radius:50%;background:var(--b);border:2px solid var(--b);flex-shrink:0}
+.ev-dot.blue{background:var(--blue-l);border-color:var(--blue)}
+.ev-dot.green{background:var(--bg-done);border-color:var(--c-done)}
+.ev-dot.amber{background:var(--bg-open);border-color:var(--c-open)}
+.ev-dot.gray{background:var(--surface2);border-color:var(--t3)}
+.ev-line{width:1px;background:var(--b);flex:1;margin-top:4px;min-height:10px}
+.fe-event:last-child .ev-line{display:none}
+.ev-body{flex:1;padding-bottom:8px}
+.ev-text{font-size:13px;color:var(--t2);line-height:1.5}
+.ev-text strong{color:var(--t1);font-weight:600}
+.ev-text .arr{color:var(--t3);margin:0 5px}
+.ev-remark{font-size:12px;color:var(--t3);font-style:italic;margin-top:3px;padding-left:1px}
+.ev-time{font-size:11px;color:var(--t3);margin-top:3px}
+
+/* ── Stammdaten ── */
+.stamm-wrap{flex:1;overflow-y:auto;padding:28px 28px 40px;background:var(--bg)}
+.stamm-grid{display:grid;grid-template-columns:3fr 2fr;gap:16px}
+.stamm-card{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);display:flex;flex-direction:column}
+.stamm-card.wide{grid-column:1/-1}
+.stamm-head{min-height:40px;padding:0 16px;background:var(--surface2);border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:500;color:var(--t2);flex-shrink:0}
+.stamm-head-src{font-size:10px;font-weight:500;color:var(--t3);font-family:var(--mono);background:var(--bg);border:1px solid var(--b);border-radius:5px;padding:2px 8px;letter-spacing:.02em}
+.stamm-body{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;flex:1}
+.stamm-card.wide .stamm-body{grid-template-columns:repeat(4,1fr)}
+.stamm-sub{grid-column:1/-1;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);padding-bottom:8px;border-bottom:1px solid var(--b)}
+.stamm-sub+*{padding-top:0}
+.kv-span2{grid-column:span 2}
+.kv-chip{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:10px;font-size:11px;font-weight:600;border:1px solid transparent}
+.kv-chip.err{background:#FEF2F2;border-color:#FECACA;color:#991B1B}
+.kv-chip.warn{background:#FFFBEB;border-color:#FDE68A;color:#92400E}
+.kv-chip.ok{background:var(--bg-done);border-color:var(--bd-done);color:var(--c-done)}
+.live-banner{display:flex;align-items:center;gap:6px;padding:7px 10px;background:var(--bg-live);border:1px solid var(--bd-live);border-radius:7px;font-size:11px;font-weight:500;color:var(--c-live)}
+
+/* ── Modals ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(31,42,34,.40);z-index:200;align-items:center;justify-content:center}
+.overlay.on{display:flex}
+.modal{background:var(--surface);border-radius:var(--r);width:420px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;border:1px solid var(--b);box-shadow:0 20px 48px rgba(0,0,0,.15);overflow:hidden}
+.modal-lg{width:480px}
+.modal-head{height:52px;padding:0 20px;border-bottom:1px solid var(--b);display:flex;align-items:center;font-size:14px;font-weight:600;letter-spacing:-.01em;flex-shrink:0}
+.modal-close{margin-left:auto;width:28px;height:28px;border:none;background:transparent;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t3)}
+.modal-close:hover{background:var(--surface2);color:var(--t1)}
+.modal-body{padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.modal-foot{height:52px;padding:0 20px;border-top:1px solid var(--b);background:var(--surface2);display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-shrink:0}
+.chg-from{padding:10px 12px;background:var(--surface2);border:1px solid var(--b);border-radius:8px;font-size:12px;color:var(--t2)}
+.chg-from strong{color:var(--t1);font-weight:600}
+.dup{display:none;background:#FFFBEB;border:1px solid var(--bd-open);border-radius:8px;padding:10px 14px;font-size:12px;color:#78350F;gap:8px;line-height:1.55}
+.dup.on{display:flex}
+.dup a{color:var(--accent);cursor:pointer;text-decoration:underline}
+
+/* ── History popover ── */
+.hist-pop{display:none;position:fixed;z-index:300;width:300px;background:var(--surface);border:1px solid var(--b);border-radius:var(--r);box-shadow:0 12px 32px rgba(0,0,0,.12);overflow:hidden}
+.hist-pop.on{display:block}
+.hist-head{height:44px;padding:0 14px;border-bottom:1px solid var(--b);display:flex;align-items:center;font-size:13px;font-weight:600}
+.hist-body{max-height:260px;overflow-y:auto}
+.hist-entry{padding:11px 14px;border-bottom:1px solid var(--b);display:flex;flex-direction:column;gap:3px}
+.hist-entry:last-child{border-bottom:none}
+.hist-val{font-size:12px;font-weight:500;color:var(--t1)}
+.hist-val .arr{color:var(--t3);margin:0 4px;font-weight:400}
+.hist-meta{font-size:11px;color:var(--t3)}
+.hist-rmk{font-size:11px;color:var(--t2);font-style:italic;margin-top:1px}
+.hist-empty{padding:14px;font-size:12px;color:var(--t3)}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--b);border-radius:2px}
+
+/* ── Case Table ── */
+.case-table{width:100%;border-collapse:collapse}
+.case-table thead{position:sticky;top:0;z-index:10;background:var(--surface)}
+.case-table thead tr{border-bottom:1px solid var(--b)}
+.case-table thead th{padding:0 14px;height:38px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--t3);text-align:left;white-space:nowrap;user-select:none}
+.th-p{width:4px;padding:0!important}
+.th-sort{cursor:pointer;transition:color .1s}
+.th-sort:hover{color:var(--t2);background:var(--surface2)}
+.th-active{color:var(--accent)!important}
+.sort-icon{margin-left:3px;font-style:normal;font-size:10px;opacity:0;transition:opacity .1s}
+.th-sort:hover .sort-icon{opacity:.45}
+.th-active .sort-icon{opacity:1!important}
+.case-table tbody tr{height:48px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .08s}
+.case-table tbody tr:last-child{border-bottom:none}
+.case-table tbody tr:hover{background:var(--paper)}
+.case-table tbody td{padding:0 14px;vertical-align:middle;font-size:13px;color:var(--t2);white-space:nowrap}
+.td-p{width:4px;padding:0!important;min-width:4px}
+.td-p.ph{background:var(--ph)}.td-p.pm{background:var(--pm)}.td-p.pl{background:var(--pl)}
+.td-id{font-family:var(--mono);font-size:11px;color:var(--t3);width:110px}
+.td-addr{font-size:13px;font-weight:400;color:var(--t1);max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.td-team{width:64px;font-size:12px;color:var(--t3)}
+.td-person{width:150px}
+.td-since{width:106px;font-size:12px;color:var(--t3)}
+.td-due{width:106px;font-size:12px;font-weight:400;color:var(--t3)}
+.td-due.late{color:#EF4444;font-weight:600}.td-due.soon{color:#D97706;font-weight:500}
+.td-status{width:148px}
+
+/* ── Dashboard ── */
+.db-wrap{flex:1;overflow-y:auto;padding:24px;background:var(--bg);display:flex;flex-direction:column;gap:20px}
+.db-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.db-kpi{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);transition:box-shadow .15s}
+.db-kpi:hover{box-shadow:0 2px 16px rgba(31,42,34,.14)}
+.db-kpi-n{font-size:28px;font-weight:700;letter-spacing:-.04em;line-height:1}
+.db-kpi-l{font-size:11px;color:var(--t2);margin-top:4px;font-weight:500}
+.db-kpi-s{font-size:11px;color:var(--t3);margin-top:1px}
+.db-kpi.c-amber .db-kpi-n{color:#C07A16}.db-kpi.c-red .db-kpi-n{color:#C0392B}
+.db-kpi.c-blue .db-kpi-n{color:var(--accent)}.db-kpi.c-green .db-kpi-n{color:#1A7A4A}
+.db-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.db-card{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.db-card-head{height:44px;padding:0 16px;background:var(--surface2);border-bottom:1px solid var(--b);display:flex;align-items:center;font-size:13px;font-weight:600;color:var(--t1)}
+.db-card-body{padding:16px}
+.bar-chart{display:flex;flex-direction:column;gap:10px}
+.bar-row{display:flex;align-items:center;gap:10px}
+.bar-lbl{width:44px;font-size:12px;color:var(--t2);font-weight:600;flex-shrink:0}
+.bar-track{flex:1;height:22px;background:var(--bg);border-radius:4px;overflow:hidden;display:flex;border:1px solid var(--b)}
+.bar-seg{height:100%;display:flex;align-items:center;padding:0 5px;font-size:10px;font-weight:700;color:rgba(255,255,255,.9);white-space:nowrap;overflow:hidden;min-width:0}
+.bar-seg.s-open{background:var(--c-open)}.bar-seg.s-wip{background:var(--c-wip)}
+.bar-seg.s-impl{background:var(--c-impl)}.bar-seg.s-wait{background:var(--c-wait)}
+.bar-seg.s-done{background:#A8A79F}
+.bar-cnt{font-size:12px;color:var(--t3);width:20px;text-align:right;flex-shrink:0}
+.bar-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--b)}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)}
+.leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.trig-list{display:flex;flex-direction:column}
+.trig-row{padding:10px 0;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:10px}
+.trig-row:last-child{border-bottom:none;padding-bottom:0}
+.trig-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700}
+.trig-icon.new{background:var(--accent-l);color:var(--accent)}.trig-icon.skip{background:var(--paper);color:var(--t3)}
+.trig-icon.ok{background:var(--bg-done);color:var(--c-done)}
+.trig-meta{flex:1;min-width:0}
+.trig-title{font-size:12px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trig-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.trig-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;flex-shrink:0}
+.trig-badge.new{background:var(--accent-l);color:var(--accent-t);border:1px solid rgba(43,58,46,.18)}
+.trig-badge.skip{background:var(--paper);color:var(--t2);border:1px solid var(--b)}
+.trig-badge.ok{background:var(--bg-done);color:var(--c-done);border:1px solid var(--bd-done)}
+.due-list{display:flex;flex-direction:column;gap:6px}
+.due-row{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--surface2);border:1px solid var(--b);border-radius:8px;cursor:pointer;transition:border-color .12s}
+.due-row:hover{border-color:var(--accent)}
+.due-row-id{font-size:10px;font-family:var(--mono);color:var(--t3);flex-shrink:0;width:96px}
+.due-row-addr{flex:1;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.due-row-date{font-size:11px;font-weight:600;flex-shrink:0}
+.due-row.late .due-row-date{color:#EF4444}.due-row.soon .due-row-date{color:#D97706}
+.stat-breakdown{display:flex;flex-direction:column;gap:8px}
+.stat-breakdown-row{display:flex;justify-content:space-between;align-items:center}
+.stat-breakdown-n{font-size:14px;font-weight:700;color:var(--t1)}
+
+/* ── Administration ── */
+.adm-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.adm-tabs{background:var(--cream);border-bottom:1px solid var(--b);padding:0 24px;display:flex;flex-shrink:0}
+.adm-tab{height:44px;display:flex;align-items:center;padding:0 16px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;transition:color .12s}
+.adm-tab:hover{color:var(--t1)}
+.adm-tab.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.adm-panels{flex:1;overflow-y:auto}
+.adm-panel{display:none;padding:24px}
+.adm-panel.on{display:block}
+.adm-section{margin-bottom:28px}
+.adm-sec-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:16px}
+.adm-sec-title{font-size:13px;font-weight:600;color:var(--t1)}
+.adm-sec-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.adm-list{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.adm-item{height:48px;display:flex;align-items:center;padding:0 14px;gap:10px;border-bottom:1px solid var(--b);transition:background .1s}
+.adm-item:last-child{border-bottom:none}
+.adm-item:hover{background:var(--surface2)}
+.adm-item:hover .adm-acts{opacity:1}
+.adm-item-ico{width:28px;height:28px;border-radius:6px;background:var(--bg);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.adm-item-label{flex:1;font-size:13px;font-weight:500;color:var(--t1)}
+.adm-acts{display:flex;gap:4px;opacity:0;transition:opacity .1s;flex-shrink:0}
+.rule-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rule-card{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.rule-card-head{padding:13px 14px;border-bottom:1px solid var(--b);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.rule-card-title{font-size:13px;font-weight:600;color:var(--t1)}
+.rule-card-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.rule-card-body{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.rule-kv{display:flex;align-items:center;justify-content:space-between}
+.rule-kv-l{font-size:11px;color:var(--t3)}
+.rule-kv-v{font-size:12px;font-weight:600;color:var(--t1)}
+.tog{position:relative;width:36px;height:20px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-sl{position:absolute;inset:0;border-radius:10px;background:var(--b);cursor:pointer;transition:background .15s}
+.tog-sl::before{content:'';position:absolute;width:14px;height:14px;left:3px;top:3px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.tog input:checked+.tog-sl{background:var(--accent)}
+.tog input:checked+.tog-sl::before{transform:translateX(16px)}
+.user-table{background:var(--surface);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)}
+.user-thead{display:grid;grid-template-columns:36px 1fr 100px 100px;gap:12px;padding:0 14px;height:36px;align-items:center;background:var(--surface2);border-bottom:1px solid var(--b);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3)}
+.user-row{display:grid;grid-template-columns:36px 1fr 100px 100px;gap:12px;padding:0 14px;height:52px;align-items:center;border-bottom:1px solid var(--b);transition:background .1s}
+.user-row:last-child{border-bottom:none}
+.user-row:hover{background:var(--surface2)}
+.u-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.u-name{font-size:13px;font-weight:500;color:var(--t1)}
+.u-email{font-size:11px;color:var(--t3)}
+.role-badge{height:20px;padding:0 8px;border-radius:10px;font-size:10px;font-weight:600;display:inline-flex;align-items:center}
+.role-badge.admin{background:var(--accent-l);color:var(--accent-t);border:1px solid rgba(43,58,46,.2)}
+.role-badge.user{background:var(--surface2);color:var(--t2);border:1px solid var(--b)}
+.role-badge.viewer{background:#F5F3FF;color:#7C3AED;border:1px solid #DDD6FE}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-mark">EWZ</div>
+    <div><div class="nav-brand">ewz <span>Störungsmanagement</span></div></div>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-section">
+    <div class="nav-label">Fälle</div>
+    <div class="nav-item active" onclick="setNav(this);filterView('mine')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="7.5" y="1" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="1" y="7.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="7.5" y="7.5" width="5.5" height="5.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+      Meine Fälle <span class="nav-badge" id="badge-mine">3</span>
+    </div>
+    <div class="nav-item" onclick="setNav(this);filterView('team')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="5" cy="4.5" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M1 12c0-2.2 1.8-3.5 4-3.5s4 1.3 4 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="10" cy="5" r="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M10 9.5c1.5.3 2.5 1.2 2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Team NDMD <span class="nav-badge" id="badge-team">7</span>
+    </div>
+    <div class="nav-item" onclick="setNav(this);filterView('all')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1.5 3.5h11M1.5 7h11M1.5 10.5h11" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Alle Fälle
+    </div>
+  </div>
+  <div class="nav-sep"></div>
+  <div class="nav-section">
+    <div class="nav-label">System</div>
+    <div class="nav-item" onclick="setNav(this);go('dashboard')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="5" width="2.5" height="8" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="5.5" y="3" width="2.5" height="10" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="10.5" y="1" width="2.5" height="12" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+      Dashboard
+    </div>
+    <div class="nav-item" onclick="setNav(this);go('admin')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Administration
+    </div>
+  </div>
+  <div class="nav-foot">
+    <div class="nav-av">RW</div>
+    <div><div class="nav-who">Reto Wuhrmann</div><div class="nav-role">NDMD</div></div>
+  </div>
+</nav>
+
+<div class="main">
+
+<!-- ═══ LIST ═══ -->
+<div class="screen active" id="s-list">
+  <div class="topbar">
+    <span class="topbar-title" id="view-title">Meine Fälle</span>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm" onclick="alert('Export…')">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 5.5l3 2.5 3-2.5M1 10.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>xlsx
+      </button>
+      <button class="btn btn-primary btn-sm" onclick="openModal()">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Neuer Fall
+      </button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat c-amber" onclick="filterByStat(this,'open')">
+      <div class="stat-n">5</div><div class="stat-l">Offen</div><div class="stat-s">2 überfällig</div>
+    </div>
+    <div class="stat c-blue" onclick="filterByStat(this,'wip')">
+      <div class="stat-n">4</div><div class="stat-l">In Bearbeitung</div><div class="stat-s">2 Teams aktiv</div>
+    </div>
+    <div class="stat c-red" onclick="filterByStat(this,'late')">
+      <div class="stat-n">2</div><div class="stat-l">Überfällig</div><div class="stat-s">Handlungsbedarf</div>
+    </div>
+    <div class="stat c-green" onclick="filterByStat(this,'done')">
+      <div class="stat-n">3</div><div class="stat-l">Gelöst diese Woche</div><div class="stat-s">Ø 2.8 Tage</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#94A3B8" stroke-width="1.5"/><path d="M10 10l2 2" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Adresse, Zählpunkt, Fall-Nr." id="s-inp" oninput="applyFilter()">
+    </div>
+    <div class="tbar-sp"></div>
+    <span class="row-cnt" id="row-cnt"></span>
+  </div>
+
+  <div class="list-wrap">
+    <div class="table-card">
+    <table class="case-table">
+      <thead>
+        <tr>
+          <th class="th-p"></th>
+          <th class="th-sort" data-sort="id" onclick="sortBy('id')">Fall-Nr. <span class="sort-icon">↕</span></th>
+          <th class="th-sort" data-sort="addr" onclick="sortBy('addr')">Adresse <span class="sort-icon">↕</span></th>
+          <th class="th-sort" data-sort="status" onclick="sortBy('status')">Status <span class="sort-icon">↕</span></th>
+          <th class="th-sort" data-sort="team" onclick="sortBy('team')">Team <span class="sort-icon">↕</span></th>
+          <th class="th-sort" data-sort="person" onclick="sortBy('person')">Person <span class="sort-icon">↕</span></th>
+          <th class="th-sort" data-sort="since" onclick="sortBy('since')">Lücke seit <span class="sort-icon">↕</span></th>
+          <th class="th-sort th-active" data-sort="due" onclick="sortBy('due')">Fälligkeit <span class="sort-icon">↑</span></th>
+        </tr>
+      </thead>
+      <tbody id="case-list"></tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ DETAIL ═══ -->
+<div class="screen" id="s-detail">
+
+  <div class="detail-bar">
+    <div class="back" onclick="go('list')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2L3 7l6 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Zurück
+    </div>
+    <span style="color:var(--b)">·</span>
+    <span class="crumb-id">F-2026-0042</span>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="alert('Link kopiert')">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M5 3H3a2 2 0 000 4h2M7 9h2a2 2 0 000-4H7M4 6h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Link
+      </button>
+      <button class="btn btn-outline btn-sm" onclick="alert('AVOnline…')">AVOnline ↗</button>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-body">
+      <div class="hero-title">Lastganglücke · Seestrasse 18, 8002 Zürich</div>
+      <div class="hero-meta">
+        <span class="badge b-live"><span class="dot"></span>Zähler live</span>
+        <span class="meta-chip err">Priorität Hoch</span>
+        <span class="meta-chip warn">Fälligkeit 15.05.2026</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on" id="tab-work" onclick="setTab('work',this)">Bearbeitung</div>
+    <div class="tab" id="tab-feed" onclick="setTab('feed',this)">Aktivität <span class="tab-n">8</span></div>
+    <div class="tab" id="tab-stamm" onclick="setTab('stamm',this)">Stammdaten</div>
+    <div class="tab-bar-end" id="tab-bar-end">
+      <div class="sidebar-toggle active" id="sb-toggle" onclick="toggleSidebar()" title="Auf einen Blick ein-/ausblenden">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M9 1v11" stroke="currentColor" stroke-width="1.4"/></svg>
+        Auf einen Blick
+      </div>
+    </div>
+  </div>
+
+  <div class="panels">
+
+    <!-- ── Bearbeitung ── -->
+    <div class="panel on" id="p-work">
+      <div class="work-layout" id="work-layout">
+        <div class="work-left">
+          <div class="work-scroll">
+
+            <div class="section">
+              <div class="section-head">Workflow</div>
+              <div class="fields-2">
+
+                <div class="field">
+                  <label class="field-label">Status</label>
+                  <div class="csel">
+                    <div class="csel-btn" onclick="toggleCsel(this.closest('.csel'))">
+                      <span class="csel-val">In Bearbeitung</span>
+                      <svg class="csel-chev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="csel-drop">
+                      <div class="csel-opt" onclick="pickCsel(this,'Offen')">Offen</div>
+                      <div class="csel-opt sel" onclick="pickCsel(this,'In Bearbeitung')">In Bearbeitung</div>
+                      <div class="csel-opt" onclick="pickCsel(this,'In Umsetzung')">In Umsetzung</div>
+                      <div class="csel-opt" onclick="pickCsel(this,'Zähler live')">Zähler live</div>
+                      <div class="csel-opt" onclick="pickCsel(this,'Warten auf Kunde')">Warten auf Kunde</div>
+                      <div class="csel-opt" onclick="pickCsel(this,'Abgeschlossen')">Abgeschlossen</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="field-label">Priorität</label>
+                  <div class="csel">
+                    <div class="csel-btn" onclick="toggleCsel(this.closest('.csel'))">
+                      <span class="csel-val">Hoch</span>
+                      <svg class="csel-chev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="csel-drop">
+                      <div class="csel-opt sel" onclick="pickCsel(this,'Hoch')">Hoch</div>
+                      <div class="csel-opt" onclick="pickCsel(this,'Mittel')">Mittel</div>
+                      <div class="csel-opt" onclick="pickCsel(this,'Niedrig')">Niedrig</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TEAM -->
+                <div class="field">
+                  <label class="field-label">Team</label>
+                  <div class="ctrl-row">
+                    <span class="ctrl-row-val" id="val-team">NDMD</span>
+                    <button class="icon-btn" title="Ändern" onclick="openChangeModal('team')">
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button class="icon-btn" title="Verlauf anzeigen" onclick="openHistory('team',this)">
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 4v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="field-label">Person</label>
+                  <div class="csel">
+                    <div class="csel-btn" onclick="toggleCsel(this.closest('.csel'))">
+                      <span class="csel-val">Reto Wuhrmann</span>
+                      <svg class="csel-chev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="csel-drop">
+                      <div class="csel-opt" onclick="pickCsel(this,'– Nicht zugewiesen –')">– Nicht zugewiesen –</div>
+                      <div class="csel-opt sel" onclick="pickCsel(this,'Reto Wuhrmann')">Reto Wuhrmann</div>
+                      <div class="csel-opt" onclick="pickCsel(this,'Adrian Brumann')">Adrian Brumann</div>
+                      <div class="csel-opt" onclick="pickCsel(this,'Othmar Marty')">Othmar Marty</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label class="field-label">Fälligkeitsdatum</label>
+                  <input type="date" class="ctrl" value="2026-05-15">
+                </div>
+
+                <div class="field">
+                  <label class="field-label">Vor Ort nötig</label>
+                  <div class="csel">
+                    <div class="csel-btn" onclick="toggleCsel(this.closest('.csel'))">
+                      <span class="csel-val">Unbekannt</span>
+                      <svg class="csel-chev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                    </div>
+                    <div class="csel-drop">
+                      <div class="csel-opt sel" onclick="pickCsel(this,'Unbekannt')">Unbekannt</div>
+                      <div class="csel-opt" onclick="pickCsel(this,'Ja')">Ja</div>
+                      <div class="csel-opt" onclick="pickCsel(this,'Nein')">Nein</div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div><!-- /workflow -->
+
+            <div class="section">
+              <div class="section-head">Ursache &amp; Massnahme</div>
+              <div class="fields-2">
+
+                <!-- URSACHE -->
+                <div class="field">
+                  <label class="field-label">Ursache</label>
+                  <div class="ctrl-row">
+                    <span class="ctrl-row-val" id="val-ursache">Unterbruch Kommunikation</span>
+                    <button class="icon-btn" title="Ändern" onclick="openChangeModal('ursache')">
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button class="icon-btn" title="Verlauf anzeigen" onclick="openHistory('ursache',this)">
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 4v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- MASSNAHME -->
+                <div class="field">
+                  <label class="field-label">Massnahme</label>
+                  <div class="ctrl-row">
+                    <span class="ctrl-row-val" id="val-massnahme">Glasfaserstörung (Netadmin)</span>
+                    <button class="icon-btn" title="Ändern" onclick="openChangeModal('massnahme')">
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                    <button class="icon-btn" title="Verlauf anzeigen" onclick="openHistory('massnahme',this)">
+                      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M6.5 4v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="field span-2">
+                  <label class="field-label">Beschreibung</label>
+                  <textarea class="ctrl" rows="3">BGW antwortet seit 13.05. nicht. Last Date of Sign lt. AMM+ 12.05. 23:45. Netadmin Ticket #NT-2026-0834 eröffnet.</textarea>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-head">Anhänge &amp; Links</div>
+              <div class="attach">
+                <div class="attach-item" onclick="alert('Netadmin…')"><span>🔗</span><span class="attach-name">Netadmin #NT-2026-0834</span><span class="attach-size">↗ Link</span></div>
+                <div class="attach-item"><span>🖼️</span><span class="attach-name">Foto_BGW_Seestrasse18.jpg</span><span class="attach-size">2.4 MB</span></div>
+                <div class="attach-item"><span>📄</span><span class="attach-name">Installationsprotokoll_2026-05-12.pdf</span><span class="attach-size">486 KB</span></div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:6px">
+                <button class="btn btn-ghost btn-sm">+ Anhang</button>
+                <button class="btn btn-ghost btn-sm">+ Link</button>
+              </div>
+            </div>
+
+          </div><!-- /work-scroll -->
+          <div class="work-save">
+            <button class="btn btn-primary" onclick="alert('Gespeichert ✓')">Speichern</button>
+          </div>
+        </div><!-- /work-left -->
+
+        <div class="work-right" id="work-right">
+          <div style="font-size:11px;font-weight:600;color:var(--t3);margin-bottom:2px">Auf einen Blick</div>
+          <div class="fact-card">
+            <div class="fact-head">Lastganglücke</div>
+            <div class="fact-body">
+              <div class="fact-row">
+                <div><div class="kv-l">Seit</div><div class="kv-v err">13.05.2026</div></div>
+                <div><div class="kv-l">Typ</div><div class="kv-v">Endlücke</div></div>
+                <div><div class="kv-l">Kategorie</div><div class="kv-v">Fremdbeliefert</div></div>
+                <div><div class="kv-l">Regel</div><div class="kv-v">36h</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="fact-card">
+            <div class="fact-head">Zählpunkt</div>
+            <div class="fact-body">
+              <div><div class="kv-l">ID</div><div class="kv-v mono">CH001…4325478</div></div>
+              <div><div class="kv-l">Adresse</div><div class="kv-v"><a href="#" onclick="alert('SAP…')">Seestrasse 18, 8002 ZH ↗</a></div></div>
+              <div class="fact-row">
+                <div><div class="kv-l">Netzebene</div><div class="kv-v">NE7</div></div>
+                <div><div class="kv-l">Typ</div><div class="kv-v">iMG Type 3</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="fact-card">
+            <div class="fact-head">Kommunikation</div>
+            <div class="fact-body">
+              <div class="live-banner">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5l2 2 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Zähler wieder live · 14.05.2026, 07:22
+              </div>
+              <div class="fact-row">
+                <div><div class="kv-l">Status</div><div class="kv-v"><span class="kv-chip ok">ONLINE</span></div></div>
+                <div><div class="kv-l">Art</div><div class="kv-v">FTTH</div></div>
+                <div><div class="kv-l">Last Sign</div><div class="kv-v" style="color:var(--c-live)">14.05. 07:22</div></div>
+                <div><div class="kv-l">AC5</div><div class="kv-v">C102</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /p-work -->
+
+    <!-- ── Aktivität ── -->
+    <div class="panel" id="p-feed">
+
+      <div class="feed-composer-bar">
+        <div class="composer">
+          <textarea placeholder="Kommentar schreiben… (@Person für Erwähnung)"></textarea>
+          <div class="composer-foot">
+            <button class="btn btn-ghost btn-sm">Abbrechen</button>
+            <button class="btn btn-primary btn-sm" onclick="alert('Kommentar gespeichert ✓')">Senden</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="feed-body">
+        <div class="feed-divider">Verlauf — neueste zuerst</div>
+        <div class="feed">
+
+          <div class="fe-event">
+            <div class="ev-dot-col"><div class="ev-dot" style="background:var(--bg-live);border-color:var(--c-live)"></div><div class="ev-line"></div></div>
+            <div class="ev-body">
+              <div class="ev-text"><strong>System</strong> · Zähler wieder live erkannt · AMM+ meldet Polling OK</div>
+              <div class="ev-time">14.05.2026, 07:22</div>
+            </div>
+          </div>
+
+          <div class="fe-comment">
+            <div class="av av-ca">CA</div>
+            <div class="fc-body">
+              <div class="fc-meta"><strong>Claude Auderset</strong> · 13.05.2026, 08:30</div>
+              <div class="fc-bubble">Glasfaser-Entstörung läuft. Netadmin meldet Behebung bis 15.05. Warte auf Bestätigung von Swisscom.</div>
+            </div>
+          </div>
+
+          <div class="fe-event">
+            <div class="ev-dot-col"><div class="ev-dot blue"></div><div class="ev-line"></div></div>
+            <div class="ev-body">
+              <div class="ev-text"><strong>Claude Auderset</strong> hat Status geändert: <strong>Offen</strong><span class="arr">→</span><strong>In Bearbeitung</strong></div>
+              <div class="ev-time">13.05.2026, 08:28</div>
+            </div>
+          </div>
+
+          <div class="fe-event">
+            <div class="ev-dot-col"><div class="ev-dot amber"></div><div class="ev-line"></div></div>
+            <div class="ev-body">
+              <div class="ev-text"><strong>Reto Wuhrmann</strong> hat Team geändert: <strong>NDBS</strong><span class="arr">→</span><strong>NDMD</strong></div>
+              <div class="ev-remark">"Zurück an NDMD nach Rücksprache mit Teamleitung"</div>
+              <div class="ev-time">12.05.2026, 14:15</div>
+            </div>
+          </div>
+
+          <div class="fe-event">
+            <div class="ev-dot-col"><div class="ev-dot amber"></div><div class="ev-line"></div></div>
+            <div class="ev-body">
+              <div class="ev-text"><strong>Reto Wuhrmann</strong> hat Team geändert: <strong>NDMD</strong><span class="arr">→</span><strong>NDBS</strong></div>
+              <div class="ev-remark">"FTTH Entstörung läuft, NDBS ist zuständig"</div>
+              <div class="ev-time">12.05.2026, 11:02</div>
+            </div>
+          </div>
+
+          <div class="fe-event">
+            <div class="ev-dot-col"><div class="ev-dot gray"></div><div class="ev-line"></div></div>
+            <div class="ev-body">
+              <div class="ev-text"><strong>Reto Wuhrmann</strong> hat Massnahme gesetzt: <strong>Glasfaserstörung (Netadmin)</strong></div>
+              <div class="ev-remark">"Netadmin Ticket #NT-2026-0834 eröffnet"</div>
+              <div class="ev-time">12.05.2026, 10:46</div>
+            </div>
+          </div>
+
+          <div class="fe-event">
+            <div class="ev-dot-col"><div class="ev-dot gray"></div><div class="ev-line"></div></div>
+            <div class="ev-body">
+              <div class="ev-text"><strong>Reto Wuhrmann</strong> hat Ursache gesetzt: <strong>Unterbruch Kommunikation</strong></div>
+              <div class="ev-remark">"BGW antwortet nicht, FTTH Störung vermutet"</div>
+              <div class="ev-time">12.05.2026, 10:45</div>
+            </div>
+          </div>
+
+          <div class="fe-comment">
+            <div class="av av-rw">RW</div>
+            <div class="fc-body">
+              <div class="fc-meta"><strong>Reto Wuhrmann</strong> · 12.05.2026, 10:45</div>
+              <div class="fc-bubble">BGW Seestrasse 18 antwortet nicht. FTTH, Last Date of Sign 12.05. 23:45. Netadmin Ticket eröffnet (#NT-2026-0834). <span class="at">@Claude Auderset</span> bitte für Vor-Ort auf Abruf halten.</div>
+            </div>
+          </div>
+
+          <div class="fe-event">
+            <div class="ev-dot-col"><div class="ev-dot green"></div></div>
+            <div class="ev-body">
+              <div class="ev-text"><strong>System</strong> hat Fall automatisch eröffnet · Regel: <strong>Fremdbeliefert 36h</strong> · Zuweisung: <strong>NDMD</strong></div>
+              <div class="ev-time">12.05.2026, 08:14</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /p-feed -->
+
+    <!-- ── Stammdaten ── -->
+    <div class="panel" id="p-stamm">
+      <div class="stamm-wrap">
+        <div class="stamm-grid">
+
+          <!-- Zählpunkt & Gerät — full width, grouped -->
+          <div class="stamm-card wide">
+            <div class="stamm-head">
+              Zählpunkt &amp; Gerät
+              <span class="stamm-head-src">SAP · DSP</span>
+            </div>
+            <div class="stamm-body">
+
+              <div class="stamm-sub">Identifikation</div>
+              <div class="kv-span2">
+                <div class="kv-l">Zählpunkt-ID</div>
+                <div class="kv-v mono">CH0016300000000000000004325478</div>
+              </div>
+              <div>
+                <div class="kv-l">Zählertyp</div>
+                <div class="kv-v">iMG Type 3</div>
+              </div>
+              <div>
+                <div class="kv-l">Seriennummer</div>
+                <div class="kv-v mono">SN-2024-88741</div>
+              </div>
+              <div>
+                <div class="kv-l">Gerätestatus</div>
+                <div class="kv-v">ELAG</div>
+              </div>
+
+              <div class="stamm-sub">Netz &amp; Installation</div>
+              <div>
+                <div class="kv-l">Netz</div>
+                <div class="kv-v">EWZ_ZH</div>
+              </div>
+              <div>
+                <div class="kv-l">Netzebene</div>
+                <div class="kv-v">NE7</div>
+              </div>
+              <div>
+                <div class="kv-l">Installation</div>
+                <div class="kv-v">03.03.2023</div>
+              </div>
+              <div>
+                <div class="kv-l">Inbetriebnahme</div>
+                <div class="kv-v">03.03.2023</div>
+              </div>
+
+              <div class="stamm-sub">Standort</div>
+              <div class="kv-span2">
+                <div class="kv-l">Anschlussobjekt</div>
+                <div class="kv-v"><a href="#" onclick="alert('SAP Hausübersicht…')">Seestrasse 18, 8002 Zürich ↗</a></div>
+              </div>
+              <div>
+                <div class="kv-l">Geräteplatz</div>
+                <div class="kv-v">EG / Kasten 1</div>
+              </div>
+              <div>
+                <div class="kv-l">Stockwerk</div>
+                <div class="kv-v">EG</div>
+              </div>
+
+              <div class="stamm-sub">Referenz</div>
+              <div>
+                <div class="kv-l">Inst.-Meldung</div>
+                <div class="kv-v mono">IM-2023-04419</div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Kommunikation (3fr) -->
+          <div class="stamm-card">
+            <div class="stamm-head">
+              Kommunikation
+              <span class="stamm-head-src">AMM+</span>
+            </div>
+            <div class="stamm-body">
+              <div>
+                <div class="kv-l">Kommunikationsart</div>
+                <div class="kv-v">FTTH</div>
+              </div>
+              <div>
+                <div class="kv-l">Gerät (NT)</div>
+                <div class="kv-v">BGW-240</div>
+              </div>
+              <div>
+                <div class="kv-l">AMICAG-Status</div>
+                <div class="kv-v"><span class="kv-chip ok">ONLINE</span></div>
+              </div>
+              <div>
+                <div class="kv-l">G-OTO-ID</div>
+                <div class="kv-v mono">OTO-48821</div>
+              </div>
+              <div>
+                <div class="kv-l">Komm.-Status AMM+</div>
+                <div class="kv-v"><span class="kv-chip ok">OK</span></div>
+              </div>
+              <div>
+                <div class="kv-l">Last Date of Sign</div>
+                <div class="kv-v" style="color:var(--c-live)">14.05.2026, 07:22</div>
+              </div>
+              <div>
+                <div class="kv-l">AC5 Code</div>
+                <div class="kv-v">C102</div>
+              </div>
+              <div style="grid-column:1/-1">
+                <div class="kv-l">Beschreibung AMM+</div>
+                <div class="kv-v" style="color:var(--t2)">BGW kein Polling seit 13.05.2026</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Kaufmännische Daten (2fr) -->
+          <div class="stamm-card">
+            <div class="stamm-head">
+              Kaufmännische Daten
+              <span class="stamm-head-src">SAP</span>
+            </div>
+            <div class="stamm-body">
+              <div>
+                <div class="kv-l">Vertragskonto</div>
+                <div class="kv-v mono">VC-1029384</div>
+              </div>
+              <div>
+                <div class="kv-l">Tariftyp</div>
+                <div class="kv-v">HT/NT Doppeltarif</div>
+              </div>
+              <div>
+                <div class="kv-l">LEG ID</div>
+                <div class="kv-v" style="color:var(--t3)">–</div>
+              </div>
+              <div>
+                <div class="kv-l">Solarsplit ID</div>
+                <div class="kv-v" style="color:var(--t3)">–</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /panels -->
+</div><!-- /s-detail -->
+
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="screen" id="s-dashboard">
+  <div class="topbar">
+    <span class="topbar-title">Dashboard</span>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <span style="font-size:12px;color:var(--t3)">Stand: 14.05.2026, 06:15</span>
+    </div>
+  </div>
+  <div class="db-wrap">
+
+    <div class="db-kpis">
+      <div class="db-kpi c-amber">
+        <div class="db-kpi-n">12</div>
+        <div class="db-kpi-l">Aktive Fälle</div>
+        <div class="db-kpi-s">+2 heute eröffnet</div>
+      </div>
+      <div class="db-kpi c-red">
+        <div class="db-kpi-n">2</div>
+        <div class="db-kpi-l">Überfällig</div>
+        <div class="db-kpi-s">Handlungsbedarf</div>
+      </div>
+      <div class="db-kpi c-blue">
+        <div class="db-kpi-n">4</div>
+        <div class="db-kpi-l">Teams aktiv</div>
+        <div class="db-kpi-s">NDMD · NDMA · NDBS · NDBM</div>
+      </div>
+      <div class="db-kpi c-green">
+        <div class="db-kpi-n">3</div>
+        <div class="db-kpi-l">Gelöst diese Woche</div>
+        <div class="db-kpi-s">Ø 2.8 Tage bis Lösung</div>
+      </div>
+    </div>
+
+    <div class="db-grid">
+
+      <!-- Fälle nach Team -->
+      <div class="db-card">
+        <div class="db-card-head">Fälle nach Team</div>
+        <div class="db-card-body">
+          <div class="bar-chart">
+            <!-- Bars proportional to max=7 (NDMD). Segments = count/7 * 100% -->
+            <div class="bar-row">
+              <span class="bar-lbl">NDMD</span>
+              <div class="bar-track">
+                <div class="bar-seg s-open" style="width:42.9%">3</div>
+                <div class="bar-seg s-wip" style="width:42.9%">3</div>
+                <div class="bar-seg s-done" style="width:14.2%">1</div>
+              </div>
+              <span class="bar-cnt">7</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-lbl">NDMA</span>
+              <div class="bar-track">
+                <div class="bar-seg s-open" style="width:28.6%">2</div>
+                <div class="bar-seg s-wip" style="width:14.2%">1</div>
+              </div>
+              <span class="bar-cnt">3</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-lbl">NDBS</span>
+              <div class="bar-track">
+                <div class="bar-seg s-impl" style="width:28.6%">2</div>
+                <div class="bar-seg s-done" style="width:14.2%">1</div>
+              </div>
+              <span class="bar-cnt">3</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-lbl">NDBM</span>
+              <div class="bar-track">
+                <div class="bar-seg s-wait" style="width:14.2%">1</div>
+                <div class="bar-seg s-done" style="width:14.2%">1</div>
+              </div>
+              <span class="bar-cnt">2</span>
+            </div>
+          </div>
+          <div class="bar-legend">
+            <div class="leg-item"><div class="leg-dot" style="background:var(--c-open)"></div>Offen</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--c-wip)"></div>In Bearbeitung</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--c-impl)"></div>In Umsetzung</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--c-wait)"></div>Warten</div>
+            <div class="leg-item"><div class="leg-dot" style="background:#94A3B8"></div>Abgeschlossen</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fälligkeiten -->
+      <div class="db-card">
+        <div class="db-card-head">Fälligkeiten – nächste 7 Tage</div>
+        <div class="db-card-body">
+          <div class="due-list">
+            <div class="due-row late" onclick="go('detail')">
+              <span class="due-row-id">F-2026-0031</span>
+              <span class="due-row-addr">Weststrasse 121, 8003 Zürich</span>
+              <span class="due-row-date">⚠ 13.05.</span>
+            </div>
+            <div class="due-row late" onclick="go('detail')">
+              <span class="due-row-id">F-2026-0039</span>
+              <span class="due-row-addr">Langstrasse 82, 8004 Zürich</span>
+              <span class="due-row-date">⚠ 14.05.</span>
+            </div>
+            <div class="due-row soon" onclick="go('detail')">
+              <span class="due-row-id">F-2026-0042</span>
+              <span class="due-row-addr">Seestrasse 18, 8002 Zürich</span>
+              <span class="due-row-date">15.05.</span>
+            </div>
+            <div class="due-row soon" onclick="go('detail')">
+              <span class="due-row-id">F-2026-0043</span>
+              <span class="due-row-addr">Josefstrasse 206, 8005 Zürich</span>
+              <span class="due-row-date">15.05.</span>
+            </div>
+            <div class="due-row soon" onclick="go('detail')">
+              <span class="due-row-id">F-2026-0047</span>
+              <span class="due-row-addr">Badenerstrasse 15, 8004 Zürich</span>
+              <span class="due-row-date">17.05.</span>
+            </div>
+            <div class="due-row" onclick="go('detail')">
+              <span class="due-row-id">F-2026-0035</span>
+              <span class="due-row-addr">Bahnhofstrasse 101, 8001 Zürich</span>
+              <span class="due-row-date">17.05.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trigger Engine -->
+      <div class="db-card">
+        <div class="db-card-head">Trigger Engine – letzte Läufe</div>
+        <div class="db-card-body">
+          <div class="trig-list">
+            <div class="trig-row">
+              <div class="trig-icon new">+2</div>
+              <div class="trig-meta">
+                <div class="trig-title">2 neue Fälle eröffnet – Regel: Fremdbeliefert 36h</div>
+                <div class="trig-sub">14.05.2026, 06:00 · SAP / EDM Report</div>
+              </div>
+              <span class="trig-badge new">+2 Fälle</span>
+            </div>
+            <div class="trig-row">
+              <div class="trig-icon skip">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4 6.5h4M2 2l8 4-8 4V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="trig-meta">
+                <div class="trig-title">3 übersprungen – offene Duplikate vorhanden</div>
+                <div class="trig-sub">13.05.2026, 18:00 · Duplikatprüfung</div>
+              </div>
+              <span class="trig-badge skip">3 Skip</span>
+            </div>
+            <div class="trig-row">
+              <div class="trig-icon new">+1</div>
+              <div class="trig-meta">
+                <div class="trig-title">1 neuer Fall eröffnet – Regel: Fremdbeliefert 7 Tage</div>
+                <div class="trig-sub">13.05.2026, 06:00 · SAP / EDM Report</div>
+              </div>
+              <span class="trig-badge new">+1 Fall</span>
+            </div>
+            <div class="trig-row">
+              <div class="trig-icon ok">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="trig-meta">
+                <div class="trig-title">Lauf abgeschlossen – kein Auslöser gefunden</div>
+                <div class="trig-sub">12.05.2026, 06:00 · SAP / EDM Report</div>
+              </div>
+              <span class="trig-badge ok">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status & Priorität -->
+      <div class="db-card">
+        <div class="db-card-head">Status &amp; Priorität (aktive Fälle)</div>
+        <div class="db-card-body">
+          <div class="stat-breakdown" style="margin-bottom:16px">
+            <div class="stat-breakdown-row"><span class="badge b-open"><span class="dot"></span>Offen</span><span class="stat-breakdown-n">5</span></div>
+            <div class="stat-breakdown-row"><span class="badge b-wip"><span class="dot"></span>In Bearbeitung</span><span class="stat-breakdown-n">4</span></div>
+            <div class="stat-breakdown-row"><span class="badge b-impl"><span class="dot"></span>In Umsetzung</span><span class="stat-breakdown-n">2</span></div>
+            <div class="stat-breakdown-row"><span class="badge b-wait"><span class="dot"></span>Warten auf Kunde</span><span class="stat-breakdown-n">1</span></div>
+          </div>
+          <div style="padding-top:14px;border-top:1px solid var(--b)">
+            <div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Priorität</div>
+            <div class="bar-chart">
+              <div class="bar-row">
+                <span class="bar-lbl" style="color:#EF4444">Hoch</span>
+                <div class="bar-track"><div class="bar-seg" style="width:71.4%;background:#EF4444">5</div></div>
+                <span class="bar-cnt">5</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-lbl" style="color:#F59E0B">Mittel</span>
+                <div class="bar-track"><div class="bar-seg" style="width:100%;background:#F59E0B">7</div></div>
+                <span class="bar-cnt">7</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-lbl" style="color:#10B981">Niedrig</span>
+                <div class="bar-track"><div class="bar-seg" style="width:42.9%;background:#10B981">3</div></div>
+                <span class="bar-cnt">3</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /s-dashboard -->
+
+
+<!-- ═══ ADMINISTRATION ═══ -->
+<div class="screen" id="s-admin">
+  <div class="topbar">
+    <span class="topbar-title">Administration</span>
+  </div>
+  <div class="adm-wrap">
+    <div class="adm-tabs">
+      <div class="adm-tab on" onclick="setAdmTab('ursachen',this)">Ursachen</div>
+      <div class="adm-tab" onclick="setAdmTab('massnahmen',this)">Massnahmen</div>
+      <div class="adm-tab" onclick="setAdmTab('regeln',this)">Trigger-Regeln</div>
+      <div class="adm-tab" onclick="setAdmTab('benutzer',this)">Teams &amp; Benutzer</div>
+    </div>
+    <div class="adm-panels">
+
+      <!-- ── Ursachen ── -->
+      <div class="adm-panel on" id="adm-ursachen">
+        <div class="adm-section">
+          <div class="adm-sec-head">
+            <div>
+              <div class="adm-sec-title">Ursachen</div>
+              <div class="adm-sec-sub">Auswahlwerte für das Feld «Ursache» im Falldetail</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="alert('Neuer Eintrag…')">+ Neuer Eintrag</button>
+          </div>
+          <div class="adm-list">
+            <div class="adm-item"><div class="adm-item-ico">🔌</div><span class="adm-item-label">Unterbruch Kommunikation</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">⚡</div><span class="adm-item-label">Spannungslos (Umbau)</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">⚡</div><span class="adm-item-label">Spannungslos (Kundenmanipulation)</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">🔧</div><span class="adm-item-label">Netzteil defekt</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">🔧</div><span class="adm-item-label">Gerät defekt</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">📋</div><span class="adm-item-label">Fehlende techn. Stammdaten</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">📋</div><span class="adm-item-label">Fehlende kfm. Stammdaten</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">🔩</div><span class="adm-item-label">In Ausführung</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">❓</div><span class="adm-item-label">Sonstiges</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Massnahmen ── -->
+      <div class="adm-panel" id="adm-massnahmen">
+        <div class="adm-section">
+          <div class="adm-sec-head">
+            <div>
+              <div class="adm-sec-title">Massnahmen</div>
+              <div class="adm-sec-sub">Auswahlwerte für das Feld «Massnahme» im Falldetail</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="alert('Neuer Eintrag…')">+ Neuer Eintrag</button>
+          </div>
+          <div class="adm-list">
+            <div class="adm-item"><div class="adm-item-ico">📦</div><span class="adm-item-label">Gerätewechsel iMG</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">📦</div><span class="adm-item-label">Gerätewechsel BGW</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">📦</div><span class="adm-item-label">Gerätewechsel SFP</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">📶</div><span class="adm-item-label">Gerätewechsel LTE</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">🌐</div><span class="adm-item-label">Glasfaserstörung (Netadmin)</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">🔽</div><span class="adm-item-label">Demontage</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">🔄</div><span class="adm-item-label">Wiederinbetriebnahme</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">📊</div><span class="adm-item-label">Notauslesung</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">0️⃣</div><span class="adm-item-label">Nullwerte</span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="icon-btn" onclick="alert('Deaktiviert')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M4 6.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></button></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Trigger-Regeln ── -->
+      <div class="adm-panel" id="adm-regeln">
+        <div class="adm-section">
+          <div class="adm-sec-head">
+            <div>
+              <div class="adm-sec-title">Trigger-Regeln</div>
+              <div class="adm-sec-sub">Regeln für die automatische Falleröffnung durch die Trigger Engine</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="alert('Neue Regel…')">+ Neue Regel</button>
+          </div>
+          <div class="rule-grid">
+
+            <div class="rule-card">
+              <div class="rule-card-head">
+                <div>
+                  <div class="rule-card-title">Fremdbeliefert 36h</div>
+                  <div class="rule-card-sub">UC1 – Fehlende Lastgangdaten EDM</div>
+                </div>
+                <label class="tog"><input type="checkbox" checked><span class="tog-sl"></span></label>
+              </div>
+              <div class="rule-card-body">
+                <div class="rule-kv"><span class="rule-kv-l">Quelle</span><span class="rule-kv-v">SAP / EDM</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Schwellenwert</span><span class="rule-kv-v">36 Stunden Lücke</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Kategorie</span><span class="rule-kv-v">Fremdbeliefert</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Zuweisung</span><span class="rule-kv-v">Team NDMD</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Priorität</span><span class="rule-kv-v">Hoch</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Fälligkeit</span><span class="rule-kv-v">+3 Werktage</span></div>
+              </div>
+            </div>
+
+            <div class="rule-card">
+              <div class="rule-card-head">
+                <div>
+                  <div class="rule-card-title">Fremdbeliefert 7 Tage</div>
+                  <div class="rule-card-sub">UC1 – Fehlende Lastgangdaten EDM</div>
+                </div>
+                <label class="tog"><input type="checkbox" checked><span class="tog-sl"></span></label>
+              </div>
+              <div class="rule-card-body">
+                <div class="rule-kv"><span class="rule-kv-l">Quelle</span><span class="rule-kv-v">SAP / EDM</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Schwellenwert</span><span class="rule-kv-v">7 Tage Lücke</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Kategorie</span><span class="rule-kv-v">Fremdbeliefert</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Zuweisung</span><span class="rule-kv-v">Team NDMD</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Priorität</span><span class="rule-kv-v">Mittel</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Fälligkeit</span><span class="rule-kv-v">+5 Werktage</span></div>
+              </div>
+            </div>
+
+            <div class="rule-card">
+              <div class="rule-card-head">
+                <div>
+                  <div class="rule-card-title">Eigenverbrauch 36h</div>
+                  <div class="rule-card-sub">UC1 – Fehlende Lastgangdaten EDM</div>
+                </div>
+                <label class="tog"><input type="checkbox" checked><span class="tog-sl"></span></label>
+              </div>
+              <div class="rule-card-body">
+                <div class="rule-kv"><span class="rule-kv-l">Quelle</span><span class="rule-kv-v">SAP / EDM</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Schwellenwert</span><span class="rule-kv-v">36 Stunden Lücke</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Kategorie</span><span class="rule-kv-v">Eigenverbrauch</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Zuweisung</span><span class="rule-kv-v">Team NDMA</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Priorität</span><span class="rule-kv-v">Hoch</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Fälligkeit</span><span class="rule-kv-v">+3 Werktage</span></div>
+              </div>
+            </div>
+
+            <div class="rule-card">
+              <div class="rule-card-head">
+                <div>
+                  <div class="rule-card-title">AMM+ Komm.-Ausfall</div>
+                  <div class="rule-card-sub">UC2 – NEEIB Fall</div>
+                </div>
+                <label class="tog"><input type="checkbox"><span class="tog-sl"></span></label>
+              </div>
+              <div class="rule-card-body">
+                <div class="rule-kv"><span class="rule-kv-l">Quelle</span><span class="rule-kv-v">AMM+</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Schwellenwert</span><span class="rule-kv-v">Status OFFLINE &gt; 48h</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Kategorie</span><span class="rule-kv-v">Kommunikation</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Zuweisung</span><span class="rule-kv-v">Team NDBS</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Priorität</span><span class="rule-kv-v">Mittel</span></div>
+                <div class="rule-kv"><span class="rule-kv-l">Fälligkeit</span><span class="rule-kv-v">+7 Werktage</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Teams & Benutzer ── -->
+      <div class="adm-panel" id="adm-benutzer">
+        <div class="adm-section">
+          <div class="adm-sec-head">
+            <div>
+              <div class="adm-sec-title">Benutzer &amp; Rollen</div>
+              <div class="adm-sec-sub">Verwaltung via Entra ID / Microsoft Graph – Gruppen werden automatisch synchronisiert</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="alert('Entra ID öffnen…')">Entra ID ↗</button>
+          </div>
+          <div class="user-table">
+            <div class="user-thead">
+              <div></div><div>Name / E-Mail</div><div>Team</div><div>Rolle</div>
+            </div>
+            <div class="user-row">
+              <div class="u-av av-rw">RW</div>
+              <div><div class="u-name">Reto Wuhrmann</div><div class="u-email">r.wuhrmann@ewz.ch</div></div>
+              <div style="font-size:12px;color:var(--t2)">NDMD</div>
+              <div><span class="role-badge admin">Admin</span></div>
+            </div>
+            <div class="user-row">
+              <div class="u-av av-ab">AB</div>
+              <div><div class="u-name">Adrian Brumann</div><div class="u-email">a.brumann@ewz.ch</div></div>
+              <div style="font-size:12px;color:var(--t2)">NDMD</div>
+              <div><span class="role-badge user">Benutzer</span></div>
+            </div>
+            <div class="user-row">
+              <div class="u-av av-om">OM</div>
+              <div><div class="u-name">Othmar Marty</div><div class="u-email">o.marty@ewz.ch</div></div>
+              <div style="font-size:12px;color:var(--t2)">NDMD</div>
+              <div><span class="role-badge user">Benutzer</span></div>
+            </div>
+            <div class="user-row">
+              <div class="u-av" style="background:linear-gradient(135deg,#F43F5E,#BE123C)">LF</div>
+              <div><div class="u-name">Lena Fischer</div><div class="u-email">l.fischer@ewz.ch</div></div>
+              <div style="font-size:12px;color:var(--t2)">NDMA</div>
+              <div><span class="role-badge user">Benutzer</span></div>
+            </div>
+            <div class="user-row">
+              <div class="u-av av-ca">CA</div>
+              <div><div class="u-name">Claude Auderset</div><div class="u-email">c.auderset@ewz.ch</div></div>
+              <div style="font-size:12px;color:var(--t2)">NDBS</div>
+              <div><span class="role-badge user">Benutzer</span></div>
+            </div>
+            <div class="user-row">
+              <div class="u-av av-jm">JM</div>
+              <div><div class="u-name">Julia Meier</div><div class="u-email">j.meier@ewz.ch</div></div>
+              <div style="font-size:12px;color:var(--t2)">NDBM</div>
+              <div><span class="role-badge user">Benutzer</span></div>
+            </div>
+            <div class="user-row">
+              <div class="u-av" style="background:linear-gradient(135deg,#64748B,#334155)">SK</div>
+              <div><div class="u-name">Sandra Keller</div><div class="u-email">s.keller@ewz.ch</div></div>
+              <div style="font-size:12px;color:var(--t2)">–</div>
+              <div><span class="role-badge viewer">Lesezugriff</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="adm-section">
+          <div class="adm-sec-head">
+            <div>
+              <div class="adm-sec-title">Teams</div>
+              <div class="adm-sec-sub">Teams für Fallzuweisung</div>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="alert('Neues Team…')">+ Neues Team</button>
+          </div>
+          <div class="adm-list">
+            <div class="adm-item"><div class="adm-item-ico">👥</div><span class="adm-item-label">NDMD <span style="font-size:11px;color:var(--t3);font-weight:400">· 3 Mitglieder</span></span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">👥</div><span class="adm-item-label">NDMA <span style="font-size:11px;color:var(--t3);font-weight:400">· 1 Mitglied</span></span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">👥</div><span class="adm-item-label">NDBS <span style="font-size:11px;color:var(--t3);font-weight:400">· 1 Mitglied</span></span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div>
+            <div class="adm-item"><div class="adm-item-ico">👥</div><span class="adm-item-label">NDBM <span style="font-size:11px;color:var(--t3);font-weight:400">· 1 Mitglied</span></span><div class="adm-acts"><button class="icon-btn" onclick="alert('Bearbeiten…')"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M9 2l2 2-7 7H2V9L9 2z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /s-admin -->
+
+</div><!-- /main -->
+
+
+<!-- MODAL: Neuer Fall -->
+<div class="overlay" id="ov" onclick="closeOv(event)">
+  <div class="modal modal-lg">
+    <div class="modal-head">Neuen Fall eröffnen
+      <button class="modal-close" onclick="closeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="field"><label class="field-label">Use Case</label>
+        <div class="csel"><div class="csel-btn" onclick="toggleCsel(this.closest('.csel'))"><span class="csel-val">UC1 – Fehlende Lastgangdaten EDM</span><svg class="csel-chev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="csel-drop"><div class="csel-opt sel" onclick="pickCsel(this,'UC1 – Fehlende Lastgangdaten EDM')">UC1 – Fehlende Lastgangdaten EDM</div><div class="csel-opt" onclick="pickCsel(this,'UC2 – NEEIB Fall')">UC2 – NEEIB Fall</div></div></div>
+      </div>
+      <div class="field"><label class="field-label">Zählpunkt / Adresse *</label>
+        <div class="search" style="width:100%;max-width:100%"><svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="#94A3B8" stroke-width="1.5"/><path d="M10 10l2 2" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round"/></svg><input type="text" placeholder="Zählpunkt-Nr. oder Adresse…" oninput="checkDup(this.value)"></div>
+      </div>
+      <div class="dup" id="dup"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" style="flex-shrink:0"><path d="M7 2L2 11h10L7 2z" stroke="#D97706" stroke-width="1.5" stroke-linejoin="round"/><path d="M7 6v2.5M7 10v.5" stroke="#D97706" stroke-width="1.5" stroke-linecap="round"/></svg><div>Offener Fall vorhanden: <a onclick="closeModal();go('detail')">F-2026-0042</a>. Trotzdem weiterfahren?</div></div>
+      <div class="fields-2" style="gap:10px">
+        <div class="field"><label class="field-label">Lücke ab *</label><input type="date" class="ctrl" value="2026-05-12"></div>
+        <div class="field"><label class="field-label">Lücke bis</label><input type="date" class="ctrl"></div>
+        <div class="field"><label class="field-label">Priorität</label>
+          <div class="csel"><div class="csel-btn" onclick="toggleCsel(this.closest('.csel'))"><span class="csel-val">Mittel</span><svg class="csel-chev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="csel-drop"><div class="csel-opt" onclick="pickCsel(this,'Hoch')">Hoch</div><div class="csel-opt sel" onclick="pickCsel(this,'Mittel')">Mittel</div><div class="csel-opt" onclick="pickCsel(this,'Niedrig')">Niedrig</div></div></div>
+        </div>
+        <div class="field"><label class="field-label">Team *</label>
+          <div class="csel"><div class="csel-btn" onclick="toggleCsel(this.closest('.csel'))"><span class="csel-val">NDMD</span><svg class="csel-chev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="csel-drop"><div class="csel-opt sel" onclick="pickCsel(this,'NDMD')">NDMD</div><div class="csel-opt" onclick="pickCsel(this,'NDMA')">NDMA</div><div class="csel-opt" onclick="pickCsel(this,'NDBS')">NDBS</div><div class="csel-opt" onclick="pickCsel(this,'NDBM')">NDBM</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="newCase()">Fall eröffnen</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Feld ändern (Bleistift) -->
+<div class="overlay" id="ov-chg" onclick="if(event.target===this)closeChangeModal()">
+  <div class="modal">
+    <div class="modal-head"><span id="chg-title">Team ändern</span>
+      <button class="modal-close" onclick="closeChangeModal()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="chg-from">Aktuell: <strong id="chg-current">–</strong></div>
+      <div class="field"><label class="field-label">Neuer Wert *</label>
+        <div class="csel" id="chg-csel">
+          <div class="csel-btn" onclick="toggleCsel(this.closest('.csel'))">
+            <span class="csel-val ph" id="chg-csel-val">– Wählen –</span>
+            <svg class="csel-chev" width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <div class="csel-drop" id="chg-drop"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Bemerkung * <span style="color:var(--t3);font-weight:400">(wird im Verlauf protokolliert)</span></label>
+        <textarea class="ctrl" rows="3" id="chg-rmk" placeholder="Begründung für die Änderung…"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeChangeModal()">Abbrechen</button>
+      <button class="btn btn-primary" onclick="saveChange()">Speichern &amp; protokollieren</button>
+    </div>
+  </div>
+</div>
+
+<!-- POPOVER: Feldverlauf (Uhr-Icon) -->
+<div class="hist-pop" id="hist-pop">
+  <div class="hist-head">
+    <span id="hist-title">Verlauf</span>
+    <button class="modal-close" style="margin-left:auto" onclick="closeHistory()"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+  </div>
+  <div class="hist-body" id="hist-body"></div>
+</div>
+
+<script>
+/* ── Data ── */
+const DATA=[
+  // Reto Wuhrmanns Fälle (NDMD)
+  {id:'F-2026-0047',addr:'Badenerstrasse 15, 8004 Zürich',    since:'14.05.2026',status:'open',p:'ph',team:'NDMD',person:'Reto Wuhrmann',  due:'17.05.2026',soon:true, late:false},
+  {id:'F-2026-0042',addr:'Seestrasse 18, 8002 Zürich',        since:'13.05.2026',status:'wip', p:'pm',team:'NDMD',person:'Reto Wuhrmann',  due:'15.05.2026',soon:true, late:false},
+  {id:'F-2026-0040',addr:'Röntgenstrasse 4, 8005 Zürich',     since:'13.05.2026',status:'open',p:'pl',team:'NDMD',person:'Reto Wuhrmann',  due:'20.05.2026',soon:false,late:false},
+  // Team NDMD, andere
+  {id:'F-2026-0039',addr:'Langstrasse 82, 8004 Zürich',       since:'12.05.2026',status:'open',p:'ph',team:'NDMD',person:'Adrian Brumann', due:'14.05.2026',soon:false,late:true },
+  {id:'F-2026-0036',addr:'Hohlstrasse 192, 8004 Zürich',      since:'11.05.2026',status:'wip', p:'pm',team:'NDMD',person:'Adrian Brumann', due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0028',addr:'Letzigraben 89, 8047 Zürich',       since:'07.05.2026',status:'wip', p:'pm',team:'NDMD',person:'Othmar Marty',   due:'16.05.2026',soon:false,late:false},
+  {id:'F-2026-0019',addr:'Birmensdorferstr. 3, 8003 Zürich',  since:'04.05.2026',status:'done',p:'ph',team:'NDMD',person:'Adrian Brumann', due:'11.05.2026',soon:false,late:false},
+  // Team NDMA
+  {id:'F-2026-0045',addr:'Militärstrasse 36, 8004 Zürich',    since:'14.05.2026',status:'open',p:'pm',team:'NDMA',person:'Lena Fischer',   due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0043',addr:'Josefstrasse 206, 8005 Zürich',     since:'13.05.2026',status:'wip', p:'ph',team:'NDMA',person:'Lena Fischer',   due:'15.05.2026',soon:true, late:false},
+  {id:'F-2026-0031',addr:'Weststrasse 121, 8003 Zürich',      since:'08.05.2026',status:'open',p:'pl',team:'NDMA',person:'–',              due:'13.05.2026',soon:false,late:true },
+  // Team NDBS
+  {id:'F-2026-0038',addr:'Hardturmstrasse 5, 8005 Zürich',    since:'11.05.2026',status:'impl',p:'pm',team:'NDBS',person:'Claude Auderset',due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0033',addr:'Gutstrasse 48, 8055 Zürich',        since:'09.05.2026',status:'impl',p:'ph',team:'NDBS',person:'Claude Auderset',due:'14.05.2026',soon:false,late:false},
+  {id:'F-2026-0021',addr:'Forchstrasse 44, 8032 Zürich',      since:'05.05.2026',status:'done',p:'pl',team:'NDBS',person:'Claude Auderset',due:'12.05.2026',soon:false,late:false},
+  // Team NDBM
+  {id:'F-2026-0035',addr:'Bahnhofstrasse 101, 8001 Zürich',   since:'10.05.2026',status:'wait',p:'pm',team:'NDBM',person:'Julia Meier',    due:'17.05.2026',soon:false,late:false},
+  {id:'F-2026-0018',addr:'Kalkbreitestrasse 2, 8003 Zürich',  since:'03.05.2026',status:'done',p:'pm',team:'NDBM',person:'Julia Meier',    due:'10.05.2026',soon:false,late:false},
+  // ── 100 zusätzliche Records ──
+  {id:'F-2026-0048',addr:'Zweierstrasse 25, 8004 Zürich',        since:'14.05.2026',status:'open',p:'ph',team:'NDMD',person:'Stefan Kellenberger',due:'17.05.2026',soon:true, late:false},
+  {id:'F-2026-0049',addr:'Bullingerstrasse 7, 8004 Zürich',      since:'14.05.2026',status:'open',p:'pm',team:'NDMA',person:'Thomas Bader',       due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0050',addr:'Quellenstrasse 14, 8005 Zürich',       since:'14.05.2026',status:'wip', p:'pm',team:'NDMD',person:'Maria Huber',         due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0051',addr:'Hermetschloostrasse 8, 8048 Zürich',   since:'13.05.2026',status:'open',p:'pl',team:'NDBS',person:'Felix Weber',         due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0052',addr:'Wipkingerstrasse 33, 8037 Zürich',     since:'13.05.2026',status:'wip', p:'ph',team:'NDMA',person:'Anna Schmid',         due:'15.05.2026',soon:true, late:false},
+  {id:'F-2026-0053',addr:'Konradstrasse 55, 8005 Zürich',        since:'13.05.2026',status:'open',p:'pm',team:'NDBM',person:'Peter Vogel',         due:'16.05.2026',soon:true, late:false},
+  {id:'F-2026-0054',addr:'Limmatstrasse 77, 8005 Zürich',        since:'12.05.2026',status:'wip', p:'pl',team:'NDMD',person:'Adrian Brumann',      due:'20.05.2026',soon:false,late:false},
+  {id:'F-2026-0055',addr:'Nordstrasse 22, 8037 Zürich',          since:'12.05.2026',status:'impl',p:'pm',team:'NDBS',person:'Sandra Mächler',      due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0056',addr:'Weinbergstrasse 101, 8006 Zürich',     since:'12.05.2026',status:'open',p:'ph',team:'NDMA',person:'Lena Fischer',        due:'13.05.2026',soon:false,late:true },
+  {id:'F-2026-0057',addr:'Schaffhauserstrasse 45, 8006 Zürich',  since:'11.05.2026',status:'wip', p:'pm',team:'NDMD',person:'Othmar Marty',        due:'17.05.2026',soon:true, late:false},
+  {id:'F-2026-0058',addr:'Regensbergstrasse 12, 8050 Zürich',    since:'11.05.2026',status:'impl',p:'pl',team:'NDBS',person:'Claude Auderset',     due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0059',addr:'Bucheggstrasse 66, 8057 Zürich',       since:'11.05.2026',status:'wait',p:'pm',team:'NDBM',person:'Julia Meier',         due:'21.05.2026',soon:false,late:false},
+  {id:'F-2026-0060',addr:'Irchelsstrasse 3, 8057 Zürich',        since:'10.05.2026',status:'open',p:'ph',team:'NDMD',person:'Stefan Kellenberger', due:'12.05.2026',soon:false,late:true },
+  {id:'F-2026-0061',addr:'Universitätstrasse 19, 8006 Zürich',   since:'10.05.2026',status:'wip', p:'pm',team:'NDMA',person:'Thomas Bader',        due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0062',addr:'Rämistrasse 50, 8001 Zürich',          since:'10.05.2026',status:'impl',p:'ph',team:'NDBS',person:'Felix Weber',         due:'15.05.2026',soon:true, late:false},
+  {id:'F-2026-0063',addr:'Heimstrasse 8, 8008 Zürich',           since:'09.05.2026',status:'wait',p:'pl',team:'NDBM',person:'Christine Ziegler',   due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0064',addr:'Asylstrasse 117, 8032 Zürich',         since:'09.05.2026',status:'wip', p:'pm',team:'NDMD',person:'Maria Huber',         due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0065',addr:'Seefeldstrasse 29, 8008 Zürich',       since:'09.05.2026',status:'open',p:'pl',team:'NDMA',person:'Anna Schmid',         due:'11.05.2026',soon:false,late:true },
+  {id:'F-2026-0066',addr:'Mühlebachstrasse 41, 8008 Zürich',     since:'09.05.2026',status:'wip', p:'ph',team:'NDBS',person:'Sandra Mächler',      due:'16.05.2026',soon:true, late:false},
+  {id:'F-2026-0067',addr:'Klausstrasse 7, 8008 Zürich',          since:'08.05.2026',status:'impl',p:'pm',team:'NDBM',person:'Peter Vogel',         due:'17.05.2026',soon:true, late:false},
+  {id:'F-2026-0068',addr:'Theaterstrasse 14, 8001 Zürich',       since:'08.05.2026',status:'open',p:'ph',team:'NDMD',person:'Adrian Brumann',      due:'10.05.2026',soon:false,late:true },
+  {id:'F-2026-0069',addr:'Florhofgasse 2, 8001 Zürich',          since:'08.05.2026',status:'wip', p:'pm',team:'NDMA',person:'Lena Fischer',        due:'20.05.2026',soon:false,late:false},
+  {id:'F-2026-0070',addr:'Münstergasse 20, 8001 Zürich',         since:'07.05.2026',status:'wait',p:'pl',team:'NDBS',person:'Claude Auderset',     due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0071',addr:'Niederdorfstrasse 6, 8001 Zürich',     since:'07.05.2026',status:'wip', p:'pm',team:'NDBM',person:'Julia Meier',         due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0072',addr:'Spiegelgasse 11, 8001 Zürich',         since:'07.05.2026',status:'impl',p:'ph',team:'NDMD',person:'Stefan Kellenberger', due:'16.05.2026',soon:true, late:false},
+  {id:'F-2026-0073',addr:'Hirschengraben 48, 8001 Zürich',       since:'06.05.2026',status:'open',p:'pm',team:'NDMA',person:'Thomas Bader',        due:'09.05.2026',soon:false,late:true },
+  {id:'F-2026-0074',addr:'Zähringerstrasse 22, 8001 Zürich',     since:'06.05.2026',status:'wip', p:'pl',team:'NDBS',person:'Felix Weber',         due:'21.05.2026',soon:false,late:false},
+  {id:'F-2026-0075',addr:'Voltastrasse 14, 8044 Zürich',         since:'06.05.2026',status:'impl',p:'pm',team:'NDBM',person:'Christine Ziegler',   due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0076',addr:'Kornhausstrasse 4, 8006 Zürich',       since:'05.05.2026',status:'wait',p:'ph',team:'NDMD',person:'Othmar Marty',        due:'15.05.2026',soon:true, late:false},
+  {id:'F-2026-0077',addr:'Stampfenbachstrasse 78, 8006 Zürich',  since:'05.05.2026',status:'wip', p:'pm',team:'NDMA',person:'Anna Schmid',         due:'20.05.2026',soon:false,late:false},
+  {id:'F-2026-0078',addr:'Gloriastrasse 32, 8006 Zürich',        since:'05.05.2026',status:'wip', p:'pl',team:'NDBS',person:'Sandra Mächler',      due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0079',addr:'Plattenstrasse 61, 8032 Zürich',       since:'04.05.2026',status:'open',p:'pm',team:'NDBM',person:'Peter Vogel',         due:'07.05.2026',soon:false,late:true },
+  {id:'F-2026-0080',addr:'Sonneggstrasse 5, 8006 Zürich',        since:'04.05.2026',status:'wip', p:'ph',team:'NDMD',person:'Maria Huber',         due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0081',addr:'Freiestrasse 2, 8032 Zürich',          since:'04.05.2026',status:'impl',p:'pm',team:'NDMA',person:'Lena Fischer',        due:'17.05.2026',soon:true, late:false},
+  {id:'F-2026-0082',addr:'Zürichbergstrasse 77, 8044 Zürich',    since:'03.05.2026',status:'wip', p:'pl',team:'NDBS',person:'Claude Auderset',     due:'21.05.2026',soon:false,late:false},
+  {id:'F-2026-0083',addr:'Tobelhofstrasse 14, 8044 Zürich',      since:'03.05.2026',status:'wait',p:'pm',team:'NDBM',person:'Julia Meier',         due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0084',addr:'Hadlaubstrasse 49, 8006 Zürich',       since:'03.05.2026',status:'open',p:'ph',team:'NDMD',person:'Adrian Brumann',      due:'06.05.2026',soon:false,late:true },
+  {id:'F-2026-0085',addr:'Klusplatz 3, 8032 Zürich',             since:'02.05.2026',status:'wip', p:'pm',team:'NDMA',person:'Thomas Bader',        due:'20.05.2026',soon:false,late:false},
+  {id:'F-2026-0086',addr:'Pestalozzistrasse 11, 8032 Zürich',    since:'02.05.2026',status:'impl',p:'pl',team:'NDBS',person:'Felix Weber',         due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0087',addr:'Minervastrasse 37, 8032 Zürich',       since:'02.05.2026',status:'wip', p:'pm',team:'NDBM',person:'Christine Ziegler',   due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0088',addr:'Culmannstrasse 1, 8006 Zürich',        since:'01.05.2026',status:'wait',p:'ph',team:'NDMD',person:'Stefan Kellenberger', due:'17.05.2026',soon:true, late:false},
+  {id:'F-2026-0089',addr:'Ottikerstrasse 22, 8006 Zürich',       since:'01.05.2026',status:'wip', p:'pm',team:'NDMA',person:'Anna Schmid',         due:'21.05.2026',soon:false,late:false},
+  {id:'F-2026-0090',addr:'Susenbergstrasse 64, 8044 Zürich',     since:'01.05.2026',status:'impl',p:'pl',team:'NDBS',person:'Sandra Mächler',      due:'20.05.2026',soon:false,late:false},
+  {id:'F-2026-0091',addr:'Bäckerstrasse 57, 8004 Zürich',        since:'30.04.2026',status:'done',p:'pm',team:'NDBM',person:'Peter Vogel',         due:'07.05.2026',soon:false,late:false},
+  {id:'F-2026-0092',addr:'Dienerstrasse 8, 8004 Zürich',         since:'29.04.2026',status:'done',p:'ph',team:'NDMD',person:'Maria Huber',         due:'06.05.2026',soon:false,late:false},
+  {id:'F-2026-0093',addr:'Volksgartenstrasse 18, 8004 Zürich',   since:'29.04.2026',status:'done',p:'pm',team:'NDMA',person:'Lena Fischer',        due:'06.05.2026',soon:false,late:false},
+  {id:'F-2026-0094',addr:'Brauerstrasse 42, 8004 Zürich',        since:'28.04.2026',status:'done',p:'pl',team:'NDBS',person:'Claude Auderset',     due:'05.05.2026',soon:false,late:false},
+  {id:'F-2026-0095',addr:'Elsässerstrasse 19, 8004 Zürich',      since:'28.04.2026',status:'done',p:'pm',team:'NDBM',person:'Julia Meier',         due:'05.05.2026',soon:false,late:false},
+  {id:'F-2026-0096',addr:'Turnerstrasse 6, 8006 Zürich',         since:'27.04.2026',status:'done',p:'ph',team:'NDMD',person:'Adrian Brumann',      due:'04.05.2026',soon:false,late:false},
+  {id:'F-2026-0097',addr:'Oberwiesenstrasse 14, 8049 Zürich',    since:'26.04.2026',status:'done',p:'pm',team:'NDMA',person:'Thomas Bader',        due:'03.05.2026',soon:false,late:false},
+  {id:'F-2026-0098',addr:'Wehntalerstrasse 30, 8057 Zürich',     since:'25.04.2026',status:'done',p:'pl',team:'NDBS',person:'Felix Weber',         due:'02.05.2026',soon:false,late:false},
+  {id:'F-2026-0099',addr:'Regensdorferstrasse 5, 8049 Zürich',   since:'25.04.2026',status:'done',p:'pm',team:'NDBM',person:'Christine Ziegler',   due:'02.05.2026',soon:false,late:false},
+  {id:'F-2026-0100',addr:'Schwandenholzstrasse 27, 8052 Zürich', since:'24.04.2026',status:'done',p:'ph',team:'NDMD',person:'Othmar Marty',        due:'01.05.2026',soon:false,late:false},
+  {id:'F-2026-0101',addr:'Friesenbergstrasse 35, 8055 Zürich',   since:'24.04.2026',status:'done',p:'pm',team:'NDMA',person:'Anna Schmid',         due:'01.05.2026',soon:false,late:false},
+  {id:'F-2026-0102',addr:'Albisstrasse 22, 8038 Zürich',         since:'23.04.2026',status:'done',p:'pl',team:'NDBS',person:'Sandra Mächler',      due:'30.04.2026',soon:false,late:false},
+  {id:'F-2026-0103',addr:'Rubistrasse 8, 8053 Zürich',           since:'23.04.2026',status:'done',p:'pm',team:'NDBM',person:'Peter Vogel',         due:'30.04.2026',soon:false,late:false},
+  {id:'F-2026-0104',addr:'Trittligasse 5, 8001 Zürich',          since:'14.05.2026',status:'open',p:'pm',team:'NDMD',person:'–',                  due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0105',addr:'Neumarkt 3, 8001 Zürich',              since:'13.05.2026',status:'wip', p:'ph',team:'NDBS',person:'Claude Auderset',     due:'17.05.2026',soon:true, late:false},
+  {id:'F-2026-0106',addr:'Augustinergasse 17, 8001 Zürich',      since:'13.05.2026',status:'open',p:'pm',team:'NDMA',person:'–',                  due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0107',addr:'Fortunagasse 9, 8001 Zürich',          since:'12.05.2026',status:'impl',p:'pl',team:'NDBM',person:'Christine Ziegler',   due:'20.05.2026',soon:false,late:false},
+  {id:'F-2026-0108',addr:'Strehlgasse 4, 8001 Zürich',           since:'12.05.2026',status:'wip', p:'pm',team:'NDMD',person:'Stefan Kellenberger', due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0109',addr:'Weinplatz 10, 8001 Zürich',            since:'11.05.2026',status:'open',p:'ph',team:'NDMA',person:'Thomas Bader',        due:'13.05.2026',soon:false,late:true },
+  {id:'F-2026-0110',addr:'Rathausquai 4, 8001 Zürich',           since:'11.05.2026',status:'wip', p:'pm',team:'NDBS',person:'Felix Weber',         due:'21.05.2026',soon:false,late:false},
+  {id:'F-2026-0111',addr:'Limmatquai 78, 8001 Zürich',           since:'10.05.2026',status:'impl',p:'pl',team:'NDBM',person:'Peter Vogel',         due:'19.05.2026',soon:false,late:false},
+  {id:'F-2026-0112',addr:'Marktgasse 14, 8001 Zürich',           since:'10.05.2026',status:'wait',p:'pm',team:'NDMD',person:'Maria Huber',         due:'22.05.2026',soon:false,late:false},
+  {id:'F-2026-0113',addr:'Oberdorfstrasse 22, 8001 Zürich',      since:'09.05.2026',status:'wip', p:'ph',team:'NDMA',person:'Anna Schmid',         due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0114',addr:'Stüssihofstatt 1, 8001 Zürich',        since:'09.05.2026',status:'open',p:'pm',team:'NDBS',person:'Sandra Mächler',      due:'12.05.2026',soon:false,late:true },
+  {id:'F-2026-0115',addr:'Kirchgasse 30, 8001 Zürich',           since:'08.05.2026',status:'wip', p:'pl',team:'NDBM',person:'Julia Meier',         due:'20.05.2026',soon:false,late:false},
+  {id:'F-2026-0116',addr:'Predigerplatz 6, 8001 Zürich',         since:'08.05.2026',status:'impl',p:'pm',team:'NDMD',person:'Othmar Marty',        due:'17.05.2026',soon:true, late:false},
+  {id:'F-2026-0117',addr:'Rigistrasse 44, 8006 Zürich',          since:'07.05.2026',status:'wip', p:'ph',team:'NDMA',person:'Lena Fischer',        due:'21.05.2026',soon:false,late:false},
+  {id:'F-2026-0118',addr:'Dufourstrasse 50, 8008 Zürich',        since:'07.05.2026',status:'open',p:'pl',team:'NDBS',person:'Claude Auderset',     due:'10.05.2026',soon:false,late:true },
+  {id:'F-2026-0119',addr:'Kreuzstrasse 23, 8008 Zürich',         since:'06.05.2026',status:'wait',p:'pm',team:'NDBM',person:'Christine Ziegler',   due:'18.05.2026',soon:false,late:false},
+  {id:'F-2026-0120',addr:'Hedwigsteig 1, 8032 Zürich',           since:'06.05.2026',status:'wip', p:'ph',team:'NDMD',person:'Adrian Brumann',      due:'20.05.2026',soon:false,late:false},
+  {id:'F-2026-0121',addr:'Kirchenweg 3, 8032 Zürich',            since:'05.05.2026',status:'impl',p:'pm',team:'NDMA',person:'Thomas Bader',        due:'16.05.2026',soon:true, late:false},
+  {id:'F-2026-0122',addr:'Hegibachstrasse 60, 8032 Zürich',      since:'05.05.2026',status:'wip', p:'pl',team:'NDBS',person:'Felix Weber',         due:'22.05.2026',soon:false,late:false},
+  {id:'F-2026-0123',addr:'Klosbachstrasse 17, 8032 Zürich',      since:'04.05.2026',status:'open',p:'pm',team:'NDBM',person:'Peter Vogel',         due:'07.05.2026',soon:false,late:true },
+  {id:'F-2026-0124',addr:'Trichtenhauserstr. 19, 8053 Zürich',   since:'04.05.2026',status:'wip', p:'ph',team:'NDMD',person:'Stefan Kellenberger', due:'21.05.2026',soon:false,late:false},
+  {id:'F-2026-0125',addr:'Langäcker 5, 8053 Zürich',             since:'03.05.2026',status:'wait',p:'pm',team:'NDMA',person:'–',                  due:'17.05.2026',soon:true, late:false},
+  {id:'F-2026-0126',addr:'Schörlistrasse 3, 8053 Zürich',        since:'03.05.2026',status:'impl',p:'pl',team:'NDBS',person:'Sandra Mächler',      due:'21.05.2026',soon:false,late:false},
+  {id:'F-2026-0127',addr:'Wittikonerstrasse 32, 8053 Zürich',    since:'02.05.2026',status:'open',p:'pm',team:'NDBM',person:'Julia Meier',         due:'05.05.2026',soon:false,late:true },
+  {id:'F-2026-0128',addr:'Pfingstweidstrasse 6, 8005 Zürich',    since:'02.05.2026',status:'wip', p:'ph',team:'NDMD',person:'Maria Huber',         due:'22.05.2026',soon:false,late:false},
+  {id:'F-2026-0129',addr:'Technoparkstrasse 1, 8005 Zürich',     since:'01.05.2026',status:'impl',p:'pm',team:'NDMA',person:'Anna Schmid',         due:'20.05.2026',soon:false,late:false},
+  {id:'F-2026-0130',addr:'Hürlimannstrasse 14, 8002 Zürich',     since:'01.05.2026',status:'done',p:'pl',team:'NDBS',person:'Claude Auderset',     due:'08.05.2026',soon:false,late:false},
+  {id:'F-2026-0131',addr:'Sihlstrasse 33, 8001 Zürich',          since:'30.04.2026',status:'done',p:'pm',team:'NDBM',person:'Christine Ziegler',   due:'07.05.2026',soon:false,late:false},
+  {id:'F-2026-0132',addr:'Talstrasse 58, 8001 Zürich',           since:'30.04.2026',status:'done',p:'ph',team:'NDMD',person:'Adrian Brumann',      due:'07.05.2026',soon:false,late:false},
+  {id:'F-2026-0133',addr:'Bürkliplatz 1, 8001 Zürich',           since:'29.04.2026',status:'done',p:'pm',team:'NDMA',person:'Thomas Bader',        due:'06.05.2026',soon:false,late:false},
+  {id:'F-2026-0134',addr:'Uraniastrasse 12, 8001 Zürich',        since:'29.04.2026',status:'done',p:'pl',team:'NDBS',person:'Felix Weber',         due:'06.05.2026',soon:false,late:false},
+  {id:'F-2026-0135',addr:'Zentralstrasse 1, 8003 Zürich',        since:'28.04.2026',status:'done',p:'pm',team:'NDBM',person:'Peter Vogel',         due:'05.05.2026',soon:false,late:false},
+  {id:'F-2026-0136',addr:'Molkenstrasse 7, 8004 Zürich',         since:'28.04.2026',status:'done',p:'ph',team:'NDMD',person:'Othmar Marty',        due:'05.05.2026',soon:false,late:false},
+  {id:'F-2026-0137',addr:'Ausstellungsstrasse 36, 8005 Zürich',  since:'27.04.2026',status:'done',p:'pm',team:'NDMA',person:'Anna Schmid',         due:'04.05.2026',soon:false,late:false},
+  {id:'F-2026-0138',addr:'Pfarrhausstrasse 14, 8003 Zürich',     since:'27.04.2026',status:'done',p:'pl',team:'NDBS',person:'Sandra Mächler',      due:'04.05.2026',soon:false,late:false},
+  {id:'F-2026-0139',addr:'Grubenstrasse 8, 8045 Zürich',         since:'26.04.2026',status:'done',p:'pm',team:'NDBM',person:'Julia Meier',         due:'03.05.2026',soon:false,late:false},
+  {id:'F-2026-0140',addr:'Giesshübelstrasse 45, 8045 Zürich',    since:'25.04.2026',status:'done',p:'ph',team:'NDMD',person:'Stefan Kellenberger', due:'02.05.2026',soon:false,late:false},
+  {id:'F-2026-0141',addr:'Schweighofstrasse 31, 8045 Zürich',    since:'25.04.2026',status:'done',p:'pm',team:'NDMA',person:'Lena Fischer',        due:'02.05.2026',soon:false,late:false},
+  {id:'F-2026-0142',addr:'Hinterbergstrasse 18, 8046 Zürich',    since:'24.04.2026',status:'done',p:'pl',team:'NDBS',person:'Claude Auderset',     due:'01.05.2026',soon:false,late:false},
+  {id:'F-2026-0143',addr:'Käferholzstrasse 32, 8046 Zürich',     since:'24.04.2026',status:'done',p:'pm',team:'NDBM',person:'Christine Ziegler',   due:'01.05.2026',soon:false,late:false},
+  {id:'F-2026-0144',addr:'Glatttalstrasse 33, 8052 Zürich',      since:'23.04.2026',status:'done',p:'ph',team:'NDMD',person:'Maria Huber',         due:'30.04.2026',soon:false,late:false},
+  {id:'F-2026-0145',addr:'Franklinstrasse 14, 8050 Zürich',      since:'23.04.2026',status:'done',p:'pm',team:'NDMA',person:'Thomas Bader',        due:'30.04.2026',soon:false,late:false},
+  {id:'F-2026-0146',addr:'Glatttalstrasse 57, 8052 Zürich',      since:'22.04.2026',status:'done',p:'pl',team:'NDBS',person:'Felix Weber',         due:'29.04.2026',soon:false,late:false},
+  {id:'F-2026-0147',addr:'Wallisellenstrasse 43, 8050 Zürich',   since:'22.04.2026',status:'done',p:'pm',team:'NDBM',person:'Peter Vogel',         due:'29.04.2026',soon:false,late:false},
+];
+const SL={open:'Offen',wip:'In Bearbeitung',impl:'In Umsetzung',live:'Zähler live',wait:'Warten auf Kunde',done:'Abgeschlossen'};
+const SC={open:'b-open',wip:'b-wip',impl:'b-impl',live:'b-live',wait:'b-wait',done:'b-done'};
+const ME='Reto Wuhrmann', MY_TEAM='NDMD';
+let fStatus='', fSearch='', fView='mine', fSort='due', fSortDir=1;
+const STATUS_ORD={open:1,wip:2,impl:3,live:4,wait:5,done:6};
+const P_ORD={ph:1,pm:2,pl:3};
+function parseDue(s){const m=s.match(/(\d+)\.(\d+)\./);return m?+m[2]*100+ +m[1]:9999;}
+
+function updateStats(){
+  const base=DATA.filter(c=>{
+    if(fView==='mine' && c.person!==ME)    return false;
+    if(fView==='team' && c.team!==MY_TEAM) return false;
+    return true;
+  });
+  const nOpen=base.filter(c=>c.status==='open').length;
+  const nLate=base.filter(c=>c.late).length;
+  const nWip =base.filter(c=>c.status==='wip').length;
+  const nDone=base.filter(c=>c.status==='done').length;
+  const wipBase=base.filter(c=>c.status==='wip');
+  let wipSub='';
+  if(fView==='all'){const t=new Set(wipBase.map(c=>c.team));wipSub=t.size+' Teams aktiv';}
+  else if(fView==='team'){const p=new Set(wipBase.map(c=>c.person).filter(p=>p!=='–'));wipSub=p.size+' Personen aktiv';}
+  document.getElementById('badge-mine').textContent=DATA.filter(c=>c.person===ME&&c.status!=='done').length;
+  document.getElementById('badge-team').textContent=DATA.filter(c=>c.team===MY_TEAM&&c.status!=='done').length;
+  const cards=document.querySelectorAll('.stat');
+  cards[0].querySelector('.stat-n').textContent=nOpen;
+  cards[0].querySelector('.stat-s').textContent=nLate+' überfällig';
+  cards[1].querySelector('.stat-n').textContent=nWip;
+  if(wipSub)cards[1].querySelector('.stat-s').textContent=wipSub;
+  cards[2].querySelector('.stat-n').textContent=nLate;
+  cards[3].querySelector('.stat-n').textContent=nDone;
+}
+
+function render(){
+  const d=DATA.filter(c=>{
+    if(fView==='mine'  && c.person!==ME)      return false;
+    if(fView==='team'  && c.team!==MY_TEAM)   return false;
+    if(fStatus==='late')                       return c.late;
+    if(fStatus && c.status!==fStatus)          return false;
+    const q=fSearch.toLowerCase();
+    if(q&&!c.addr.toLowerCase().includes(q)&&!c.id.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  d.sort((a,b)=>{
+    let r=0;
+    if(fSort==='due')    r=parseDue(a.due)-parseDue(b.due);
+    else if(fSort==='status') r=(STATUS_ORD[a.status]||9)-(STATUS_ORD[b.status]||9);
+    else if(fSort==='p')      r=(P_ORD[a.p]||9)-(P_ORD[b.p]||9);
+    else if(fSort==='team')   r=a.team.localeCompare(b.team);
+    else if(fSort==='person') r=a.person.localeCompare(b.person);
+    else if(fSort==='since')  r=a.since.localeCompare(b.since);
+    else if(fSort==='id')     r=a.id.localeCompare(b.id);
+    else if(fSort==='addr')   r=a.addr.localeCompare(b.addr);
+    return r*fSortDir;
+  });
+  document.getElementById('case-list').innerHTML=d.map(c=>`
+    <tr onclick="go('detail')">
+      <td class="td-p ${c.p}"></td>
+      <td class="td-id">${c.id}</td>
+      <td class="td-addr">${c.addr}</td>
+      <td class="td-status"><span class="badge ${SC[c.status]}"><span class="dot"></span>${SL[c.status]}</span></td>
+      <td class="td-team">${c.team}</td>
+      <td class="td-person">${c.person}</td>
+      <td class="td-since">${c.since}</td>
+      <td class="td-due ${c.late?'late':c.soon?'soon':''}">${c.late?'⚠ ':''}${c.due}</td>
+    </tr>`).join('');
+  document.getElementById('row-cnt').textContent=d.length+' Fälle';
+}
+function applyFilter(){fSearch=document.getElementById('s-inp').value;render();}
+function sortBy(key){
+  if(fSort===key) fSortDir*=-1;
+  else { fSort=key; fSortDir=1; }
+  updateSortHeaders();
+  render();
+}
+function updateSortHeaders(){
+  document.querySelectorAll('.th-sort').forEach(th=>{
+    const k=th.dataset.sort;
+    const icon=th.querySelector('.sort-icon');
+    if(k===fSort){ th.classList.add('th-active'); icon.textContent=fSortDir===1?'↑':'↓'; }
+    else { th.classList.remove('th-active'); icon.textContent='↕'; }
+  });
+}
+function filterByStat(el,status){
+  const wasActive=fStatus===status;
+  fStatus=wasActive?'':status;
+  document.querySelectorAll('.stat').forEach(s=>s.classList.remove('active'));
+  if(!wasActive)el.classList.add('active');
+  render();
+}
+function filterView(v){
+  fView=v; fStatus='';
+  document.querySelectorAll('.stat').forEach(s=>s.classList.remove('active'));
+  document.getElementById('view-title').textContent={mine:'Meine Fälle',team:'Team NDMD',all:'Alle Fälle'}[v];
+  go('list');
+  updateStats();
+  render();
+}
+function setNav(el){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');}
+function go(s){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById('s-'+s).classList.add('active');}
+function setTab(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');document.getElementById('p-'+id).classList.add('on');
+  // hide sidebar toggle when not on Bearbeitung tab
+  document.getElementById('tab-bar-end').style.display=(id==='work')?'flex':'none';
+}
+
+/* Sidebar toggle */
+let sidebarOpen=true;
+function toggleSidebar(){
+  sidebarOpen=!sidebarOpen;
+  document.getElementById('work-layout').classList.toggle('sidebar-hidden',!sidebarOpen);
+  document.getElementById('sb-toggle').classList.toggle('active',sidebarOpen);
+}
+
+/* New case modal */
+function openModal(){document.getElementById('ov').classList.add('on');}
+function closeModal(){document.getElementById('ov').classList.remove('on');document.getElementById('dup').classList.remove('on');}
+function closeOv(e){if(e.target===e.currentTarget)closeModal();}
+function checkDup(v){document.getElementById('dup').classList.toggle('on',v.toLowerCase().includes('see')||v.includes('4325478'));}
+function newCase(){closeModal();alert('Fall F-2026-0051 eröffnet.\nStatus: Offen · Team: NDMD · Fälligkeit: 18.05.2026');}
+
+/* Custom select */
+function toggleCsel(el){
+  const isOpen=el.classList.contains('open');
+  document.querySelectorAll('.csel.open').forEach(c=>c.classList.remove('open'));
+  if(!isOpen)el.classList.add('open');
+}
+function pickCsel(el,val){
+  const csel=el.closest('.csel');
+  const v=csel.querySelector('.csel-val');
+  v.textContent=val;v.classList.remove('ph');
+  csel.querySelectorAll('.csel-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');csel.classList.remove('open');
+}
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.csel')&&!e.target.closest('.hist-pop'))
+    document.querySelectorAll('.csel.open').forEach(c=>c.classList.remove('open'));
+});
+
+/* Change modal (pencil) */
+const CHG_OPTS={
+  team:['NDMD','NDMA','NDBS','NDBM'],
+  ursache:['Unterbruch Kommunikation','Spannungslos (Umbau)','Spannungslos (Kundenmanipulation)','Netzteil defekt','Gerät defekt','Fehlende techn. Stammdaten','Fehlende kfm. Stammdaten','In Ausführung','Sonstiges'],
+  massnahme:['Gerätewechsel iMG','Gerätewechsel BGW','Gerätewechsel SFP','Gerätewechsel LTE','Glasfaserstörung (Netadmin)','Demontage','Wiederinbetriebnahme','Notauslesung','Nullwerte']
+};
+const CHG_LABELS={team:'Team',ursache:'Ursache',massnahme:'Massnahme'};
+const CHG_HIST={
+  team:[
+    {from:'NDBS',to:'NDMD',by:'Reto Wuhrmann',at:'12.05.2026, 14:15',rmk:'Zurück an NDMD nach Rücksprache mit Teamleitung'},
+    {from:'NDMD',to:'NDBS',by:'Reto Wuhrmann',at:'12.05.2026, 11:02',rmk:'FTTH Entstörung läuft, NDBS ist zuständig'},
+  ],
+  ursache:[{from:'–',to:'Unterbruch Kommunikation',by:'Reto Wuhrmann',at:'12.05.2026, 10:45',rmk:'BGW antwortet nicht, FTTH Störung vermutet'}],
+  massnahme:[{from:'–',to:'Glasfaserstörung (Netadmin)',by:'Reto Wuhrmann',at:'12.05.2026, 10:46',rmk:'Netadmin Ticket #NT-2026-0834 eröffnet'}]
+};
+let activeField=null,chgSelected=null;
+
+function openChangeModal(field){
+  activeField=field;chgSelected=null;
+  closeHistory();
+  document.getElementById('chg-title').textContent=CHG_LABELS[field]+' ändern';
+  document.getElementById('chg-current').textContent=document.getElementById('val-'+field).textContent;
+  const drop=document.getElementById('chg-drop');
+  drop.innerHTML=CHG_OPTS[field].map(o=>`<div class="csel-opt" onclick="pickChange(this,'${o.replace(/'/g,"\\'")}')">${o}</div>`).join('');
+  document.getElementById('chg-csel-val').textContent='– Wählen –';
+  document.getElementById('chg-csel-val').classList.add('ph');
+  document.getElementById('chg-csel').classList.remove('open');
+  document.getElementById('chg-rmk').value='';
+  document.getElementById('chg-rmk').classList.remove('err');
+  document.getElementById('ov-chg').classList.add('on');
+}
+function pickChange(el,val){
+  chgSelected=val;
+  const v=document.getElementById('chg-csel-val');
+  v.textContent=val;v.classList.remove('ph');
+  el.closest('.csel').querySelectorAll('.csel-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');el.closest('.csel').classList.remove('open');
+}
+function saveChange(){
+  if(!chgSelected){alert('Bitte neuen Wert wählen.');return;}
+  const rmkEl=document.getElementById('chg-rmk');
+  const rmk=rmkEl.value.trim();
+  if(!rmk){rmkEl.classList.add('err');rmkEl.focus();return;}
+  rmkEl.classList.remove('err');
+  const old=document.getElementById('val-'+activeField).textContent;
+  document.getElementById('val-'+activeField).textContent=chgSelected;
+  CHG_HIST[activeField].unshift({from:old,to:chgSelected,by:'Reto Wuhrmann',at:'gerade eben',rmk});
+  closeChangeModal();
+}
+function closeChangeModal(){document.getElementById('ov-chg').classList.remove('on');document.getElementById('chg-csel').classList.remove('open');}
+
+/* History popover (clock icon) */
+function openHistory(field,btn){
+  closeHistory();
+  document.getElementById('hist-title').textContent='Verlauf: '+CHG_LABELS[field];
+  const hist=CHG_HIST[field];
+  document.getElementById('hist-body').innerHTML=hist.length===0
+    ?'<div class="hist-empty">Keine Änderungen</div>'
+    :hist.map(h=>`
+      <div class="hist-entry">
+        <div class="hist-val">${h.from}<span class="arr"> → </span>${h.to}</div>
+        <div class="hist-meta">${h.by} · ${h.at}</div>
+        ${h.rmk?`<div class="hist-rmk">"${h.rmk}"</div>`:''}
+      </div>`).join('');
+  const pop=document.getElementById('hist-pop');
+  const r=btn.getBoundingClientRect();
+  pop.style.top=(r.bottom+6)+'px';
+  pop.style.left=Math.max(8,r.right-300)+'px';
+  pop.classList.add('on');
+}
+function closeHistory(){document.getElementById('hist-pop').classList.remove('on');}
+document.addEventListener('click',function(e){
+  const pop=document.getElementById('hist-pop');
+  if(pop.classList.contains('on')&&!pop.contains(e.target)&&!e.target.closest('[title="Verlauf anzeigen"]'))
+    closeHistory();
+},{capture:true});
+
+/* Admin tabs */
+function setAdmTab(id,el){
+  document.querySelectorAll('.adm-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.adm-panel').forEach(p=>p.classList.remove('on'));
+  el.classList.add('on');document.getElementById('adm-'+id).classList.add('on');
+}
+
+updateStats();
+updateSortHeaders();
+render();
+</script>
+</body>
+</html>
